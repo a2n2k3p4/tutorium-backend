@@ -1,13 +1,13 @@
 package dbserver
-
+import "os"
 func NewConfig() *Config {
 	return &Config{
 		// Input your connection details here...
-		DBUser:     "postgres",
-		DBPassword: "2546",
-		DBHost:     "localhost",
-		DBPort:     "5432",
-		DBName:     "tutorium",
+		DBUser:     os.Getenv("DB_USER"),
+		DBPassword: os.Getenv("DB_PASSWORD"),
+		DBHost:     os.Getenv("DB_HOST"),
+		DBPort:     os.Getenv("DB_PORT"),
+		DBName:     os.Getenv("DB_NAME"),
 		//
 	}
 }
