@@ -27,7 +27,7 @@ CREATE TABLE users (
   last_name          VARCHAR(30) NOT NULL,
   gender             VARCHAR(6),
   phone_number       VARCHAR(20),
-  balance            NUMERIC(12,2) DEFAULT 0 CHECK (balance >= 0),,     --MAX BALANCE IS 10 Billion
+  balance            NUMERIC(12,2) DEFAULT 0 CHECK (balance >= 0),     --MAX BALANCE IS 10 Billion
   created_at         TIMESTAMP DEFAULT NOW(),
   learner_id         BIGINT  UNIQUE,
   teacher_id         BIGINT  UNIQUE,
