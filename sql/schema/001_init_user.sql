@@ -27,7 +27,7 @@ CREATE TABLE users (
   last_name          VARCHAR(30) NOT NULL,
   gender             VARCHAR(6),
   phone_number       VARCHAR(20),
-  balance            NUMERIC(12,2) DEFAULT 0 CHECK (balance >= 0),,     --MAX BALANCE IS 10 Billion
+  balance            NUMERIC(12,2) DEFAULT 0 CHECK (balance >= 0),     --MAX BALANCE IS 10 Billion
   created_at         TIMESTAMP DEFAULT NOW(),
   learner_id         BIGINT  UNIQUE,
   teacher_id         BIGINT  UNIQUE,
@@ -99,7 +99,10 @@ CREATE TABLE class_sessions (
   enrollment_deadline       TIMESTAMP   NOT NULL,
   class_start               TIMESTAMP   NOT NULL,
   class_finish              TIMESTAMP   NOT NULL,
-  class_status              VARCHAR(20)
+  class_status              VARCHAR(20),
+
+  CONSTRAINT fk_classsessions_classes
+  FOREIGN KEY (class_id) REFERENCES classes(class_id) ON DELETE CASCADE
 );
 
 -- 9. ClassCategories (many-to-many)
