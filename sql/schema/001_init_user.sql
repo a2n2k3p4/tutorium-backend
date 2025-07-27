@@ -99,7 +99,10 @@ CREATE TABLE class_sessions (
   enrollment_deadline       TIMESTAMP   NOT NULL,
   class_start               TIMESTAMP   NOT NULL,
   class_finish              TIMESTAMP   NOT NULL,
-  class_status              VARCHAR(20)
+  class_status              VARCHAR(20),
+
+  CONSTRAINT fk_classsessions_classes
+  FOREIGN KEY (class_id) REFERENCES classes(class_id) ON DELETE CASCADE
 );
 
 -- 9. ClassCategories (many-to-many)
