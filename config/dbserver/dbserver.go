@@ -1,12 +1,13 @@
 package dbserver
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+
 	"github.com/joho/godotenv"
 )
 
@@ -19,18 +20,19 @@ type Config struct {
 }
 
 func (c *Config) DBUrl() string {
-	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s", c.DBUser, c.DBPassword, c.DBHost, c.DBPort, c.DBName)
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Bangkok",
+		c.DBHost, c.DBUser, c.DBPassword, c.DBName, c.DBPort)
 }
 
-func ConnectDB(cfg *Config) (*pgxpool.Pool, error) {
+func ConnectDB(cfg *Config) (*gorm.DB, error) {
 	dbUrl := cfg.DBUrl()
 
-	pool, err := pgxpool.New(context.Background(), dbUrl)
+	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
 
-	return pool, nil
+	return db, nil
 }
 
 func NewConfig() *Config {
