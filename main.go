@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 
 	//module name "github.com/Parkorn/KUTutorium"
@@ -9,7 +8,19 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-//Before running the server, change config/dbserver/config.go to correct connection info
+// Before running the server, change config/dbserver/config.go to correct connection info
+// Define a struct matching the columns (use pointers for nullable FKs)
+type User struct {
+	UserID      int64   `json:"user_id" gorm:"column:user_id"`
+	FirstName   string  `json:"first_name" gorm:"column:first_name"`
+	LastName    string  `json:"last_name" gorm:"column:last_name"`
+	Gender      string  `json:"gender" gorm:"column:gender"`
+	PhoneNumber string  `json:"phone_number" gorm:"column:phone_number"`
+	Balance     float64 `json:"balance" gorm:"column:balance"`
+	LearnerID   *int64  `json:"learner_id,omitempty" gorm:"column:learner_id"`
+	TeacherID   *int64  `json:"teacher_id,omitempty" gorm:"column:teacher_id"`
+	AdminID     *int64  `json:"admin_id,omitempty" gorm:"column:admin_id"`
+}
 
 func main() {
 	cfg := dbserver.NewConfig()
@@ -18,65 +29,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to connect to DB: %v", err)
 	}
-	defer db.Close()
+
+	db.AutoMigrate(&User{})
 
 	app := fiber.New()
 
 	// Define the /users route and handler inline
 	app.Get("/users", func(c *fiber.Ctx) error {
-		// 1) Select all the columns you need
-		rows, err := db.Query(context.Background(), `
-        	SELECT 
-          	user_id,
-          	first_name,
-          	last_name,
-          	gender,
-          	phone_number,
-          	balance,
-          	learner_id,
-          	teacher_id,
-          	admin_id
-        	FROM users
-    	`)
-		if err != nil {
+		var users []User
+		if err := db.Find(&users).Error; err != nil {
 			return c.Status(500).SendString("Failed to query users")
 		}
-		defer rows.Close()
-
-		// 2) Define a struct matching the columns (use pointers for nullable FKs)
-		type User struct {
-			UserID      int64   `json:"user_id"`
-			FirstName   string  `json:"first_name"`
-			LastName    string  `json:"last_name"`
-			Gender      string  `json:"gender"`
-			PhoneNumber string  `json:"phone_number"`
-			Balance     float64 `json:"balance"`
-			LearnerID   *int64  `json:"learner_id,omitempty"`
-			TeacherID   *int64  `json:"teacher_id,omitempty"`
-			AdminID     *int64  `json:"admin_id,omitempty"`
-		}
-
-		users := make([]User, 0)
-
-		// 3) Scan into the matching fields in the same order
-		for rows.Next() {
-			var u User
-			if err := rows.Scan(
-				&u.UserID,
-				&u.FirstName,
-				&u.LastName,
-				&u.Gender,
-				&u.PhoneNumber,
-				&u.Balance,
-				&u.LearnerID,
-				&u.TeacherID,
-				&u.AdminID,
-			); err != nil {
-				return c.Status(500).SendString("Failed to scan user row")
-			}
-			users = append(users, u)
-		}
-
 		return c.JSON(users)
 	})
 
