@@ -5,6 +5,7 @@ import (
 
 	//module name "github.com/a2n2k3p4/tutorium-backend"
 	"github.com/a2n2k3p4/tutorium-backend/config/dbserver" //store functions related to connecting to PostgreSQL
+	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -18,7 +19,7 @@ func main() {
 		log.Fatalf("Unable to connect to DB: %v", err)
 	}
 
-	if err := db.AutoMigrate(&User{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}); err != nil {
 		log.Fatalf("Failed to migrate schema: %v", err)
 	}
 
@@ -26,7 +27,7 @@ func main() {
 
 	// Define the /users route and handler inline
 	app.Get("/users", func(c *fiber.Ctx) error {
-		var users []User
+		var users []models.User
 		if err := db.Find(&users).Error; err != nil {
 			return c.Status(500).SendString("Failed to query users")
 		}
