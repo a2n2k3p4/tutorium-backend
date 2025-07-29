@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	//module name "github.com/Parkorn/KUTutorium"
-	"github.com/Parkorn/KUTutorium/config/dbserver" //store functions related to connecting to PostgreSQL
+	//module name "github.com/a2n2k3p4/tutorium-backend"
+	"github.com/a2n2k3p4/tutorium-backend/config/dbserver" //store functions related to connecting to PostgreSQL
 	"github.com/gofiber/fiber/v2"
 )
 
