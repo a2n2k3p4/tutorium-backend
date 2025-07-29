@@ -30,7 +30,9 @@ func main() {
 		log.Fatalf("Unable to connect to DB: %v", err)
 	}
 
-	db.AutoMigrate(&User{})
+	if err := db.AutoMigrate(&User{}); err != nil {
+		log.Fatalf("Failed to migrate schema: %v", err)
+	}
 
 	app := fiber.New()
 
