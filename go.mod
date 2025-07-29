@@ -1,4 +1,4 @@
-module github.com/Parkorn/KUTutorium
+module github.com/a2n2k3p4/tutorium-backend
 
 go 1.24.4
 
