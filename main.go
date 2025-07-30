@@ -5,6 +5,7 @@ import (
 
 	//module name "github.com/a2n2k3p4/tutorium-backend"
 	"github.com/a2n2k3p4/tutorium-backend/config/dbserver" //store functions related to connecting to PostgreSQL
+	"github.com/a2n2k3p4/tutorium-backend/handlers"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 )
@@ -25,14 +26,8 @@ func main() {
 
 	app := fiber.New()
 
+	handlers.AdminRoutes(db, app) // Register admin routes
 	// Define the /users route and handler inline
-	app.Get("/users", func(c *fiber.Ctx) error {
-		var users []models.User
-		if err := db.Find(&users).Error; err != nil {
-			return c.Status(500).SendString("Failed to query users")
-		}
-		return c.JSON(users)
-	})
 
 	//เริ่มจากการสร้าง user แล้วการใส่ learner , teacher , admin ให้ user
 	// app.Post("/users/registerUser"       , func(c *fiber.Ctx) error {...}
