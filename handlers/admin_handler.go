@@ -13,11 +13,11 @@ var db *gorm.DB
 func AdminRoutes(database *gorm.DB, app *fiber.App) {
 	db = database
 
-	app.Post("/admins", CreateAdmin)
+	app.Post("/admin", CreateAdmin)
 	app.Get("/admins", GetAdmins)
-	app.Get("/admins/:id", GetAdmin)
-	// app.Put("/admins/:id", UpdateAdmin) No application logic for updating admin
-	app.Delete("/admins/:id", DeleteAdmin)
+	app.Get("/admin/:id", GetAdmin)
+	// app.Put("/admin/:id", UpdateAdmin) No application logic for updating admin
+	app.Delete("/admin/:id", DeleteAdmin)
 }
 
 func CreateAdmin(c *fiber.Ctx) error {

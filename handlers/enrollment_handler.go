@@ -8,77 +8,101 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
-
-func AdminRoutes(database *gorm.DB, app *fiber.App) {
+func EnrollmentRoutes(database *gorm.DB, app *fiber.App) {
 	db = database
 
-	app.Post("/admins", CreateAdmin)
-	app.Get("/admins", GetAdmins)
-	app.Get("/admins/:id", GetAdmin)
-	// app.Put("/admins/:id", UpdateAdmin) No application logic for updating admin
-	app.Delete("/admins/:id", DeleteAdmin)
+	app.Post("/enrollment", CreateEnrollment)
+	app.Get("/enrollments", GetEnrollments)
+	app.Get("/enrollment/:id", GetEnrollment)
+	app.Put("/enrollment/:id", UpdateEnrollment)
+	app.Delete("/enrollment/:id", DeleteEnrollment)
 }
 
-func CreateAdmin(c *fiber.Ctx) error {
-	var admin models.Admin
+func CreateEnrollment(c *fiber.Ctx) error {
+	var enrollment models.Enrollment
 
-	if err := c.BodyParser(&admin); err != nil {
+	if err := c.BodyParser(&enrollment); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Create(&admin)
-	return c.Status(200).JSON(admin)
+	db.Create(&enrollment)
+	return c.Status(200).JSON(enrollment)
 }
 
-func GetAdmins(c *fiber.Ctx) error {
-	admins := []models.Admin{}
-	db.Find(&admins)
+func GetEnrollments(c *fiber.Ctx) error {
+	enrollments := []models.Enrollment{}
+	db.Find(&enrollments)
 
-	return c.Status(200).JSON(admins)
+	return c.Status(200).JSON(enrollments)
 }
 
-func findadmin(id int, admin *models.Admin) error {
-	db.Find(&admin, "id = ?", id)
-	if admin.ID == 0 {
-		return errors.New("admin does not exist")
+func findenrollment(id int, enrollment *models.Enrollment) error {
+	db.Find(&enrollment, "id = ?", id)
+	if enrollment.ID == 0 {
+		return errors.New("enrollment does not exist")
 	}
 	return nil
 }
 
-func GetAdmin(c *fiber.Ctx) error {
+func GetEnrollment(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("ID")
 
-	var admin models.Admin
+	var enrollment models.Enrollment
 
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findadmin(id, &admin); err != nil {
+	if err := findenrollment(id, &enrollment); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(admin)
+	return c.Status(200).JSON(enrollment)
 }
 
-func DeleteAdmin(c *fiber.Ctx) error {
+func UpdateEnrollment(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
-	var admin models.Admin
+	var enrollment models.Enrollment
 
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findadmin(id, &admin)
+	err = findenrollment(id, &enrollment)
 
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err = db.Delete(&admin).Error; err != nil {
+	var enrollment_update models.Enrollment
+	if err := c.BodyParser(&enrollment_update); err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	db.Model(&enrollment).Updates(enrollment_update)
+
+	return c.Status(200).JSON(enrollment)
+
+}
+
+func DeleteEnrollment(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+
+	var enrollment models.Enrollment
+
+	if err != nil {
+		return c.Status(400).JSON("Please ensure that :id is an integer")
+	}
+
+	err = findenrollment(id, &enrollment)
+
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	if err = db.Delete(&enrollment).Error; err != nil {
 		return c.Status(404).JSON(err.Error())
 	}
-	return c.Status(200).JSON("Successfully deleted admin")
+	return c.Status(200).JSON("Successfully deleted enrollment")
 }

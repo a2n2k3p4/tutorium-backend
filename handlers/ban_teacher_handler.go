@@ -8,77 +8,101 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
-
-func AdminRoutes(database *gorm.DB, app *fiber.App) {
+func BanTeacherRoutes(database *gorm.DB, app *fiber.App) {
 	db = database
 
-	app.Post("/admins", CreateAdmin)
-	app.Get("/admins", GetAdmins)
-	app.Get("/admins/:id", GetAdmin)
-	// app.Put("/admins/:id", UpdateAdmin) No application logic for updating admin
-	app.Delete("/admins/:id", DeleteAdmin)
+	app.Post("/banteacher", CreateBanTeacher)
+	app.Get("/banteachers", GetBanTeachers)
+	app.Get("/banteacher/:id", GetBanTeacher)
+	app.Put("/banteacher/:id", UpdateBanTeacher)
+	app.Delete("/banteacher/:id", DeleteBanTeacher)
 }
 
-func CreateAdmin(c *fiber.Ctx) error {
-	var admin models.Admin
+func CreateBanTeacher(c *fiber.Ctx) error {
+	var banteacher models.BanDetailsTeacher
 
-	if err := c.BodyParser(&admin); err != nil {
+	if err := c.BodyParser(&banteacher); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Create(&admin)
-	return c.Status(200).JSON(admin)
+	db.Create(&banteacher)
+	return c.Status(200).JSON(banteacher)
 }
 
-func GetAdmins(c *fiber.Ctx) error {
-	admins := []models.Admin{}
-	db.Find(&admins)
+func GetBanTeachers(c *fiber.Ctx) error {
+	banteachers := []models.BanDetailsTeacher{}
+	db.Find(&banteachers)
 
-	return c.Status(200).JSON(admins)
+	return c.Status(200).JSON(banteachers)
 }
 
-func findadmin(id int, admin *models.Admin) error {
-	db.Find(&admin, "id = ?", id)
-	if admin.ID == 0 {
-		return errors.New("admin does not exist")
+func findbanteacher(id int, banteacher *models.BanDetailsTeacher) error {
+	db.Find(&banteacher, "id = ?", id)
+	if banteacher.ID == 0 {
+		return errors.New("ban teacher does not exist")
 	}
 	return nil
 }
 
-func GetAdmin(c *fiber.Ctx) error {
+func GetBanTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("ID")
 
-	var admin models.Admin
+	var banteacher models.BanDetailsTeacher
 
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findadmin(id, &admin); err != nil {
+	if err := findbanteacher(id, &banteacher); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(admin)
+	return c.Status(200).JSON(banteacher)
 }
 
-func DeleteAdmin(c *fiber.Ctx) error {
+func UpdateBanTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
-	var admin models.Admin
+	var banteacher models.BanDetailsTeacher
 
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findadmin(id, &admin)
+	err = findbanteacher(id, &banteacher)
 
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err = db.Delete(&admin).Error; err != nil {
+	var banteacher_update models.BanDetailsTeacher
+	if err := c.BodyParser(&banteacher_update); err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	db.Model(&banteacher).Updates(banteacher_update)
+
+	return c.Status(200).JSON(banteacher)
+
+}
+
+func DeleteBanTeacher(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+
+	var banteacher models.BanDetailsTeacher
+
+	if err != nil {
+		return c.Status(400).JSON("Please ensure that :id is an integer")
+	}
+
+	err = findbanteacher(id, &banteacher)
+
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	if err = db.Delete(&banteacher).Error; err != nil {
 		return c.Status(404).JSON(err.Error())
 	}
-	return c.Status(200).JSON("Successfully deleted admin")
+	return c.Status(200).JSON("Successfully deleted ban teacher")
 }

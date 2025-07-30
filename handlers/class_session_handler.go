@@ -8,77 +8,101 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
-
-func AdminRoutes(database *gorm.DB, app *fiber.App) {
+func ClassSessionRoutes(database *gorm.DB, app *fiber.App) {
 	db = database
 
-	app.Post("/admins", CreateAdmin)
-	app.Get("/admins", GetAdmins)
-	app.Get("/admins/:id", GetAdmin)
-	// app.Put("/admins/:id", UpdateAdmin) No application logic for updating admin
-	app.Delete("/admins/:id", DeleteAdmin)
+	app.Post("/class_session", CreateClassSession)
+	app.Get("/class_sessions", GetClassSessions)
+	app.Get("/class_session/:id", GetClassSession)
+	app.Put("/class_session/:id", UpdateClassSession)
+	app.Delete("/class_session/:id", DeleteClassSession)
 }
 
-func CreateAdmin(c *fiber.Ctx) error {
-	var admin models.Admin
+func CreateClassSession(c *fiber.Ctx) error {
+	var class_session models.ClassSession
 
-	if err := c.BodyParser(&admin); err != nil {
+	if err := c.BodyParser(&class_session); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Create(&admin)
-	return c.Status(200).JSON(admin)
+	db.Create(&class_session)
+	return c.Status(200).JSON(class_session)
 }
 
-func GetAdmins(c *fiber.Ctx) error {
-	admins := []models.Admin{}
-	db.Find(&admins)
+func GetClassSessions(c *fiber.Ctx) error {
+	class_sessions := []models.ClassSession{}
+	db.Find(&class_sessions)
 
-	return c.Status(200).JSON(admins)
+	return c.Status(200).JSON(class_sessions)
 }
 
-func findadmin(id int, admin *models.Admin) error {
-	db.Find(&admin, "id = ?", id)
-	if admin.ID == 0 {
-		return errors.New("admin does not exist")
+func findclasssession(id int, class_session *models.ClassSession) error {
+	db.Find(&class_session, "id = ?", id)
+	if class_session.ID == 0 {
+		return errors.New("class session does not exist")
 	}
 	return nil
 }
 
-func GetAdmin(c *fiber.Ctx) error {
+func GetClassSession(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("ID")
 
-	var admin models.Admin
+	var class_session models.ClassSession
 
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findadmin(id, &admin); err != nil {
+	if err := findclasssession(id, &class_session); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(admin)
+	return c.Status(200).JSON(class_session)
 }
 
-func DeleteAdmin(c *fiber.Ctx) error {
+func UpdateClassSession(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
-	var admin models.Admin
+	var class_session models.ClassSession
 
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findadmin(id, &admin)
+	err = findclasssession(id, &class_session)
 
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err = db.Delete(&admin).Error; err != nil {
+	var class_session_update models.ClassSession
+	if err := c.BodyParser(&class_session_update); err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	db.Model(&class_session).Updates(class_session_update)
+
+	return c.Status(200).JSON(class_session)
+
+}
+
+func DeleteClassSession(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+
+	var class_session models.ClassSession
+
+	if err != nil {
+		return c.Status(400).JSON("Please ensure that :id is an integer")
+	}
+
+	err = findclasssession(id, &class_session)
+
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	if err = db.Delete(&class_session).Error; err != nil {
 		return c.Status(404).JSON(err.Error())
 	}
-	return c.Status(200).JSON("Successfully deleted admin")
+	return c.Status(200).JSON("Successfully deleted class session")
 }
