@@ -12,7 +12,7 @@ func ClassCategoryRoutes(database *gorm.DB, app *fiber.App) {
 	db = database
 
 	app.Post("/class_category", CreateClassCategory)
-	app.Get("/class_category", GetClassCategories)
+	app.Get("/class_categories", GetClassCategories)
 	app.Get("/class_category/:id", GetClassCategory)
 	app.Put("/class_category/:id", UpdateClassCategory)
 	app.Delete("/class_category/:id", DeleteClassCategory)
