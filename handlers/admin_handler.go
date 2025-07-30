@@ -8,8 +8,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
-
 func AdminRoutes(database *gorm.DB, app *fiber.App) {
 	db = database
 
