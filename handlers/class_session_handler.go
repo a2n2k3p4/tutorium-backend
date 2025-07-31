@@ -42,7 +42,7 @@ func findclasssession(id int, class_session *models.ClassSession) error {
 }
 
 func GetClassSession(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("ID")
+	id, err := c.ParamsInt("id")
 
 	var class_session models.ClassSession
 
