@@ -1,7 +1,7 @@
 # Using Debian Bookworm as it's more stable than Ubuntu
 FROM debian:bookworm
 
-# update upgrade and dependency
+# Update, upgrade and install dependencies
 RUN apt-get update -y && apt-get full-upgrade -y && apt-get install -y \
     curl \
     wget \
