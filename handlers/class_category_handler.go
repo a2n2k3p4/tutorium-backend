@@ -42,7 +42,7 @@ func findclasscategory(id int, class_category *models.ClassCategory) error {
 }
 
 func GetClassCategory(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("ID")
+	id, err := c.ParamsInt("id")
 
 	var class_category models.ClassCategory
 
