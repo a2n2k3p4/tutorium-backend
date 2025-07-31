@@ -42,7 +42,7 @@ func findbanlearner(id int, banlearner *models.BanDetailsLearner) error {
 }
 
 func GetBanLearner(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("ID")
+	id, err := c.ParamsInt("id")
 
 	var banlearner models.BanDetailsLearner
 
