@@ -27,10 +27,10 @@ func CreateClass(c *fiber.Ctx) error {
 }
 
 func GetClasses(c *fiber.Ctx) error {
-	classs := []models.Class{}
-	db.Find(&classs)
+	classes := []models.Class{}
+	db.Find(&classes)
 
-	return c.Status(200).JSON(classs)
+	return c.Status(200).JSON(classes)
 }
 
 func findclass(id int, class *models.Class) error {
