@@ -20,7 +20,7 @@ RUN curl -OL https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && \
     tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && \
     rm go${GO_VERSION}.linux-amd64.tar.gz
 
-# add path go
+# Add Go to PATH
 ENV PATH="/usr/local/go/bin:${PATH}"
 
 WORKDIR /app
