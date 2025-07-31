@@ -1,4 +1,4 @@
-# debian version bookworm noob ubuntu better than
+# Using Debian Bookworm as it's more stable than Ubuntu
 FROM debian:bookworm
 
 # update upgrade and dependency
