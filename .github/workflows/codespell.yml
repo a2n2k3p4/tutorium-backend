@@ -1,4 +1,4 @@
-name: code spell
+name: codespell
 
 on:
   push:
