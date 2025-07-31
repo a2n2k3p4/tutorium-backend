@@ -4,12 +4,8 @@ services:
     container_name: go_app
     depends_on:
       - postgres
-    environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: myuser
-      DB_PASSWORD: mypassword
-      DB_NAME: mydatabase
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     restart: unless-stopped
@@ -17,14 +13,12 @@ services:
   postgres:
     image: postgres:latest
     container_name: postgres
-    environment:
-      POSTGRES_DB: mydatabase
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
+    env_file:
+      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "3000:3000"
     restart: unless-stopped
 
   pgadmin:
