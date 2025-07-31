@@ -5,12 +5,9 @@ import (
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
-func ClassRoutes(database *gorm.DB, app *fiber.App) {
-	db = database
-
+func ClassRoutes(app *fiber.App) {
 	app.Post("/class", CreateClass)
 	app.Get("/classes", GetClasses)
 	app.Get("/class/:id", GetClass)

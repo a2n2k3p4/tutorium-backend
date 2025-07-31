@@ -5,12 +5,9 @@ import (
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
-func ClassCategoryRoutes(database *gorm.DB, app *fiber.App) {
-	db = database
-
+func ClassCategoryRoutes(app *fiber.App) {
 	app.Post("/class_category", CreateClassCategory)
 	app.Get("/class_categories", GetClassCategories)
 	app.Get("/class_category/:id", GetClassCategory)

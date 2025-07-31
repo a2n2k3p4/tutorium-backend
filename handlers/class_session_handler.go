@@ -5,12 +5,9 @@ import (
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
-func ClassSessionRoutes(database *gorm.DB, app *fiber.App) {
-	db = database
-
+func ClassSessionRoutes(app *fiber.App) {
 	app.Post("/class_session", CreateClassSession)
 	app.Get("/class_sessions", GetClassSessions)
 	app.Get("/class_session/:id", GetClassSession)

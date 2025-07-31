@@ -5,12 +5,9 @@ import (
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
-func EnrollmentRoutes(database *gorm.DB, app *fiber.App) {
-	db = database
-
+func EnrollmentRoutes(app *fiber.App) {
 	app.Post("/enrollment", CreateEnrollment)
 	app.Get("/enrollments", GetEnrollments)
 	app.Get("/enrollment/:id", GetEnrollment)

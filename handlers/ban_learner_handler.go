@@ -5,12 +5,9 @@ import (
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
-func BanLearnerRoutes(database *gorm.DB, app *fiber.App) {
-	db = database
-
+func BanLearnerRoutes(app *fiber.App) {
 	app.Post("/banlearner", CreateBanLearner)
 	app.Get("/banlearners", GetBanLearners)
 	app.Get("/banlearner/:id", GetBanLearner)

@@ -10,11 +10,11 @@ var db *gorm.DB
 func AllRoutes(database *gorm.DB, app *fiber.App) {
 	db = database
 
-	AdminRoutes(database, app)
-	BanLearnerRoutes(database, app)
-	BanTeacherRoutes(database, app)
-	ClassCategoryRoutes(database, app)
-	ClassRoutes(database, app)
-	ClassSessionRoutes(database, app)
-	EnrollmentRoutes(database, app)
+	AdminRoutes(app)
+	BanLearnerRoutes(app)
+	BanTeacherRoutes(app)
+	ClassCategoryRoutes(app)
+	ClassRoutes(app)
+	ClassSessionRoutes(app)
+	EnrollmentRoutes(app)
 }

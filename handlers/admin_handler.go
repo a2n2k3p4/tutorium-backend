@@ -5,12 +5,9 @@ import (
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
-func AdminRoutes(database *gorm.DB, app *fiber.App) {
-	db = database
-
+func AdminRoutes(app *fiber.App) {
 	app.Post("/admin", CreateAdmin)
 	app.Get("/admins", GetAdmins)
 	app.Get("/admin/:id", GetAdmin)
