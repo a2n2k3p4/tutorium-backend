@@ -42,7 +42,7 @@ func findenrollment(id int, enrollment *models.Enrollment) error {
 }
 
 func GetEnrollment(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("ID")
+	id, err := c.ParamsInt("id")
 
 	var enrollment models.Enrollment
 
