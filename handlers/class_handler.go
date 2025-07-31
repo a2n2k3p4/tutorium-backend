@@ -42,7 +42,7 @@ func findclass(id int, class *models.Class) error {
 }
 
 func GetClass(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("ID")
+	id, err := c.ParamsInt("id")
 
 	var class models.Class
 
