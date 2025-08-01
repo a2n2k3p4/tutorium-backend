@@ -28,13 +28,20 @@ func CreateAdmin(c *fiber.Ctx) error {
 
 func GetAdmins(c *fiber.Ctx) error {
 	admins := []models.Admin{}
-	db.Find(&admins)
+	dbErr := db.Find(&admins).Error
+	if dbErr != nil {
+		return c.Status(404).JSON(dbErr)
+	}
 
 	return c.Status(200).JSON(admins)
 }
 
 func findadmin(id int, admin *models.Admin) error {
-	db.Find(&admin, "id = ?", id)
+	dbErr := db.Find(&admin, "id = ?", id).Error
+	if dbErr != nil {
+		return errors.New(dbErr.Error())
+	}
+
 	if admin.ID == 0 {
 		return errors.New("admin does not exist")
 	}
@@ -42,7 +49,7 @@ func findadmin(id int, admin *models.Admin) error {
 }
 
 func GetAdmin(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("ID")
+	id, err := c.ParamsInt("id")
 
 	var admin models.Admin
 

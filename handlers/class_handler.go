@@ -27,14 +27,21 @@ func CreateClass(c *fiber.Ctx) error {
 }
 
 func GetClasses(c *fiber.Ctx) error {
-	classs := []models.Class{}
-	db.Find(&classs)
+	classes := []models.Class{}
+	dbErr := db.Find(&classes).Error
+	if dbErr != nil {
+		return c.Status(404).JSON(dbErr)
+	}
 
-	return c.Status(200).JSON(classs)
+	return c.Status(200).JSON(classes)
 }
 
 func findclass(id int, class *models.Class) error {
-	db.Find(&class, "id = ?", id)
+	dbErr := db.Find(&class, "id = ?", id).Error
+	if dbErr != nil {
+		return errors.New(dbErr.Error())
+	}
+
 	if class.ID == 0 {
 		return errors.New("class does not exist")
 	}
@@ -42,7 +49,7 @@ func findclass(id int, class *models.Class) error {
 }
 
 func GetClass(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("ID")
+	id, err := c.ParamsInt("id")
 
 	var class models.Class
 

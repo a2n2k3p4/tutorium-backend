@@ -28,13 +28,20 @@ func CreateEnrollment(c *fiber.Ctx) error {
 
 func GetEnrollments(c *fiber.Ctx) error {
 	enrollments := []models.Enrollment{}
-	db.Find(&enrollments)
+	dbErr := db.Find(&enrollments).Error
+	if dbErr != nil {
+		return c.Status(404).JSON(dbErr)
+	}
 
 	return c.Status(200).JSON(enrollments)
 }
 
 func findenrollment(id int, enrollment *models.Enrollment) error {
-	db.Find(&enrollment, "id = ?", id)
+	dbErr := db.Find(&enrollment, "id = ?", id).Error
+	if dbErr != nil {
+		return errors.New(dbErr.Error())
+	}
+
 	if enrollment.ID == 0 {
 		return errors.New("enrollment does not exist")
 	}
@@ -42,7 +49,7 @@ func findenrollment(id int, enrollment *models.Enrollment) error {
 }
 
 func GetEnrollment(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("ID")
+	id, err := c.ParamsInt("id")
 
 	var enrollment models.Enrollment
 

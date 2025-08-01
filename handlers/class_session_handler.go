@@ -28,13 +28,20 @@ func CreateClassSession(c *fiber.Ctx) error {
 
 func GetClassSessions(c *fiber.Ctx) error {
 	class_sessions := []models.ClassSession{}
-	db.Find(&class_sessions)
+	dbErr := db.Find(&class_sessions).Error
+	if dbErr != nil {
+		return c.Status(404).JSON(dbErr)
+	}
 
 	return c.Status(200).JSON(class_sessions)
 }
 
 func findclasssession(id int, class_session *models.ClassSession) error {
-	db.Find(&class_session, "id = ?", id)
+	dbErr := db.Find(&class_session, "id = ?", id).Error
+	if dbErr != nil {
+		return errors.New(dbErr.Error())
+	}
+
 	if class_session.ID == 0 {
 		return errors.New("class session does not exist")
 	}
@@ -42,7 +49,7 @@ func findclasssession(id int, class_session *models.ClassSession) error {
 }
 
 func GetClassSession(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("ID")
+	id, err := c.ParamsInt("id")
 
 	var class_session models.ClassSession
 

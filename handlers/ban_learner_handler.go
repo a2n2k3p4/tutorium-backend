@@ -28,13 +28,20 @@ func CreateBanLearner(c *fiber.Ctx) error {
 
 func GetBanLearners(c *fiber.Ctx) error {
 	banlearners := []models.BanDetailsLearner{}
-	db.Find(&banlearners)
+	dbErr := db.Find(&banlearners).Error
+	if dbErr != nil {
+		return c.Status(404).JSON(dbErr)
+	}
 
 	return c.Status(200).JSON(banlearners)
 }
 
 func findbanlearner(id int, banlearner *models.BanDetailsLearner) error {
-	db.Find(&banlearner, "id = ?", id)
+	dbErr := db.Find(&banlearner, "id = ?", id).Error
+	if dbErr != nil {
+		return errors.New(dbErr.Error())
+	}
+
 	if banlearner.ID == 0 {
 		return errors.New("ban learner does not exist")
 	}
@@ -42,7 +49,7 @@ func findbanlearner(id int, banlearner *models.BanDetailsLearner) error {
 }
 
 func GetBanLearner(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("ID")
+	id, err := c.ParamsInt("id")
 
 	var banlearner models.BanDetailsLearner
 

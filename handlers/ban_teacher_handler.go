@@ -28,13 +28,20 @@ func CreateBanTeacher(c *fiber.Ctx) error {
 
 func GetBanTeachers(c *fiber.Ctx) error {
 	banteachers := []models.BanDetailsTeacher{}
-	db.Find(&banteachers)
+	dbErr := db.Find(&banteachers).Error
+	if dbErr != nil {
+		return c.Status(404).JSON(dbErr)
+	}
 
 	return c.Status(200).JSON(banteachers)
 }
 
 func findbanteacher(id int, banteacher *models.BanDetailsTeacher) error {
-	db.Find(&banteacher, "id = ?", id)
+	dbErr := db.Find(&banteacher, "id = ?", id).Error
+	if dbErr != nil {
+		return errors.New(dbErr.Error())
+	}
+
 	if banteacher.ID == 0 {
 		return errors.New("ban teacher does not exist")
 	}
@@ -42,7 +49,7 @@ func findbanteacher(id int, banteacher *models.BanDetailsTeacher) error {
 }
 
 func GetBanTeacher(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("ID")
+	id, err := c.ParamsInt("id")
 
 	var banteacher models.BanDetailsTeacher
 

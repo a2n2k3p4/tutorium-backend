@@ -28,13 +28,20 @@ func CreateClassCategory(c *fiber.Ctx) error {
 
 func GetClassCategories(c *fiber.Ctx) error {
 	class_categories := []models.ClassCategory{}
-	db.Find(&class_categories)
+	dbErr := db.Find(&class_categories).Error
+	if dbErr != nil {
+		return c.Status(404).JSON(dbErr)
+	}
 
 	return c.Status(200).JSON(class_categories)
 }
 
 func findclasscategory(id int, class_category *models.ClassCategory) error {
-	db.Find(&class_category, "id = ?", id)
+	dbErr := db.Find(&class_category, "id = ?", id).Error
+	if dbErr != nil {
+		return errors.New(dbErr.Error())
+	}
+
 	if class_category.ID == 0 {
 		return errors.New("class category does not exist")
 	}
@@ -42,7 +49,7 @@ func findclasscategory(id int, class_category *models.ClassCategory) error {
 }
 
 func GetClassCategory(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("ID")
+	id, err := c.ParamsInt("id")
 
 	var class_category models.ClassCategory
 
