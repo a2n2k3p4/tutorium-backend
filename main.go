@@ -29,11 +29,11 @@ func main() {
 	handlers.AllRoutes(db, app) // Register admin routes
 	// Define the /users route and handler inline
 
-	//เริ่มจากการสร้าง user แล้วการใส่ learner , teacher , admin ให้ user
+	// เริ่มจากการสร้าง user แล้วการใส่ learner , teacher , admin ให้ user
 	// app.Post("/users/registerUser"       , func(c *fiber.Ctx) error {...}
 	// app.Post("/users/:id/registerLearner", func(c *fiber.Ctx) error {...})
 	// app.Post("/users/:id/registerTeacher", func(c *fiber.Ctx) error {...})
 	// app.Post("/users/:id/registerAdmin"  , func(c *fiber.Ctx) error {...})
 
-	log.Fatal(app.Listen(":3000")) //using PORT 3000 (localhost:3000)
+	log.Fatal(app.Listen(":8000")) // using PORT 8000 (localhost:8000)
 }
