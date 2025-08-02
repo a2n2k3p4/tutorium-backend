@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type ClassCategory struct {
 	gorm.Model
-	ClassCategory string `gorm:"size:30;primaryKey"`
+	ClassCategory string `gorm:"size:30"`
 
-	Class Class `gorm:"foreignKey:ID;references:ID;constraint:OnDelete:CASCADE"`
+	Classes []Class `gorm:"many2many:class_class_categories;constraint:OnDelete:CASCADE"`
 }
