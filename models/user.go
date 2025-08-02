@@ -1,14 +1,25 @@
 package models
 
+import (
+	"gorm.io/gorm"
+)
+
 // Define a struct matching the columns (use pointers for nullable FKs)
 type User struct {
-	UserID      int64   `json:"user_id" gorm:"column:user_id"`
-	FirstName   string  `json:"first_name" gorm:"column:first_name"`
-	LastName    string  `json:"last_name" gorm:"column:last_name"`
-	Gender      string  `json:"gender" gorm:"column:gender"`
-	PhoneNumber string  `json:"phone_number" gorm:"column:phone_number"`
-	Balance     float64 `json:"balance" gorm:"column:balance"`
-	LearnerID   *int64  `json:"learner_id,omitempty" gorm:"column:learner_id"`
-	TeacherID   *int64  `json:"teacher_id,omitempty" gorm:"column:teacher_id"`
-	AdminID     *int64  `json:"admin_id,omitempty" gorm:"column:admin_id"`
+	gorm.Model
+	SessionID      string `gorm:"size:255"`
+	ProfilePicture []byte
+	FirstName      string  `gorm:"size:30;not null"`
+	LastName       string  `gorm:"size:30;not null"`
+	Gender         string  `gorm:"size:6"`
+	PhoneNumber    string  `gorm:"size:20"`
+	Balance        float64 `gorm:"type:numeric(12,2);default:0;check:balance >= 0"`
+
+	LearnerID *uint `gorm:"unique"`
+	TeacherID *uint `gorm:"unique"`
+	AdminID   *uint `gorm:"unique"`
+
+	Learner *Learner `gorm:"foreignKey:LearnerID;references:ID;constraint:OnDelete:SET NULL;"`
+	Teacher *Teacher `gorm:"foreignKey:TeacherID;references:ID;constraint:OnDelete:SET NULL;"`
+	Admin   *Admin   `gorm:"foreignKey:AdminID;references:ID;constraint:OnDelete:SET NULL;"`
 }
