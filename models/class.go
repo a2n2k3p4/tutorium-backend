@@ -13,5 +13,6 @@ type Class struct {
 	ClassDescription   string    `gorm:"size:1000"`
 	EnrollmentDeadline time.Time `gorm:"not null"`
 
-	Teacher Teacher `gorm:"foreignKey:TeacherID;references:ID;constraint:OnDelete:CASCADE"`
+	Teacher    Teacher         `gorm:"foreignKey:TeacherID;references:ID;constraint:OnDelete:CASCADE"`
+	Categories []ClassCategory `gorm:"many2many:class_class_categories;constraint:OnDelete:CASCADE"`
 }
