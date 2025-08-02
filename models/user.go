@@ -1,8 +1,6 @@
 package models
 
 import (
-	"time"
-
 	"gorm.io/gorm"
 )
 
@@ -11,12 +9,11 @@ type User struct {
 	gorm.Model
 	SessionID      string `gorm:"size:255"`
 	ProfilePicture []byte
-	FirstName      string    `gorm:"size:30;not null"`
-	LastName       string    `gorm:"size:30;not null"`
-	Gender         string    `gorm:"size:6"`
-	PhoneNumber    string    `gorm:"size:20"`
-	Balance        float64   `gorm:"type:numeric(12,2);default:0;check:balance >= 0"`
-	CreatedAt      time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+	FirstName      string  `gorm:"size:30;not null"`
+	LastName       string  `gorm:"size:30;not null"`
+	Gender         string  `gorm:"size:6"`
+	PhoneNumber    string  `gorm:"size:20"`
+	Balance        float64 `gorm:"type:numeric(12,2);default:0;check:balance >= 0"`
 
 	LearnerID *uint `gorm:"unique"`
 	TeacherID *uint `gorm:"unique"`
