@@ -81,7 +81,7 @@ func UpdateReport(c *fiber.Ctx) error {
 
 	var report_updated models.Report
 	if err := c.BodyParser(&report_updated); err != nil {
-		return c.Status(500).JSON(err.Error())
+		return c.Status(400).JSON(err.Error())
 	}
 
 	if err := db.Model(&report).Updates(report_updated).Error; err != nil {
