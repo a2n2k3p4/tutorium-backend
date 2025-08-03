@@ -39,7 +39,7 @@ func GetReports(c *fiber.Ctx) error {
 }
 
 func findReport(id int, report *models.Report) error {
-	return db.First(report, "id = ?", id).Error
+	return db.Preload("Reporter").Preload("Reported").First(report, "id = ?", id).Error
 }
 
 func GetReport(c *fiber.Ctx) error {
