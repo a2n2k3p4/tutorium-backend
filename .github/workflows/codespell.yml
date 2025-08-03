@@ -17,10 +17,3 @@ jobs:
 
       - name: setup spell check
         uses: codespell-project/actions-codespell@v2
-        with:
-          path: .
-          builtin: clear,rare
-          check_filenames: true
-          check_hidden: true
-          ignore_words_file: .codespellignore
-          only_warn: 1

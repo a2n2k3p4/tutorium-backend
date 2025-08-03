@@ -89,7 +89,6 @@ func UpdateBanTeacher(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(banteacher)
-
 }
 
 func DeleteBanTeacher(c *fiber.Ctx) error {

@@ -1,0 +1,127 @@
+definitions:
+  models.Admin:
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is the API for Tutorium Backend system.
+  license:
+    name: AGPL-3.0
+    url: https://www.gnu.org/licenses/agpl-3.0.en.html
+  termsOfService: http://swagger.io/terms/
+  title: Tutorium Backend API
+  version: "1.0"
+paths:
+  /admin:
+    post:
+      consumes:
+      - application/json
+      description: Create a new admin with the provided data
+      parameters:
+      - description: Admin data
+        in: body
+        name: admin
+        required: true
+        schema:
+          $ref: '#/definitions/models.Admin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Admin'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new admin
+      tags:
+      - admins
+  /admin/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a specific admin by their ID
+      parameters:
+      - description: Admin ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted admin
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request - Invalid ID or admin not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error during deletion
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete admin by ID
+      tags:
+      - admins
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a specific admin by their ID
+      parameters:
+      - description: Admin ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Admin'
+        "400":
+          description: Bad request - Invalid ID or admin not found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get admin by ID
+      tags:
+      - admins
+  /admins:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all admins
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Admin'
+            type: array
+        "404":
+          description: Admins not found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all admins
+      tags:
+      - admins
+schemes:
+- http
+- https
+swagger: "2.0"
