@@ -27,7 +27,7 @@ func CreateReport(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(report)
+	return c.Status(201).JSON(report)
 }
 
 func GetReports(c *fiber.Ctx) error {

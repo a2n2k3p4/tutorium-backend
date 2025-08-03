@@ -27,7 +27,7 @@ func CreateNotification(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(notification)
+	return c.Status(201).JSON(notification)
 }
 
 func GetNotifications(c *fiber.Ctx) error {

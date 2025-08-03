@@ -27,7 +27,7 @@ func CreateTeacher(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(teacher)
+	return c.Status(201).JSON(teacher)
 }
 
 func GetTeachers(c *fiber.Ctx) error {

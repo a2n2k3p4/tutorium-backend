@@ -27,7 +27,7 @@ func CreateClassCategory(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(class_category)
+	return c.Status(201).JSON(class_category)
 }
 
 func GetClassCategories(c *fiber.Ctx) error {

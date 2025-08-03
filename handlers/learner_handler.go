@@ -27,7 +27,7 @@ func CreateLearner(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(learner)
+	return c.Status(201).JSON(learner)
 }
 
 func GetLearners(c *fiber.Ctx) error {

@@ -26,7 +26,7 @@ func CreateClass(c *fiber.Ctx) error {
 	if err := db.Create(&class).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
-	return c.Status(200).JSON(class)
+	return c.Status(201).JSON(class)
 }
 
 func GetClasses(c *fiber.Ctx) error {
