@@ -82,7 +82,7 @@ func UpdateTeacher(c *fiber.Ctx) error {
 
 	var teacher_update models.Teacher
 	if err := c.BodyParser(&teacher_update); err != nil {
-		return c.Status(500).JSON(err.Error())
+		return c.Status(400).JSON(err.Error())
 	}
 
 	if err := db.Model(&teacher).Updates(teacher_update).Error; err != nil {
