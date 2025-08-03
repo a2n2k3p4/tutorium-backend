@@ -8,8 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func NotificationRoutes(database *gorm.DB, app *fiber.App) {
-	db = database
+func NotificationRoutes(app *fiber.App) {
 	app.Post("/notification", CreateNotification)
 	app.Get("/notifications", GetNotifications)
 	app.Get("/notification/:id", GetNotification)
