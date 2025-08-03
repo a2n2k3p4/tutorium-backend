@@ -15,6 +15,16 @@ func AdminRoutes(app *fiber.App) {
 	app.Delete("/admin/:id", DeleteAdmin)
 }
 
+// CreateAdmin godoc
+// @Summary Create a new admin
+// @Description Create a new admin with the provided data
+// @Tags admins
+// @Accept json
+// @Produce json
+// @Param admin body models.Admin true "Admin data"
+// @Success 200 {object} models.Admin
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Router /admin [post]
 func CreateAdmin(c *fiber.Ctx) error {
 	var admin models.Admin
 
@@ -26,6 +36,15 @@ func CreateAdmin(c *fiber.Ctx) error {
 	return c.Status(200).JSON(admin)
 }
 
+// GetAdmins godoc
+// @Summary Get all admins
+// @Description Retrieve a list of all admins
+// @Tags admins
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.Admin
+// @Failure 404 {object} map[string]interface{} "Admins not found"
+// @Router /admins [get]
 func GetAdmins(c *fiber.Ctx) error {
 	admins := []models.Admin{}
 	dbErr := db.Find(&admins).Error
@@ -48,6 +67,16 @@ func findadmin(id int, admin *models.Admin) error {
 	return nil
 }
 
+// GetAdmin godoc
+// @Summary Get admin by ID
+// @Description Retrieve a specific admin by their ID
+// @Tags admins
+// @Accept json
+// @Produce json
+// @Param id path int true "Admin ID"
+// @Success 200 {object} models.Admin
+// @Failure 400 {object} map[string]interface{} "Bad request - Invalid ID or admin not found"
+// @Router /admin/{id} [get]
 func GetAdmin(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -64,6 +93,17 @@ func GetAdmin(c *fiber.Ctx) error {
 	return c.Status(200).JSON(admin)
 }
 
+// DeleteAdmin godoc
+// @Summary Delete admin by ID
+// @Description Delete a specific admin by their ID
+// @Tags admins
+// @Accept json
+// @Produce json
+// @Param id path int true "Admin ID"
+// @Success 200 {object} map[string]interface{} "Successfully deleted admin"
+// @Failure 400 {object} map[string]interface{} "Bad request - Invalid ID or admin not found"
+// @Failure 404 {object} map[string]interface{} "Database error during deletion"
+// @Router /admin/{id} [delete]
 func DeleteAdmin(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -74,7 +114,6 @@ func DeleteAdmin(c *fiber.Ctx) error {
 	}
 
 	err = findadmin(id, &admin)
-
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
