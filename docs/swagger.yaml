@@ -9,8 +9,8 @@ info:
     url: http://www.swagger.io/support
   description: This is the API for Tutorium Backend system.
   license:
-    name: MIT
-    url: https://opensource.org/licenses/MIT
+    name: GNU Affero General Public License v3.0
+    url: https://www.gnu.org/licenses/agpl-3.0.html
   termsOfService: http://swagger.io/terms/
   title: Tutorium Backend API
   version: "1.0"
