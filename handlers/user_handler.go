@@ -27,7 +27,7 @@ func CreateUser(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(user)
+	return c.Status(201).JSON(user)
 }
 
 func GetUsers(c *fiber.Ctx) error {
