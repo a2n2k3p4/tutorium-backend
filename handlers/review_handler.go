@@ -85,7 +85,7 @@ func UpdateReview(c *fiber.Ctx) error {
 
 	var review_updated models.Review
 	if err := c.BodyParser(&review_updated); err != nil {
-		return c.Status(500).JSON(err.Error())
+		return c.Status(400).JSON(err.Error())
 	}
 
 	if review_updated.Rating < 1 || review_updated.Rating > 5 {
