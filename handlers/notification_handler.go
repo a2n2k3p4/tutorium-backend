@@ -81,7 +81,7 @@ func UpdateNotification(c *fiber.Ctx) error {
 
 	var notification_updated models.Notification
 	if err := c.BodyParser(&notification_updated); err != nil {
-		return c.Status(500).JSON(err.Error())
+		return c.Status(400).JSON(err.Error())
 	}
 
 	if err := db.Model(&notification).Updates(notification_updated).Error; err != nil {
