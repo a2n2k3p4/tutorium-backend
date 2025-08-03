@@ -17,4 +17,10 @@ func AllRoutes(database *gorm.DB, app *fiber.App) {
 	ClassRoutes(app)
 	ClassSessionRoutes(app)
 	EnrollmentRoutes(app)
+	LearnerRoutes(app)
+	NotificationRoutes(app)
+	ReportRoutes(app)
+	ReviewRoutes(app)
+	TeacherRoutes(app)
+	UserRoutes(app)
 }
