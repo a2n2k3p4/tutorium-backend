@@ -102,7 +102,7 @@ func GetAdmin(c *fiber.Ctx) error {
 // @Param id path int true "Admin ID"
 // @Success 200 {object} map[string]interface{} "Successfully deleted admin"
 // @Failure 400 {object} map[string]interface{} "Bad request - Invalid ID or admin not found"
-// @Failure 404 {object} map[string]interface{} "Database error during deletion"
+// @Failure 500 {object} map[string]interface{} "Internal server error during deletion"
 // @Router /admin/{id} [delete]
 func DeleteAdmin(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
