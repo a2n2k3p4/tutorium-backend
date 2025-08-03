@@ -16,8 +16,8 @@ const docTemplate = `{
             "email": "support@swagger.io"
         },
         "license": {
-            "name": "MIT",
-            "url": "https://opensource.org/licenses/MIT"
+            "name": "AGPL-3.0",
+            "url": "https://www.gnu.org/licenses/agpl-3.0.en.html"
         },
         "version": "{{.Version}}"
     },
@@ -139,8 +139,8 @@ const docTemplate = `{
                             "additionalProperties": true
                         }
                     },
-                    "404": {
-                        "description": "Database error during deletion",
+                    "500": {
+                        "description": "Internal server error during deletion",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true

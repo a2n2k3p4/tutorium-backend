@@ -74,7 +74,6 @@ func UpdateBanTeacher(c *fiber.Ctx) error {
 	}
 
 	err = findbanteacher(id, &banteacher)
-
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
@@ -87,7 +86,6 @@ func UpdateBanTeacher(c *fiber.Ctx) error {
 	db.Model(&banteacher).Updates(banteacher_update)
 
 	return c.Status(200).JSON(banteacher)
-
 }
 
 func DeleteBanTeacher(c *fiber.Ctx) error {
@@ -100,7 +98,6 @@ func DeleteBanTeacher(c *fiber.Ctx) error {
 	}
 
 	err = findbanteacher(id, &banteacher)
-
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}

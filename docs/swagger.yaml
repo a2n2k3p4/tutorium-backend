@@ -9,8 +9,8 @@ info:
     url: http://www.swagger.io/support
   description: This is the API for Tutorium Backend system.
   license:
-    name: GNU Affero General Public License v3.0
-    url: https://www.gnu.org/licenses/agpl-3.0.html
+    name: AGPL-3.0
+    url: https://www.gnu.org/licenses/agpl-3.0.en.html
   termsOfService: http://swagger.io/terms/
   title: Tutorium Backend API
   version: "1.0"
@@ -66,8 +66,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
-        "404":
-          description: Database error during deletion
+        "500":
+          description: Internal server error during deletion
           schema:
             additionalProperties: true
             type: object
