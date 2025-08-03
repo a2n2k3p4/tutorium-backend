@@ -79,10 +79,6 @@ func UpdateEnrollment(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
-	}
-
 	var enrollment_update models.Enrollment
 	if err := c.BodyParser(&enrollment_update); err != nil {
 		return c.Status(400).JSON(err.Error())
