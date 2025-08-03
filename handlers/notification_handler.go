@@ -39,13 +39,7 @@ func GetNotifications(c *fiber.Ctx) error {
 }
 
 func findNotification(id int, notification *models.Notification) error {
-	if err := db.Preload("User").First(notification, "id = ?", id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errors.New("notification does not exist")
-		}
-		return err
-	}
-	return nil
+	return db.Preload("User").First(notification, "id = ?", id).Error
 }
 
 func GetNotification(c *fiber.Ctx) error {
@@ -57,8 +51,12 @@ func GetNotification(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findNotification(id, &notification); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findNotification(id, &notification)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("notification not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(notification)
@@ -73,8 +71,12 @@ func UpdateNotification(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findNotification(id, &notification); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findNotification(id, &notification)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("notification not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	var notification_updated models.Notification
@@ -98,12 +100,16 @@ func DeleteNotification(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findNotification(id, &notification); err != nil {
-		return c.Status(404).JSON(err.Error())
+	err = findNotification(id, &notification)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("notification not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	if err := db.Delete(&notification).Error; err != nil {
-		return c.Status(404).JSON(err.Error())
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON("Successfully deleted notification")

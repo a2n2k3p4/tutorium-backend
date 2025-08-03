@@ -5,6 +5,7 @@ import (
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 func EnrollmentRoutes(app *fiber.App) {
@@ -22,30 +23,23 @@ func CreateEnrollment(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Create(&enrollment)
+	if err := db.Create(&enrollment).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	return c.Status(200).JSON(enrollment)
 }
 
 func GetEnrollments(c *fiber.Ctx) error {
 	enrollments := []models.Enrollment{}
-	dbErr := db.Find(&enrollments).Error
-	if dbErr != nil {
-		return c.Status(404).JSON(dbErr)
+	if err := db.Preload("Learner").Preload("Class").Find(&enrollments).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
 	}
-
 	return c.Status(200).JSON(enrollments)
 }
 
-func findenrollment(id int, enrollment *models.Enrollment) error {
-	dbErr := db.Find(&enrollment, "id = ?", id).Error
-	if dbErr != nil {
-		return errors.New(dbErr.Error())
-	}
-
-	if enrollment.ID == 0 {
-		return errors.New("enrollment does not exist")
-	}
-	return nil
+func findEnrollment(id int, enrollment *models.Enrollment) error {
+	return db.Preload("Learner").Preload("Class").First(enrollment, "id = ?", id).Error
 }
 
 func GetEnrollment(c *fiber.Ctx) error {
@@ -57,8 +51,12 @@ func GetEnrollment(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findenrollment(id, &enrollment); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findEnrollment(id, &enrollment)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("enrollment not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(enrollment)
@@ -73,7 +71,13 @@ func UpdateEnrollment(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findenrollment(id, &enrollment)
+	err = findEnrollment(id, &enrollment)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("enrollment not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
+	}
 
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
@@ -84,7 +88,9 @@ func UpdateEnrollment(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Model(&enrollment).Updates(enrollment_update)
+	if err := db.Model(&enrollment).Updates(enrollment_update).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	return c.Status(200).JSON(enrollment)
 
@@ -99,14 +105,16 @@ func DeleteEnrollment(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findenrollment(id, &enrollment)
-
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findEnrollment(id, &enrollment)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("enrollment not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	if err = db.Delete(&enrollment).Error; err != nil {
-		return c.Status(404).JSON(err.Error())
+		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted enrollment")
 }

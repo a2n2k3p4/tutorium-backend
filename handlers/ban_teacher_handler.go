@@ -5,6 +5,7 @@ import (
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 func BanTeacherRoutes(app *fiber.App) {
@@ -22,30 +23,23 @@ func CreateBanTeacher(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Create(&banteacher)
+	if err := db.Create(&banteacher).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 	return c.Status(200).JSON(banteacher)
 }
 
 func GetBanTeachers(c *fiber.Ctx) error {
 	banteachers := []models.BanDetailsTeacher{}
-	dbErr := db.Find(&banteachers).Error
-	if dbErr != nil {
-		return c.Status(404).JSON(dbErr)
+	if err := db.Preload("Teacher").Find(&banteachers).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(banteachers)
 }
 
-func findbanteacher(id int, banteacher *models.BanDetailsTeacher) error {
-	dbErr := db.Find(&banteacher, "id = ?", id).Error
-	if dbErr != nil {
-		return errors.New(dbErr.Error())
-	}
-
-	if banteacher.ID == 0 {
-		return errors.New("ban teacher does not exist")
-	}
-	return nil
+func findBanTeacher(id int, banteacher *models.BanDetailsTeacher) error {
+	return db.Preload("Teacher").First(banteacher, "id = ?", id).Error
 }
 
 func GetBanTeacher(c *fiber.Ctx) error {
@@ -57,8 +51,12 @@ func GetBanTeacher(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findbanteacher(id, &banteacher); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findBanTeacher(id, &banteacher)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("banteacher not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(banteacher)
@@ -73,10 +71,12 @@ func UpdateBanTeacher(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findbanteacher(id, &banteacher)
-
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findBanTeacher(id, &banteacher)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("banteacher not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	var banteacher_update models.BanDetailsTeacher
@@ -84,7 +84,9 @@ func UpdateBanTeacher(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Model(&banteacher).Updates(banteacher_update)
+	if err := db.Model(&banteacher).Updates(banteacher_update).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	return c.Status(200).JSON(banteacher)
 
@@ -99,14 +101,16 @@ func DeleteBanTeacher(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findbanteacher(id, &banteacher)
-
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findBanTeacher(id, &banteacher)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("banteacher not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	if err = db.Delete(&banteacher).Error; err != nil {
-		return c.Status(404).JSON(err.Error())
+		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted ban teacher")
 }

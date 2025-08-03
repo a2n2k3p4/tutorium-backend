@@ -40,13 +40,7 @@ func GetLearners(c *fiber.Ctx) error {
 }
 
 func findLearner(id int, learner *models.Learner) error {
-	if err := db.First(learner, "id = ?", id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errors.New("learner does not exist")
-		}
-		return err
-	}
-	return nil
+	return db.First(learner, "id = ?", id).Error
 }
 
 func GetLearner(c *fiber.Ctx) error {
@@ -58,8 +52,12 @@ func GetLearner(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findLearner(id, &learner); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findLearner(id, &learner)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("Learner not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(learner)
@@ -74,12 +72,16 @@ func DeleteLearner(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err = findLearner(id, &learner); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findLearner(id, &learner)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("Learner not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	if err = db.Delete(&learner).Error; err != nil {
-		return c.Status(404).JSON(err.Error())
+		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted Learner")
 }

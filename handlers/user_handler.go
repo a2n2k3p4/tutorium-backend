@@ -40,13 +40,7 @@ func GetUsers(c *fiber.Ctx) error {
 }
 
 func findUser(id int, user *models.User) error {
-	if err := db.First(user, "id = ?", id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errors.New("user does not exist")
-		}
-		return err
-	}
-	return nil
+	return db.First(user, "id = ?", id).Error
 }
 
 func GetUser(c *fiber.Ctx) error {
@@ -58,8 +52,12 @@ func GetUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findUser(id, &user); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findUser(id, &user)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("user not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(user)
@@ -74,8 +72,12 @@ func UpdateUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findUser(id, &user); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findUser(id, &user)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("user not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	var user_update models.User
@@ -99,12 +101,16 @@ func DeleteUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findUser(id, &user); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findUser(id, &user)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("user not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	if err = db.Delete(&user).Error; err != nil {
-		return c.Status(404).JSON(err.Error())
+		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted User")
 }

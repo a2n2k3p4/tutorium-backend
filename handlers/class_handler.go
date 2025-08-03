@@ -5,6 +5,7 @@ import (
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 func ClassRoutes(app *fiber.App) {
@@ -22,30 +23,23 @@ func CreateClass(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Create(&class)
+	if err := db.Create(&class).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 	return c.Status(200).JSON(class)
 }
 
 func GetClasses(c *fiber.Ctx) error {
 	classes := []models.Class{}
-	dbErr := db.Find(&classes).Error
-	if dbErr != nil {
-		return c.Status(404).JSON(dbErr)
+	if err := db.Preload("Teacher").Preload("Categories").Find(&classes).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(classes)
 }
 
-func findclass(id int, class *models.Class) error {
-	dbErr := db.Find(&class, "id = ?", id).Error
-	if dbErr != nil {
-		return errors.New(dbErr.Error())
-	}
-
-	if class.ID == 0 {
-		return errors.New("class does not exist")
-	}
-	return nil
+func findClass(id int, class *models.Class) error {
+	return db.Preload("Teacher").Preload("Categories").First(class, "id = ?", id).Error
 }
 
 func GetClass(c *fiber.Ctx) error {
@@ -57,8 +51,12 @@ func GetClass(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findclass(id, &class); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findClass(id, &class)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("class not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(class)
@@ -73,10 +71,12 @@ func UpdateClass(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findclass(id, &class)
-
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findClass(id, &class)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("class not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	var class_update models.Class
@@ -84,7 +84,9 @@ func UpdateClass(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Model(&class).Updates(class_update)
+	if err := db.Model(&class).Updates(class_update).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	return c.Status(200).JSON(class)
 
@@ -99,14 +101,16 @@ func DeleteClass(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findclass(id, &class)
-
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findClass(id, &class)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("class not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	if err = db.Delete(&class).Error; err != nil {
-		return c.Status(404).JSON(err.Error())
+		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted class")
 }

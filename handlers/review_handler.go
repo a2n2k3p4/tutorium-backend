@@ -43,13 +43,7 @@ func GetReviews(c *fiber.Ctx) error {
 }
 
 func findReview(id int, review *models.Review) error {
-	if err := db.Preload("Learner").Preload("Class").First(review, "id = ?", id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errors.New("review does not exist")
-		}
-		return err
-	}
-	return nil
+	return db.Preload("Learner").Preload("Class").First(review, "id = ?", id).Error
 }
 
 func GetReview(c *fiber.Ctx) error {
@@ -61,8 +55,12 @@ func GetReview(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findReview(id, &review); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findReview(id, &review)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("review not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(review)
@@ -77,8 +75,12 @@ func UpdateReview(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findReview(id, &review); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findReview(id, &review)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("review not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	var review_updated models.Review
@@ -106,12 +108,16 @@ func DeleteReview(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findReview(id, &review); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findReview(id, &review)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("review not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	if err := db.Delete(&review).Error; err != nil {
-		return c.Status(404).JSON(err.Error())
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON("Successfully deleted review")

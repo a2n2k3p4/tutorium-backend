@@ -5,6 +5,7 @@ import (
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 func ClassSessionRoutes(app *fiber.App) {
@@ -22,30 +23,24 @@ func CreateClassSession(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Create(&class_session)
+	if err := db.Create(&class_session).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	return c.Status(200).JSON(class_session)
 }
 
 func GetClassSessions(c *fiber.Ctx) error {
 	class_sessions := []models.ClassSession{}
-	dbErr := db.Find(&class_sessions).Error
-	if dbErr != nil {
-		return c.Status(404).JSON(dbErr)
+	if err := db.Preload("Class").Find(&class_sessions).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(class_sessions)
 }
 
-func findclasssession(id int, class_session *models.ClassSession) error {
-	dbErr := db.Find(&class_session, "id = ?", id).Error
-	if dbErr != nil {
-		return errors.New(dbErr.Error())
-	}
-
-	if class_session.ID == 0 {
-		return errors.New("class session does not exist")
-	}
-	return nil
+func findClassSession(id int, class_session *models.ClassSession) error {
+	return db.Preload("Class").First(class_session, "id = ?", id).Error
 }
 
 func GetClassSession(c *fiber.Ctx) error {
@@ -57,8 +52,12 @@ func GetClassSession(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findclasssession(id, &class_session); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findClassSession(id, &class_session)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("class_session not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(class_session)
@@ -73,10 +72,12 @@ func UpdateClassSession(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findclasssession(id, &class_session)
-
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findClassSession(id, &class_session)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("class_session not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	var class_session_update models.ClassSession
@@ -84,7 +85,9 @@ func UpdateClassSession(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Model(&class_session).Updates(class_session_update)
+	if err := db.Model(&class_session).Updates(class_session_update).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	return c.Status(200).JSON(class_session)
 
@@ -99,14 +102,16 @@ func DeleteClassSession(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findclasssession(id, &class_session)
-
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findClassSession(id, &class_session)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("class_session not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	if err = db.Delete(&class_session).Error; err != nil {
-		return c.Status(404).JSON(err.Error())
+		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted class session")
 }

@@ -39,13 +39,7 @@ func GetReports(c *fiber.Ctx) error {
 }
 
 func findReport(id int, report *models.Report) error {
-	if err := db.Preload("Reporter").Preload("Reported").First(report, "id = ?", id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errors.New("report does not exist")
-		}
-		return err
-	}
-	return nil
+	return db.First(report, "id = ?", id).Error
 }
 
 func GetReport(c *fiber.Ctx) error {
@@ -57,8 +51,12 @@ func GetReport(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findReport(id, &report); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findReport(id, &report)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("report not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(report)
@@ -73,8 +71,12 @@ func UpdateReport(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findReport(id, &report); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findReport(id, &report)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("report not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	var report_updated models.Report
@@ -98,12 +100,16 @@ func DeleteReport(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findReport(id, &report); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findReport(id, &report)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("report not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	if err = db.Delete(&report).Error; err != nil {
-		return c.Status(404).JSON(err.Error())
+		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted Report")
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 func ClassCategoryRoutes(app *fiber.App) {
@@ -22,30 +23,24 @@ func CreateClassCategory(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Create(&class_category)
+	if err := db.Create(&class_category).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	return c.Status(200).JSON(class_category)
 }
 
 func GetClassCategories(c *fiber.Ctx) error {
 	class_categories := []models.ClassCategory{}
-	dbErr := db.Find(&class_categories).Error
-	if dbErr != nil {
-		return c.Status(404).JSON(dbErr)
+	if err := db.Preload("Classes").Find(&class_categories).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(class_categories)
 }
 
-func findclasscategory(id int, class_category *models.ClassCategory) error {
-	dbErr := db.Find(&class_category, "id = ?", id).Error
-	if dbErr != nil {
-		return errors.New(dbErr.Error())
-	}
-
-	if class_category.ID == 0 {
-		return errors.New("class category does not exist")
-	}
-	return nil
+func findClassCategory(id int, class_category *models.ClassCategory) error {
+	return db.Preload("Classes").First(class_category, "id = ?", id).Error
 }
 
 func GetClassCategory(c *fiber.Ctx) error {
@@ -57,8 +52,12 @@ func GetClassCategory(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findclasscategory(id, &class_category); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findClassCategory(id, &class_category)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("class_category not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(class_category)
@@ -73,10 +72,12 @@ func UpdateClassCategory(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findclasscategory(id, &class_category)
-
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findClassCategory(id, &class_category)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("class_category not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	var class_category_update models.ClassCategory
@@ -84,7 +85,9 @@ func UpdateClassCategory(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Model(&class_category).Updates(class_category_update)
+	if err := db.Model(&class_category).Updates(class_category_update).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	return c.Status(200).JSON(class_category)
 
@@ -99,14 +102,16 @@ func DeleteClassCategory(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findclasscategory(id, &class_category)
-
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findClassCategory(id, &class_category)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("class_category not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	if err = db.Delete(&class_category).Error; err != nil {
-		return c.Status(404).JSON(err.Error())
+		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted class category")
 }
