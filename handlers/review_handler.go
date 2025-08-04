@@ -83,13 +83,19 @@ func UpdateReview(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	var review_updated models.Review
+	type ReviewUpdate struct {
+		Rating  *int
+		Comment *string
+	}
+
+	var review_updated ReviewUpdate
 	if err := c.BodyParser(&review_updated); err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
-
-	if review_updated.Rating < 1 || review_updated.Rating > 5 {
-		return c.Status(400).JSON("Rating must be between 1 and 5")
+	if review_updated.Rating != nil {
+		if *review_updated.Rating < 1 || *review_updated.Rating > 5 {
+			return c.Status(400).JSON("Rating must be between 1 and 5")
+		}
 	}
 
 	if err := db.Model(&review).Updates(review_updated).Error; err != nil {
