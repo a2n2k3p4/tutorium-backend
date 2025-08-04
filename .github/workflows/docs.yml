@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
 
       - name: Setup Go environment
         uses: actions/setup-go@v4
@@ -31,14 +34,9 @@ jobs:
           swag init
 
       - name: Commit and push docs if changed
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-
-          git add docs/
-          if git diff --cached --quiet; then
-            echo "No changes in docs to commit."
-          else
-            git commit -m "Auto update swagger docs"
-            git push origin HEAD:main
-          fi
+        if: github.event_name == 'push'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: format Go code via gofmt/goimports"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "github-actions[bot]@users.noreply.github.com"
