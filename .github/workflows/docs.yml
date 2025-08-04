@@ -1,0 +1,44 @@
+name: autoGenDocs
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.24
+
+      - name: Install swag CLI
+        run: |
+          go install github.com/swaggo/swag/cmd/swag@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Generate Swagger docs
+        run: |
+          swag init
+
+      - name: Commit and push docs if changed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add docs/
+          if git diff --cached --quiet; then
+            echo "No changes in docs to commit."
+          else
+            git commit -m "Auto update swagger docs"
+            git push origin HEAD:main
+          fi
