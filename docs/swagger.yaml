@@ -1,6 +1,30 @@
 definitions:
   models.Admin:
     type: object
+  models.BanDetailsLearner:
+    type: object
+  models.BanDetailsTeacher:
+    type: object
+  models.Class:
+    type: object
+  models.ClassCategory:
+    type: object
+  models.ClassSession:
+    type: object
+  models.Enrollment:
+    type: object
+  models.Learner:
+    type: object
+  models.Notification:
+    type: object
+  models.Report:
+    type: object
+  models.Review:
+    type: object
+  models.Teacher:
+    type: object
+  models.User:
+    type: object
 host: localhost:8000
 info:
   contact:
@@ -121,6 +145,2042 @@ paths:
       summary: Get all admins
       tags:
       - admins
+  /banlearner:
+    post:
+      consumes:
+      - application/json
+      description: CreateBanLearner creates a new ban record for a learner
+      parameters:
+      - description: Ban Learner Payload
+        in: body
+        name: banlearner
+        required: true
+        schema:
+          $ref: '#/definitions/models.BanDetailsLearner'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.BanDetailsLearner'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new banned learner record
+      tags:
+      - BanLearners
+  /banlearner/{id}:
+    delete:
+      description: DeleteBanLearner deletes a ban record by ID
+      parameters:
+      - description: Ban Learner ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted ban learner
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a banned learner record
+      tags:
+      - BanLearners
+    get:
+      description: GetBanLearner returns a single ban record by ID
+      parameters:
+      - description: Ban Learner ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.BanDetailsLearner'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a banned learner by ID
+      tags:
+      - BanLearners
+    put:
+      consumes:
+      - application/json
+      description: UpdateBanLearner modifies an existing ban record
+      parameters:
+      - description: Ban Learner ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated ban record
+        in: body
+        name: banlearner
+        required: true
+        schema:
+          $ref: '#/definitions/models.BanDetailsLearner'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.BanDetailsLearner'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a banned learner record
+      tags:
+      - BanLearners
+  /banlearners:
+    get:
+      description: GetBanLearners returns a list of all ban records
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.BanDetailsLearner'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all banned learners
+      tags:
+      - BanLearners
+  /banteacher:
+    post:
+      consumes:
+      - application/json
+      description: CreateBanTeacher creates a new BanDetailsTeacher entry
+      parameters:
+      - description: BanTeacher payload
+        in: body
+        name: banteacher
+        required: true
+        schema:
+          $ref: '#/definitions/models.BanDetailsTeacher'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.BanDetailsTeacher'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new ban record for a teacher
+      tags:
+      - BanTeachers
+  /banteacher/{id}:
+    delete:
+      description: DeleteBanTeacher removes a BanDetailsTeacher record by its ID
+      parameters:
+      - description: BanTeacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted ban teacher
+          schema:
+            type: string
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: BanTeacher not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a ban record by ID
+      tags:
+      - BanTeachers
+    get:
+      description: GetBanTeacher retrieves a single BanDetailsTeacher by its ID
+      parameters:
+      - description: BanTeacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.BanDetailsTeacher'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: BanTeacher not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get ban record by ID
+      tags:
+      - BanTeachers
+    put:
+      consumes:
+      - application/json
+      description: UpdateBanTeacher updates an existing BanDetailsTeacher
+      parameters:
+      - description: BanTeacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated payload
+        in: body
+        name: banteacher
+        required: true
+        schema:
+          $ref: '#/definitions/models.BanDetailsTeacher'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.BanDetailsTeacher'
+        "400":
+          description: Invalid input or not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: BanTeacher not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a ban record by ID
+      tags:
+      - BanTeachers
+  /banteachers:
+    get:
+      description: GetBanTeachers retrieves all BanDetailsTeacher entries with associated
+        Teacher
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.BanDetailsTeacher'
+            type: array
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all ban records for teachers
+      tags:
+      - BanTeachers
+  /class:
+    post:
+      consumes:
+      - application/json
+      description: CreateClass creates a new Class record
+      parameters:
+      - description: Class payload
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.Class'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Class'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new class
+      tags:
+      - Classes
+  /class/{id}:
+    delete:
+      description: DeleteClass removes a Class record by its ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted class
+          schema:
+            type: string
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Class not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a class by ID
+      tags:
+      - Classes
+    get:
+      description: GetClass retrieves a single Class by its ID, including Teacher
+        and Categories
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Class'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Class not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get class by ID
+      tags:
+      - Classes
+    put:
+      consumes:
+      - application/json
+      description: UpdateClass updates a Class record by its ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated class payload
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.Class'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Class'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Class not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing class
+      tags:
+      - Classes
+  /class_categories:
+    get:
+      description: GetClassCategories retrieves all ClassCategory records with Classes
+        relation
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ClassCategory'
+            type: array
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all class categories
+      tags:
+      - ClassCategories
+  /class_category:
+    post:
+      consumes:
+      - application/json
+      description: CreateClassCategory creates a new ClassCategory record
+      parameters:
+      - description: ClassCategory payload
+        in: body
+        name: class_category
+        required: true
+        schema:
+          $ref: '#/definitions/models.ClassCategory'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ClassCategory'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new class category
+      tags:
+      - ClassCategories
+  /class_category/{id}:
+    delete:
+      description: DeleteClassCategory removes a ClassCategory record by its ID
+      parameters:
+      - description: ClassCategory ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted class category
+          schema:
+            type: string
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: ClassCategory not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a class category by ID
+      tags:
+      - ClassCategories
+    get:
+      description: GetClassCategory retrieves a single ClassCategory by its ID, including
+        Classes
+      parameters:
+      - description: ClassCategory ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ClassCategory'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: ClassCategory not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get class category by ID
+      tags:
+      - ClassCategories
+    put:
+      consumes:
+      - application/json
+      description: UpdateClassCategory updates a ClassCategory record by its ID
+      parameters:
+      - description: ClassCategory ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated payload
+        in: body
+        name: class_category
+        required: true
+        schema:
+          $ref: '#/definitions/models.ClassCategory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ClassCategory'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: ClassCategory not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing class category
+      tags:
+      - ClassCategories
+  /class_session:
+    post:
+      consumes:
+      - application/json
+      description: CreateClassSession creates a new ClassSession record
+      parameters:
+      - description: ClassSession payload
+        in: body
+        name: class_session
+        required: true
+        schema:
+          $ref: '#/definitions/models.ClassSession'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ClassSession'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new class session
+      tags:
+      - ClassSessions
+  /class_session/{id}:
+    delete:
+      description: DeleteClassSession removes a ClassSession record by its ID
+      parameters:
+      - description: ClassSession ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted class session
+          schema:
+            type: string
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: ClassSession not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a class session by ID
+      tags:
+      - ClassSessions
+    get:
+      description: GetClassSession retrieves a single ClassSession by its ID, including
+        Class
+      parameters:
+      - description: ClassSession ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ClassSession'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: ClassSession not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get class session by ID
+      tags:
+      - ClassSessions
+    put:
+      consumes:
+      - application/json
+      description: UpdateClassSession updates a ClassSession record by its ID
+      parameters:
+      - description: ClassSession ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated ClassSession payload
+        in: body
+        name: class_session
+        required: true
+        schema:
+          $ref: '#/definitions/models.ClassSession'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ClassSession'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: ClassSession not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing class session
+      tags:
+      - ClassSessions
+  /class_sessions:
+    get:
+      description: GetClassSessions retrieves all ClassSession records with Class
+        relation
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ClassSession'
+            type: array
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all class sessions
+      tags:
+      - ClassSessions
+  /classes:
+    get:
+      description: GetClasses retrieves all Class records with Teacher and Categories
+        relations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Class'
+            type: array
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all classes
+      tags:
+      - Classes
+  /enrollment:
+    post:
+      consumes:
+      - application/json
+      description: CreateEnrollment creates a new Enrollment record
+      parameters:
+      - description: Enrollment payload
+        in: body
+        name: enrollment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Enrollment'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Enrollment'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new enrollment
+      tags:
+      - Enrollments
+  /enrollment/{id}:
+    delete:
+      description: DeleteEnrollment removes an Enrollment record by its ID
+      parameters:
+      - description: Enrollment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted enrollment
+          schema:
+            type: string
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Enrollment not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete an enrollment by ID
+      tags:
+      - Enrollments
+    get:
+      description: GetEnrollment retrieves a single Enrollment by its ID, including
+        related Learner and Class
+      parameters:
+      - description: Enrollment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Enrollment'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Enrollment not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get enrollment by ID
+      tags:
+      - Enrollments
+    put:
+      consumes:
+      - application/json
+      description: UpdateEnrollment updates an Enrollment record by its ID
+      parameters:
+      - description: Enrollment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated enrollment payload
+        in: body
+        name: enrollment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Enrollment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Enrollment'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Enrollment not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing enrollment
+      tags:
+      - Enrollments
+  /enrollments:
+    get:
+      description: GetEnrollments retrieves all Enrollment records with associated
+        Learner and Class
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Enrollment'
+            type: array
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all enrollments
+      tags:
+      - Enrollments
+  /learner:
+    post:
+      consumes:
+      - application/json
+      description: CreateLearner creates a new Learner record
+      parameters:
+      - description: Learner payload
+        in: body
+        name: learner
+        required: true
+        schema:
+          $ref: '#/definitions/models.Learner'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Learner'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new learner
+      tags:
+      - Learners
+  /learner/{id}:
+    delete:
+      description: DeleteLearner removes a Learner record by its ID
+      parameters:
+      - description: Learner ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted Learner
+          schema:
+            type: string
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Learner not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a learner by ID
+      tags:
+      - Learners
+    get:
+      description: GetLearner retrieves a single Learner by its ID
+      parameters:
+      - description: Learner ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Learner'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Learner not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get learner by ID
+      tags:
+      - Learners
+  /learners:
+    get:
+      description: GetLearners retrieves all Learner records
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Learner'
+            type: array
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all learners
+      tags:
+      - Learners
+  /notification:
+    post:
+      consumes:
+      - application/json
+      description: CreateNotification creates a new Notification record
+      parameters:
+      - description: Notification payload
+        in: body
+        name: notification
+        required: true
+        schema:
+          $ref: '#/definitions/models.Notification'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Notification'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new notification
+      tags:
+      - Notifications
+  /notification/{id}:
+    delete:
+      description: DeleteNotification removes a Notification record by its ID
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted notification
+          schema:
+            type: string
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Notification not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a notification by ID
+      tags:
+      - Notifications
+    get:
+      description: GetNotification retrieves a single Notification by its ID, including
+        the User
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Notification'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Notification not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get notification by ID
+      tags:
+      - Notifications
+    put:
+      consumes:
+      - application/json
+      description: UpdateNotification updates a Notification record by its ID
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated notification payload
+        in: body
+        name: notification
+        required: true
+        schema:
+          $ref: '#/definitions/models.Notification'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Notification'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Notification not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing notification
+      tags:
+      - Notifications
+  /notifications:
+    get:
+      description: GetNotifications retrieves all Notification records with associated
+        User
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Notification'
+            type: array
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all notifications
+      tags:
+      - Notifications
+  /report:
+    post:
+      consumes:
+      - application/json
+      description: CreateReport creates a new Report record
+      parameters:
+      - description: Report payload
+        in: body
+        name: report
+        required: true
+        schema:
+          $ref: '#/definitions/models.Report'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Report'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new report
+      tags:
+      - Reports
+  /report/{id}:
+    delete:
+      description: DeleteReport removes a Report record by its ID
+      parameters:
+      - description: Report ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted Report
+          schema:
+            type: string
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Report not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a report by ID
+      tags:
+      - Reports
+    get:
+      description: GetReport retrieves a single Report by its ID, including Reporter
+        and Reported
+      parameters:
+      - description: Report ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Report'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Report not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get report by ID
+      tags:
+      - Reports
+    put:
+      consumes:
+      - application/json
+      description: UpdateReport updates a Report record by its ID
+      parameters:
+      - description: Report ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated report payload
+        in: body
+        name: report
+        required: true
+        schema:
+          $ref: '#/definitions/models.Report'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Report'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Report not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing report
+      tags:
+      - Reports
+  /reports:
+    get:
+      description: GetReports retrieves all Report records with Reporter and Reported
+        relations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Report'
+            type: array
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all reports
+      tags:
+      - Reports
+  /review:
+    post:
+      consumes:
+      - application/json
+      description: CreateReview creates a new Review record with rating validation
+      parameters:
+      - description: Review payload
+        in: body
+        name: review
+        required: true
+        schema:
+          $ref: '#/definitions/models.Review'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Review'
+        "400":
+          description: Invalid input or rating out of range
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new review
+      tags:
+      - Reviews
+  /review/{id}:
+    delete:
+      description: DeleteReview removes a Review record by its ID
+      parameters:
+      - description: Review ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted review
+          schema:
+            type: string
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Review not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a review by ID
+      tags:
+      - Reviews
+    get:
+      description: GetReview retrieves a single Review by its ID, including related
+        Learner and Class
+      parameters:
+      - description: Review ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Review'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Review not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get review by ID
+      tags:
+      - Reviews
+    put:
+      consumes:
+      - application/json
+      description: UpdateReview updates a Review record by its ID; only Rating and
+        Comment fields
+      parameters:
+      - description: Review ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated review payload
+        in: body
+        name: review
+        required: true
+        schema:
+          $ref: '#/definitions/models.Review'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Review'
+        "400":
+          description: Invalid input or rating out of range
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Review not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing review
+      tags:
+      - Reviews
+  /reviews:
+    get:
+      description: GetReviews retrieves all Review records with related Learner and
+        Class
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Review'
+            type: array
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all reviews
+      tags:
+      - Reviews
+  /teacher:
+    post:
+      consumes:
+      - application/json
+      description: CreateTeacher creates a new Teacher record
+      parameters:
+      - description: Teacher payload
+        in: body
+        name: teacher
+        required: true
+        schema:
+          $ref: '#/definitions/models.Teacher'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Teacher'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new teacher
+      tags:
+      - Teachers
+  /teacher/{id}:
+    delete:
+      description: DeleteTeacher removes a Teacher record by its ID
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted Teacher
+          schema:
+            type: string
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Teacher not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a teacher by ID
+      tags:
+      - Teachers
+    get:
+      description: GetTeacher retrieves a single Teacher by its ID
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Teacher'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Teacher not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get teacher by ID
+      tags:
+      - Teachers
+    put:
+      consumes:
+      - application/json
+      description: UpdateTeacher updates a Teacher record by its ID
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated teacher payload
+        in: body
+        name: teacher
+        required: true
+        schema:
+          $ref: '#/definitions/models.Teacher'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Teacher'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Teacher not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing teacher
+      tags:
+      - Teachers
+  /teachers:
+    get:
+      description: GetTeachers retrieves all Teacher records
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Teacher'
+            type: array
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all teachers
+      tags:
+      - Teachers
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: CreateUser creates a new user record
+      parameters:
+      - description: User payload
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new user
+      tags:
+      - Users
+  /user/{id}:
+    delete:
+      description: DeleteUser removes a user record by its ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted User
+          schema:
+            type: string
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a user by ID
+      tags:
+      - Users
+    get:
+      description: GetUser retrieves a single user by its ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get user by ID
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: UpdateUser updates a user record by its ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated user payload
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing user
+      tags:
+      - Users
+  /users:
+    get:
+      description: GetUsers retrieves all user records
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all users
+      tags:
+      - Users
 schemes:
 - http
 - https
