@@ -16,6 +16,17 @@ func ClassCategoryRoutes(app *fiber.App) {
 	app.Delete("/class_category/:id", DeleteClassCategory)
 }
 
+// CreateClassCategory godoc
+// @Summary      Create a new class category
+// @Description  CreateClassCategory creates a new ClassCategory record
+// @Tags         ClassCategories
+// @Accept       json
+// @Produce      json
+// @Param        class_category  body      models.ClassCategory  true  "ClassCategory payload"
+// @Success      201             {object}  models.ClassCategory
+// @Failure      400             {object}  map[string]string    "Invalid input"
+// @Failure      500             {object}  map[string]string    "Server error"
+// @Router       /class_category [post]
 func CreateClassCategory(c *fiber.Ctx) error {
 	var class_category models.ClassCategory
 
@@ -30,6 +41,14 @@ func CreateClassCategory(c *fiber.Ctx) error {
 	return c.Status(201).JSON(class_category)
 }
 
+// GetClassCategories godoc
+// @Summary      List all class categories
+// @Description  GetClassCategories retrieves all ClassCategory records with Classes relation
+// @Tags         ClassCategories
+// @Produce      json
+// @Success      200             {array}   models.ClassCategory
+// @Failure      500             {object}  map[string]string    "Server error"
+// @Router       /class_categories [get]
 func GetClassCategories(c *fiber.Ctx) error {
 	class_categories := []models.ClassCategory{}
 	if err := db.Preload("Classes").Find(&class_categories).Error; err != nil {
@@ -43,6 +62,17 @@ func findClassCategory(id int, class_category *models.ClassCategory) error {
 	return db.Preload("Classes").First(class_category, "id = ?", id).Error
 }
 
+// GetClassCategory godoc
+// @Summary      Get class category by ID
+// @Description  GetClassCategory retrieves a single ClassCategory by its ID, including Classes
+// @Tags         ClassCategories
+// @Produce      json
+// @Param        id   path      int                true  "ClassCategory ID"
+// @Success      200  {object}  models.ClassCategory
+// @Failure      400  {object}  map[string]string  "Invalid ID"
+// @Failure      404  {object}  map[string]string  "ClassCategory not found"
+// @Failure      500  {object}  map[string]string  "Server error"
+// @Router       /class_category/{id} [get]
 func GetClassCategory(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -63,6 +93,19 @@ func GetClassCategory(c *fiber.Ctx) error {
 	return c.Status(200).JSON(class_category)
 }
 
+// UpdateClassCategory godoc
+// @Summary      Update an existing class category
+// @Description  UpdateClassCategory updates a ClassCategory record by its ID
+// @Tags         ClassCategories
+// @Accept       json
+// @Produce      json
+// @Param        id              path      int                   true  "ClassCategory ID"
+// @Param        class_category  body      models.ClassCategory  true  "Updated payload"
+// @Success      200             {object}  models.ClassCategory
+// @Failure      400             {object}  map[string]string    "Invalid input"
+// @Failure      404             {object}  map[string]string    "ClassCategory not found"
+// @Failure      500             {object}  map[string]string    "Server error"
+// @Router       /class_category/{id} [put]
 func UpdateClassCategory(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -93,6 +136,17 @@ func UpdateClassCategory(c *fiber.Ctx) error {
 
 }
 
+// DeleteClassCategory godoc
+// @Summary      Delete a class category by ID
+// @Description  DeleteClassCategory removes a ClassCategory record by its ID
+// @Tags         ClassCategories
+// @Produce      json
+// @Param        id   path      int                true  "ClassCategory ID"
+// @Success      200  {string}  string  "Successfully deleted class category"
+// @Failure      400  {object}  map[string]string  "Invalid ID"
+// @Failure      404  {object}  map[string]string  "ClassCategory not found"
+// @Failure      500  {object}  map[string]string  "Server error"
+// @Router       /class_category/{id} [delete]
 func DeleteClassCategory(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

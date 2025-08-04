@@ -16,6 +16,17 @@ func ClassRoutes(app *fiber.App) {
 	app.Delete("/class/:id", DeleteClass)
 }
 
+// CreateClass godoc
+// @Summary      Create a new class
+// @Description  CreateClass creates a new Class record
+// @Tags         Classes
+// @Accept       json
+// @Produce      json
+// @Param        class  body      models.Class  true  "Class payload"
+// @Success      201    {object}  models.Class
+// @Failure      400    {object}  map[string]string  "Invalid input"
+// @Failure      500    {object}  map[string]string  "Server error"
+// @Router       /class [post]
 func CreateClass(c *fiber.Ctx) error {
 	var class models.Class
 
@@ -29,6 +40,14 @@ func CreateClass(c *fiber.Ctx) error {
 	return c.Status(201).JSON(class)
 }
 
+// GetClasses godoc
+// @Summary      List all classes
+// @Description  GetClasses retrieves all Class records with Teacher and Categories relations
+// @Tags         Classes
+// @Produce      json
+// @Success      200    {array}   models.Class
+// @Failure      500    {object}  map[string]string  "Server error"
+// @Router       /classes [get]
 func GetClasses(c *fiber.Ctx) error {
 	classes := []models.Class{}
 	if err := db.Preload("Teacher").Preload("Categories").Find(&classes).Error; err != nil {
@@ -42,6 +61,17 @@ func findClass(id int, class *models.Class) error {
 	return db.Preload("Teacher").Preload("Categories").First(class, "id = ?", id).Error
 }
 
+// GetClass godoc
+// @Summary      Get class by ID
+// @Description  GetClass retrieves a single Class by its ID, including Teacher and Categories
+// @Tags         Classes
+// @Produce      json
+// @Param        id    path      int  true  "Class ID"
+// @Success      200   {object}  models.Class
+// @Failure      400   {object}  map[string]string  "Invalid ID"
+// @Failure      404   {object}  map[string]string  "Class not found"
+// @Failure      500   {object}  map[string]string  "Server error"
+// @Router       /class/{id} [get]
 func GetClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -62,6 +92,19 @@ func GetClass(c *fiber.Ctx) error {
 	return c.Status(200).JSON(class)
 }
 
+// UpdateClass godoc
+// @Summary      Update an existing class
+// @Description  UpdateClass updates a Class record by its ID
+// @Tags         Classes
+// @Accept       json
+// @Produce      json
+// @Param        id     path      int           true  "Class ID"
+// @Param        class  body      models.Class  true  "Updated class payload"
+// @Success      200    {object}  models.Class
+// @Failure      400    {object}  map[string]string  "Invalid input"
+// @Failure      404    {object}  map[string]string  "Class not found"
+// @Failure      500    {object}  map[string]string  "Server error"
+// @Router       /class/{id} [put]
 func UpdateClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -92,6 +135,17 @@ func UpdateClass(c *fiber.Ctx) error {
 
 }
 
+// DeleteClass godoc
+// @Summary      Delete a class by ID
+// @Description  DeleteClass removes a Class record by its ID
+// @Tags         Classes
+// @Produce      json
+// @Param        id   path      int  true  "Class ID"
+// @Success      200  {string}  string  "Successfully deleted class"
+// @Failure      400  {object}  map[string]string  "Invalid ID"
+// @Failure      404  {object}  map[string]string  "Class not found"
+// @Failure      500  {object}  map[string]string  "Server error"
+// @Router       /class/{id} [delete]
 func DeleteClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
