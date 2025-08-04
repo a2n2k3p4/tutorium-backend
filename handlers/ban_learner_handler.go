@@ -5,6 +5,7 @@ import (
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 func BanLearnerRoutes(app *fiber.App) {
@@ -22,30 +23,23 @@ func CreateBanLearner(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Create(&banlearner)
-	return c.Status(200).JSON(banlearner)
+	if err := db.Create(&banlearner).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+	return c.Status(201).JSON(banlearner)
 }
 
 func GetBanLearners(c *fiber.Ctx) error {
 	banlearners := []models.BanDetailsLearner{}
-	dbErr := db.Find(&banlearners).Error
-	if dbErr != nil {
-		return c.Status(404).JSON(dbErr)
+	if err := db.Preload("Learner").Find(&banlearners).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(banlearners)
 }
 
-func findbanlearner(id int, banlearner *models.BanDetailsLearner) error {
-	dbErr := db.Find(&banlearner, "id = ?", id).Error
-	if dbErr != nil {
-		return errors.New(dbErr.Error())
-	}
-
-	if banlearner.ID == 0 {
-		return errors.New("ban learner does not exist")
-	}
-	return nil
+func findBanLearner(id int, banlearner *models.BanDetailsLearner) error {
+	return db.Preload("Learner").First(banlearner, "id = ?", id).Error
 }
 
 func GetBanLearner(c *fiber.Ctx) error {
@@ -57,8 +51,12 @@ func GetBanLearner(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findbanlearner(id, &banlearner); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findBanLearner(id, &banlearner)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("banlearner not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(banlearner)
@@ -73,10 +71,12 @@ func UpdateBanLearner(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findbanlearner(id, &banlearner)
-
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findBanLearner(id, &banlearner)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("banlearner not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	var banlearner_update models.BanDetailsLearner
@@ -84,7 +84,9 @@ func UpdateBanLearner(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Model(&banlearner).Updates(banlearner_update)
+	if err := db.Model(&banlearner).Updates(banlearner_update).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	return c.Status(200).JSON(banlearner)
 
@@ -99,14 +101,16 @@ func DeleteBanLearner(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findbanlearner(id, &banlearner)
-
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findBanLearner(id, &banlearner)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("banlearner not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	if err = db.Delete(&banlearner).Error; err != nil {
-		return c.Status(404).JSON(err.Error())
+		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted ban learner")
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 func AdminRoutes(app *fiber.App) {
@@ -32,8 +33,10 @@ func CreateAdmin(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	db.Create(&admin)
-	return c.Status(200).JSON(admin)
+	if err := db.Create(&admin).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+	return c.Status(201).JSON(admin)
 }
 
 // GetAdmins godoc
@@ -47,24 +50,15 @@ func CreateAdmin(c *fiber.Ctx) error {
 // @Router /admins [get]
 func GetAdmins(c *fiber.Ctx) error {
 	admins := []models.Admin{}
-	dbErr := db.Find(&admins).Error
-	if dbErr != nil {
-		return c.Status(404).JSON(dbErr)
+	if err := db.Find(&admins).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(admins)
 }
 
-func findadmin(id int, admin *models.Admin) error {
-	dbErr := db.Find(&admin, "id = ?", id).Error
-	if dbErr != nil {
-		return errors.New(dbErr.Error())
-	}
-
-	if admin.ID == 0 {
-		return errors.New("admin does not exist")
-	}
-	return nil
+func findAdmin(id int, admin *models.Admin) error {
+	return db.First(admin, "id = ?", id).Error
 }
 
 // GetAdmin godoc
@@ -86,8 +80,12 @@ func GetAdmin(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	if err := findadmin(id, &admin); err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findAdmin(id, &admin)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("admin not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(admin)
@@ -113,13 +111,16 @@ func DeleteAdmin(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findadmin(id, &admin)
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
+	err = findAdmin(id, &admin)
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("admin not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
 	}
 
 	if err = db.Delete(&admin).Error; err != nil {
-		return c.Status(404).JSON(err.Error())
+		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted admin")
 }
