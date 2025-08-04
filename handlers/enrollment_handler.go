@@ -27,7 +27,7 @@ func CreateEnrollment(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(enrollment)
+	return c.Status(201).JSON(enrollment)
 }
 
 func GetEnrollments(c *fiber.Ctx) error {

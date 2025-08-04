@@ -3,15 +3,33 @@ package main
 import (
 	"log"
 
-	//module name "github.com/a2n2k3p4/tutorium-backend"
-	"github.com/a2n2k3p4/tutorium-backend/config/dbserver" //store functions related to connecting to PostgreSQL
+	// module name "github.com/a2n2k3p4/tutorium-backend"
+	"github.com/a2n2k3p4/tutorium-backend/config/dbserver" // store functions related to connecting to PostgreSQL
 	"github.com/a2n2k3p4/tutorium-backend/handlers"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
+
+	// swagger
+	_ "github.com/a2n2k3p4/tutorium-backend/docs"
+	"github.com/gofiber/swagger"
 )
 
 // Before running the server, change config/dbserver/config.go to correct connection info
 
+// @title	Tutorium Backend API
+// @version	1.0
+// @description	This is the API for Tutorium Backend system.
+// @termsOfService	http://swagger.io/terms/
+
+// @contact.name	API Support
+// @contact.url	http://www.swagger.io/support
+// @contact.email	support@swagger.io
+
+// @license.name	AGPL-3.0
+// @license.url	https://www.gnu.org/licenses/agpl-3.0.en.html
+
+// @host	localhost:8000
+// @schemes	http https
 func main() {
 	cfg := dbserver.NewConfig()
 
@@ -22,7 +40,18 @@ func main() {
 
 	models.Migrate(db)
 
+	// path
 	app := fiber.New()
+
+	// debug route
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"message": "Tutorium Backend API",
+			"swagger": "http://localhost:8000/swagger/",
+		})
+	})
+
+	app.Get("/swagger/*", swagger.HandlerDefault)
 
 	handlers.AllRoutes(db, app) // Register admin routes
 	// Define the /users route and handler inline
@@ -33,5 +62,9 @@ func main() {
 	// app.Post("/users/:id/registerTeacher", func(c *fiber.Ctx) error {...})
 	// app.Post("/users/:id/registerAdmin"  , func(c *fiber.Ctx) error {...})
 
-	log.Fatal(app.Listen(":8000")) // using PORT 8000 (localhost:8000)
+	// lg
+	log.Println("Server starting on :8000")
+	log.Println("API endpoint: http://localhost:8000/")
+	log.Println("Swagger UI: http://localhost:8000/swagger/")
+	log.Fatal(app.Listen(":8000"))
 }

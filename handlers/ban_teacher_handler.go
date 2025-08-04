@@ -26,7 +26,7 @@ func CreateBanTeacher(c *fiber.Ctx) error {
 	if err := db.Create(&banteacher).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
-	return c.Status(200).JSON(banteacher)
+	return c.Status(201).JSON(banteacher)
 }
 
 func GetBanTeachers(c *fiber.Ctx) error {
@@ -89,7 +89,6 @@ func UpdateBanTeacher(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(banteacher)
-
 }
 
 func DeleteBanTeacher(c *fiber.Ctx) error {

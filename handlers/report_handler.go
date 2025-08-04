@@ -27,7 +27,7 @@ func CreateReport(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(report)
+	return c.Status(201).JSON(report)
 }
 
 func GetReports(c *fiber.Ctx) error {
@@ -39,7 +39,7 @@ func GetReports(c *fiber.Ctx) error {
 }
 
 func findReport(id int, report *models.Report) error {
-	return db.First(report, "id = ?", id).Error
+	return db.Preload("Reporter").Preload("Reported").First(report, "id = ?", id).Error
 }
 
 func GetReport(c *fiber.Ctx) error {
@@ -81,7 +81,7 @@ func UpdateReport(c *fiber.Ctx) error {
 
 	var report_updated models.Report
 	if err := c.BodyParser(&report_updated); err != nil {
-		return c.Status(500).JSON(err.Error())
+		return c.Status(400).JSON(err.Error())
 	}
 
 	if err := db.Model(&report).Updates(report_updated).Error; err != nil {

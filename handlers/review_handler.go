@@ -31,7 +31,7 @@ func CreateReview(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(review)
+	return c.Status(201).JSON(review)
 }
 
 func GetReviews(c *fiber.Ctx) error {
@@ -90,7 +90,7 @@ func UpdateReview(c *fiber.Ctx) error {
 
 	var review_updated ReviewUpdate
 	if err := c.BodyParser(&review_updated); err != nil {
-		return c.Status(500).JSON(err.Error())
+		return c.Status(400).JSON(err.Error())
 	}
 	if review_updated.Rating != nil {
 		if *review_updated.Rating < 1 || *review_updated.Rating > 5 {

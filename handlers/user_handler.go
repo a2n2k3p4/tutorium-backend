@@ -27,7 +27,7 @@ func CreateUser(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(user)
+	return c.Status(201).JSON(user)
 }
 
 func GetUsers(c *fiber.Ctx) error {
@@ -82,7 +82,7 @@ func UpdateUser(c *fiber.Ctx) error {
 
 	var user_update models.User
 	if err := c.BodyParser(&user_update); err != nil {
-		return c.Status(500).JSON(err.Error())
+		return c.Status(400).JSON(err.Error())
 	}
 
 	if err := db.Model(&user).Updates(user_update).Error; err != nil {

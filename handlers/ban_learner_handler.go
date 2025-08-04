@@ -26,7 +26,7 @@ func CreateBanLearner(c *fiber.Ctx) error {
 	if err := db.Create(&banlearner).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
-	return c.Status(200).JSON(banlearner)
+	return c.Status(201).JSON(banlearner)
 }
 
 func GetBanLearners(c *fiber.Ctx) error {

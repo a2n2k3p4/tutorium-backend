@@ -27,7 +27,7 @@ func CreateTeacher(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(teacher)
+	return c.Status(201).JSON(teacher)
 }
 
 func GetTeachers(c *fiber.Ctx) error {
@@ -82,7 +82,7 @@ func UpdateTeacher(c *fiber.Ctx) error {
 
 	var teacher_update models.Teacher
 	if err := c.BodyParser(&teacher_update); err != nil {
-		return c.Status(500).JSON(err.Error())
+		return c.Status(400).JSON(err.Error())
 	}
 
 	if err := db.Model(&teacher).Updates(teacher_update).Error; err != nil {
