@@ -22,8 +22,8 @@ func ClassSessionRoutes(app *fiber.App) {
 // @Tags         ClassSessions
 // @Accept       json
 // @Produce      json
-// @Param        class_session  body      models.ClassSession  true  "ClassSession payload"
-// @Success      201            {object}  models.ClassSession
+// @Param        class_session  body      models.ClassSessionDoc  true  "ClassSession payload"
+// @Success      201            {object}  models.ClassSessionDoc
 // @Failure      400            {object}  map[string]string    "Invalid input"
 // @Failure      500            {object}  map[string]string    "Server error"
 // @Router       /class_session [post]
@@ -46,7 +46,7 @@ func CreateClassSession(c *fiber.Ctx) error {
 // @Description  GetClassSessions retrieves all ClassSession records with Class relation
 // @Tags         ClassSessions
 // @Produce      json
-// @Success      200            {array}   models.ClassSession
+// @Success      200            {array}   models.ClassSessionDoc
 // @Failure      500            {object}  map[string]string    "Server error"
 // @Router       /class_sessions [get]
 func GetClassSessions(c *fiber.Ctx) error {
@@ -68,7 +68,7 @@ func findClassSession(id int, class_session *models.ClassSession) error {
 // @Tags         ClassSessions
 // @Produce      json
 // @Param        id   path      int                true  "ClassSession ID"
-// @Success      200  {object}  models.ClassSession
+// @Success      200  {object}  models.ClassSessionDoc
 // @Failure      400  {object}  map[string]string  "Invalid ID"
 // @Failure      404  {object}  map[string]string  "ClassSession not found"
 // @Failure      500  {object}  map[string]string  "Server error"
@@ -100,8 +100,8 @@ func GetClassSession(c *fiber.Ctx) error {
 // @Accept       json
 // @Produce      json
 // @Param        id             path      int                  true  "ClassSession ID"
-// @Param        class_session  body      models.ClassSession  true  "Updated ClassSession payload"
-// @Success      200            {object}  models.ClassSession
+// @Param        class_session  body      models.ClassSessionDoc  true  "Updated ClassSession payload"
+// @Success      200            {object}  models.ClassSessionDoc
 // @Failure      400            {object}  map[string]string    "Invalid input"
 // @Failure      404            {object}  map[string]string    "ClassSession not found"
 // @Failure      500            {object}  map[string]string    "Server error"

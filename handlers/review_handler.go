@@ -22,8 +22,8 @@ func ReviewRoutes(app *fiber.App) {
 // @Tags         Reviews
 // @Accept       json
 // @Produce      json
-// @Param        review  body      models.Review  true  "Review payload"
-// @Success      201     {object}  models.Review
+// @Param        review  body      models.ReviewDoc  true  "Review payload"
+// @Success      201     {object}  models.ReviewDoc
 // @Failure      400     {object}  map[string]string  "Invalid input or rating out of range"
 // @Failure      500     {object}  map[string]string  "Server error"
 // @Router       /review [post]
@@ -50,7 +50,7 @@ func CreateReview(c *fiber.Ctx) error {
 // @Description  GetReviews retrieves all Review records with related Learner and Class
 // @Tags         Reviews
 // @Produce      json
-// @Success      200     {array}   models.Review
+// @Success      200     {array}   models.ReviewDoc
 // @Failure      500     {object}  map[string]string  "Server error"
 // @Router       /reviews [get]
 func GetReviews(c *fiber.Ctx) error {
@@ -71,7 +71,7 @@ func findReview(id int, review *models.Review) error {
 // @Tags         Reviews
 // @Produce      json
 // @Param        id   path      int  true  "Review ID"
-// @Success      200  {object}  models.Review
+// @Success      200  {object}  models.ReviewDoc
 // @Failure      400  {object}  map[string]string  "Invalid ID"
 // @Failure      404  {object}  map[string]string  "Review not found"
 // @Failure      500  {object}  map[string]string  "Server error"
@@ -103,8 +103,8 @@ func GetReview(c *fiber.Ctx) error {
 // @Accept       json
 // @Produce      json
 // @Param        id      path      int            true  "Review ID"
-// @Param        review  body      models.Review  true  "Updated review payload"
-// @Success      200     {object}  models.Review
+// @Param        review  body      models.ReviewDoc  true  "Updated review payload"
+// @Success      200     {object}  models.ReviewDoc
 // @Failure      400     {object}  map[string]string  "Invalid input or rating out of range"
 // @Failure      404     {object}  map[string]string  "Review not found"
 // @Failure      500     {object}  map[string]string  "Server error"

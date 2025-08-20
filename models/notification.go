@@ -16,3 +16,14 @@ type Notification struct {
 
 	User User `gorm:"foreignKey:UserID;references:ID;constraint:OnDelete:CASCADE"`
 }
+
+// ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
+
+type NotificationDoc struct {
+	ID                      uint      `json:"id" example:"100"`
+	UserID                  uint      `json:"user_id" example:"42"`
+	NotificationType        string    `json:"notification_type" example:"System Alert"`
+	NotificationDescription string    `json:"notification_description" example:"Your class has been rescheduled"`
+	NotificationDate        time.Time `json:"notification_date" example:"2025-08-20T15:04:05Z"`
+	ReadFlag                bool      `json:"read_flag" example:"false"`
+}

@@ -22,8 +22,8 @@ func UserRoutes(app *fiber.App) {
 // @Tags         Users
 // @Accept       json
 // @Produce      json
-// @Param        user  body      models.User  true  "User payload"
-// @Success      201   {object}  models.User
+// @Param        user  body      models.UserDoc  true  "User payload"
+// @Success      201   {object}  models.UserDoc
 // @Failure      400   {object}  map[string]string  "Invalid input"
 // @Failure      500   {object}  map[string]string  "Server error"
 // @Router       /user [post]
@@ -46,7 +46,7 @@ func CreateUser(c *fiber.Ctx) error {
 // @Description  GetUsers retrieves all user records
 // @Tags         Users
 // @Produce      json
-// @Success      200  {array}   models.User
+// @Success      200  {array}   models.UserDoc
 // @Failure      500  {object}  map[string]string  "Server error"
 // @Router       /users [get]
 func GetUsers(c *fiber.Ctx) error {
@@ -68,7 +68,7 @@ func findUser(id int, user *models.User) error {
 // @Tags         Users
 // @Produce      json
 // @Param        id   path      int  true  "User ID"
-// @Success      200  {object}  models.User
+// @Success      200  {object}  models.UserDoc
 // @Failure      400  {object}  map[string]string  "Invalid ID"
 // @Failure      404  {object}  map[string]string  "User not found"
 // @Failure      500  {object}  map[string]string  "Server error"
@@ -100,8 +100,8 @@ func GetUser(c *fiber.Ctx) error {
 // @Accept       json
 // @Produce      json
 // @Param        id    path      int         true  "User ID"
-// @Param        user  body      models.User true  "Updated user payload"
-// @Success      200   {object}  models.User
+// @Param        user  body      models.UserDoc true  "Updated user payload"
+// @Success      200   {object}  models.UserDoc
 // @Failure      400   {object}  map[string]string  "Invalid input"
 // @Failure      404   {object}  map[string]string  "User not found"
 // @Failure      500   {object}  map[string]string  "Server error"

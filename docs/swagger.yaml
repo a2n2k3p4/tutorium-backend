@@ -1,29 +1,230 @@
 definitions:
-  models.Admin:
+  models.AdminDoc:
+    properties:
+      id:
+        example: 43
+        type: integer
     type: object
-  models.BanDetailsLearner:
+  models.BanDetailsLearnerDoc:
+    properties:
+      ban_description:
+        example: Spamming inappropriate content
+        type: string
+      ban_end:
+        example: "2025-08-30T12:00:00Z"
+        type: string
+      ban_start:
+        example: "2025-08-20T12:00:00Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      learner_id:
+        example: 42
+        type: integer
     type: object
-  models.BanDetailsTeacher:
+  models.BanDetailsTeacherDoc:
+    properties:
+      ban_description:
+        example: Repeated policy violations
+        type: string
+      ban_end:
+        example: "2025-08-30T12:00:00Z"
+        type: string
+      ban_start:
+        example: "2025-08-20T12:00:00Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      teacher_id:
+        example: 7
+        type: integer
     type: object
-  models.Class:
+  models.ClassCategoryDoc:
+    properties:
+      class_category:
+        example: Mathematics
+        type: string
+      classes:
+        items:
+          $ref: '#/definitions/models.ClassDoc'
+        type: array
+      id:
+        example: 3
+        type: integer
     type: object
-  models.ClassCategory:
+  models.ClassDoc:
+    properties:
+      class_description:
+        example: Advanced Python programming course
+        type: string
+      enrollment_deadline:
+        example: "2025-09-10T23:59:59Z"
+        type: string
+      id:
+        example: 21
+        type: integer
+      learner_limit:
+        example: 50
+        type: integer
+      teacher_id:
+        example: 7
+        type: integer
     type: object
-  models.ClassSession:
+  models.ClassSessionDoc:
+    properties:
+      class_finish:
+        example: "2025-09-05T16:00:00Z"
+        type: string
+      class_id:
+        example: 12
+        type: integer
+      class_start:
+        example: "2025-09-05T14:00:00Z"
+        type: string
+      class_status:
+        example: Scheduled
+        type: string
+      description:
+        example: Weekly tutoring session for calculus
+        type: string
+      enrollment_deadline:
+        example: "2025-09-01T23:59:59Z"
+        type: string
+      id:
+        example: 15
+        type: integer
     type: object
-  models.Enrollment:
+  models.EnrollmentDoc:
+    properties:
+      class_id:
+        example: 21
+        type: integer
+      enrollment_status:
+        example: active
+        type: string
+      id:
+        example: 101
+        type: integer
+      learner_id:
+        example: 42
+        type: integer
     type: object
-  models.Learner:
+  models.LearnerDoc:
+    properties:
+      id:
+        example: 42
+        type: integer
     type: object
-  models.Notification:
+  models.NotificationDoc:
+    properties:
+      id:
+        example: 100
+        type: integer
+      notification_date:
+        example: "2025-08-20T15:04:05Z"
+        type: string
+      notification_description:
+        example: Your class has been rescheduled
+        type: string
+      notification_type:
+        example: System Alert
+        type: string
+      read_flag:
+        example: false
+        type: boolean
+      user_id:
+        example: 42
+        type: integer
     type: object
-  models.Report:
+  models.ReportDoc:
+    properties:
+      id:
+        example: 12
+        type: integer
+      report_date:
+        example: "2025-08-20T14:30:00Z"
+        type: string
+      report_description:
+        example: User sent inappropriate messages
+        type: string
+      report_picture:
+        example: base64-encoded-image-string
+        type: string
+      report_type:
+        example: Abuse
+        type: string
+      report_user_id:
+        example: 5
+        type: integer
+      reported_user_id:
+        example: 8
+        type: integer
     type: object
-  models.Review:
+  models.ReviewDoc:
+    properties:
+      class_id:
+        example: 9
+        type: integer
+      comment:
+        example: This class was very informative and well-structured.
+        type: string
+      id:
+        example: 101
+        type: integer
+      learner_id:
+        example: 42
+        type: integer
+      rating:
+        example: 5
+        type: integer
     type: object
-  models.Teacher:
+  models.TeacherDoc:
+    properties:
+      description:
+        example: Experienced Mathematics teacher specializing in calculus and linear
+          algebra.
+        type: string
+      id:
+        example: 12
+        type: integer
     type: object
-  models.User:
+  models.UserDoc:
+    properties:
+      admin_id:
+        example: 3
+        type: integer
+      balance:
+        example: 250.75
+        type: number
+      first_name:
+        example: Alice
+        type: string
+      gender:
+        example: Female
+        type: string
+      id:
+        example: 101
+        type: integer
+      last_name:
+        example: Smith
+        type: string
+      learner_id:
+        example: 42
+        type: integer
+      phone_number:
+        example: "+66912345678"
+        type: string
+      profile_picture:
+        example: <base64-encoded-image>
+        type: string
+      session_id:
+        example: sess-abc123xyz
+        type: string
+      teacher_id:
+        example: 7
+        type: integer
     type: object
 host: localhost:8000
 info:
@@ -50,14 +251,14 @@ paths:
         name: admin
         required: true
         schema:
-          $ref: '#/definitions/models.Admin'
+          $ref: '#/definitions/models.AdminDoc'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Admin'
+            $ref: '#/definitions/models.AdminDoc'
         "400":
           description: Bad request
           schema:
@@ -114,7 +315,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Admin'
+            $ref: '#/definitions/models.AdminDoc'
         "400":
           description: Bad request - Invalid ID or admin not found
           schema:
@@ -135,7 +336,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Admin'
+              $ref: '#/definitions/models.AdminDoc'
             type: array
         "404":
           description: Admins not found
@@ -156,14 +357,14 @@ paths:
         name: banlearner
         required: true
         schema:
-          $ref: '#/definitions/models.BanDetailsLearner'
+          $ref: '#/definitions/models.BanDetailsLearnerDoc'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.BanDetailsLearner'
+            $ref: '#/definitions/models.BanDetailsLearnerDoc'
         "400":
           description: Bad Request
           schema:
@@ -230,7 +431,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.BanDetailsLearner'
+            $ref: '#/definitions/models.BanDetailsLearnerDoc'
         "400":
           description: Bad Request
           schema:
@@ -267,14 +468,14 @@ paths:
         name: banlearner
         required: true
         schema:
-          $ref: '#/definitions/models.BanDetailsLearner'
+          $ref: '#/definitions/models.BanDetailsLearnerDoc'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.BanDetailsLearner'
+            $ref: '#/definitions/models.BanDetailsLearnerDoc'
         "400":
           description: Bad Request
           schema:
@@ -306,7 +507,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.BanDetailsLearner'
+              $ref: '#/definitions/models.BanDetailsLearnerDoc'
             type: array
         "500":
           description: Internal Server Error
@@ -328,14 +529,14 @@ paths:
         name: banteacher
         required: true
         schema:
-          $ref: '#/definitions/models.BanDetailsTeacher'
+          $ref: '#/definitions/models.BanDetailsTeacherDoc'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.BanDetailsTeacher'
+            $ref: '#/definitions/models.BanDetailsTeacherDoc'
         "400":
           description: Invalid input
           schema:
@@ -402,7 +603,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.BanDetailsTeacher'
+            $ref: '#/definitions/models.BanDetailsTeacherDoc'
         "400":
           description: Invalid ID
           schema:
@@ -439,14 +640,14 @@ paths:
         name: banteacher
         required: true
         schema:
-          $ref: '#/definitions/models.BanDetailsTeacher'
+          $ref: '#/definitions/models.BanDetailsTeacherDoc'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.BanDetailsTeacher'
+            $ref: '#/definitions/models.BanDetailsTeacherDoc'
         "400":
           description: Invalid input or not found
           schema:
@@ -479,7 +680,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.BanDetailsTeacher'
+              $ref: '#/definitions/models.BanDetailsTeacherDoc'
             type: array
         "500":
           description: Server error
@@ -501,14 +702,14 @@ paths:
         name: class
         required: true
         schema:
-          $ref: '#/definitions/models.Class'
+          $ref: '#/definitions/models.ClassDoc'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.Class'
+            $ref: '#/definitions/models.ClassDoc'
         "400":
           description: Invalid input
           schema:
@@ -576,7 +777,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Class'
+            $ref: '#/definitions/models.ClassDoc'
         "400":
           description: Invalid ID
           schema:
@@ -613,14 +814,14 @@ paths:
         name: class
         required: true
         schema:
-          $ref: '#/definitions/models.Class'
+          $ref: '#/definitions/models.ClassDoc'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Class'
+            $ref: '#/definitions/models.ClassDoc'
         "400":
           description: Invalid input
           schema:
@@ -653,7 +854,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ClassCategory'
+              $ref: '#/definitions/models.ClassCategoryDoc'
             type: array
         "500":
           description: Server error
@@ -675,14 +876,14 @@ paths:
         name: class_category
         required: true
         schema:
-          $ref: '#/definitions/models.ClassCategory'
+          $ref: '#/definitions/models.ClassCategoryDoc'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.ClassCategory'
+            $ref: '#/definitions/models.ClassCategoryDoc'
         "400":
           description: Invalid input
           schema:
@@ -750,7 +951,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ClassCategory'
+            $ref: '#/definitions/models.ClassCategoryDoc'
         "400":
           description: Invalid ID
           schema:
@@ -787,14 +988,14 @@ paths:
         name: class_category
         required: true
         schema:
-          $ref: '#/definitions/models.ClassCategory'
+          $ref: '#/definitions/models.ClassCategoryDoc'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ClassCategory'
+            $ref: '#/definitions/models.ClassCategoryDoc'
         "400":
           description: Invalid input
           schema:
@@ -827,14 +1028,14 @@ paths:
         name: class_session
         required: true
         schema:
-          $ref: '#/definitions/models.ClassSession'
+          $ref: '#/definitions/models.ClassSessionDoc'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.ClassSession'
+            $ref: '#/definitions/models.ClassSessionDoc'
         "400":
           description: Invalid input
           schema:
@@ -902,7 +1103,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ClassSession'
+            $ref: '#/definitions/models.ClassSessionDoc'
         "400":
           description: Invalid ID
           schema:
@@ -939,14 +1140,14 @@ paths:
         name: class_session
         required: true
         schema:
-          $ref: '#/definitions/models.ClassSession'
+          $ref: '#/definitions/models.ClassSessionDoc'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ClassSession'
+            $ref: '#/definitions/models.ClassSessionDoc'
         "400":
           description: Invalid input
           schema:
@@ -979,7 +1180,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ClassSession'
+              $ref: '#/definitions/models.ClassSessionDoc'
             type: array
         "500":
           description: Server error
@@ -1001,7 +1202,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Class'
+              $ref: '#/definitions/models.ClassDoc'
             type: array
         "500":
           description: Server error
@@ -1023,14 +1224,14 @@ paths:
         name: enrollment
         required: true
         schema:
-          $ref: '#/definitions/models.Enrollment'
+          $ref: '#/definitions/models.EnrollmentDoc'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.Enrollment'
+            $ref: '#/definitions/models.EnrollmentDoc'
         "400":
           description: Invalid input
           schema:
@@ -1098,7 +1299,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Enrollment'
+            $ref: '#/definitions/models.EnrollmentDoc'
         "400":
           description: Invalid ID
           schema:
@@ -1135,14 +1336,14 @@ paths:
         name: enrollment
         required: true
         schema:
-          $ref: '#/definitions/models.Enrollment'
+          $ref: '#/definitions/models.EnrollmentDoc'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Enrollment'
+            $ref: '#/definitions/models.EnrollmentDoc'
         "400":
           description: Invalid input
           schema:
@@ -1175,7 +1376,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Enrollment'
+              $ref: '#/definitions/models.EnrollmentDoc'
             type: array
         "500":
           description: Server error
@@ -1197,14 +1398,14 @@ paths:
         name: learner
         required: true
         schema:
-          $ref: '#/definitions/models.Learner'
+          $ref: '#/definitions/models.LearnerDoc'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.Learner'
+            $ref: '#/definitions/models.LearnerDoc'
         "400":
           description: Invalid input
           schema:
@@ -1271,7 +1472,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Learner'
+            $ref: '#/definitions/models.LearnerDoc'
         "400":
           description: Invalid ID
           schema:
@@ -1303,7 +1504,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Learner'
+              $ref: '#/definitions/models.LearnerDoc'
             type: array
         "500":
           description: Server error
@@ -1325,14 +1526,14 @@ paths:
         name: notification
         required: true
         schema:
-          $ref: '#/definitions/models.Notification'
+          $ref: '#/definitions/models.NotificationDoc'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.Notification'
+            $ref: '#/definitions/models.NotificationDoc'
         "400":
           description: Invalid input
           schema:
@@ -1400,7 +1601,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Notification'
+            $ref: '#/definitions/models.NotificationDoc'
         "400":
           description: Invalid ID
           schema:
@@ -1437,14 +1638,14 @@ paths:
         name: notification
         required: true
         schema:
-          $ref: '#/definitions/models.Notification'
+          $ref: '#/definitions/models.NotificationDoc'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Notification'
+            $ref: '#/definitions/models.NotificationDoc'
         "400":
           description: Invalid input
           schema:
@@ -1477,7 +1678,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Notification'
+              $ref: '#/definitions/models.NotificationDoc'
             type: array
         "500":
           description: Server error
@@ -1499,14 +1700,14 @@ paths:
         name: report
         required: true
         schema:
-          $ref: '#/definitions/models.Report'
+          $ref: '#/definitions/models.ReportDoc'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.Report'
+            $ref: '#/definitions/models.ReportDoc'
         "400":
           description: Invalid input
           schema:
@@ -1574,7 +1775,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Report'
+            $ref: '#/definitions/models.ReportDoc'
         "400":
           description: Invalid ID
           schema:
@@ -1611,14 +1812,14 @@ paths:
         name: report
         required: true
         schema:
-          $ref: '#/definitions/models.Report'
+          $ref: '#/definitions/models.ReportDoc'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Report'
+            $ref: '#/definitions/models.ReportDoc'
         "400":
           description: Invalid input
           schema:
@@ -1651,7 +1852,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Report'
+              $ref: '#/definitions/models.ReportDoc'
             type: array
         "500":
           description: Server error
@@ -1673,14 +1874,14 @@ paths:
         name: review
         required: true
         schema:
-          $ref: '#/definitions/models.Review'
+          $ref: '#/definitions/models.ReviewDoc'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.Review'
+            $ref: '#/definitions/models.ReviewDoc'
         "400":
           description: Invalid input or rating out of range
           schema:
@@ -1748,7 +1949,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Review'
+            $ref: '#/definitions/models.ReviewDoc'
         "400":
           description: Invalid ID
           schema:
@@ -1786,14 +1987,14 @@ paths:
         name: review
         required: true
         schema:
-          $ref: '#/definitions/models.Review'
+          $ref: '#/definitions/models.ReviewDoc'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Review'
+            $ref: '#/definitions/models.ReviewDoc'
         "400":
           description: Invalid input or rating out of range
           schema:
@@ -1826,7 +2027,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Review'
+              $ref: '#/definitions/models.ReviewDoc'
             type: array
         "500":
           description: Server error
@@ -1848,14 +2049,14 @@ paths:
         name: teacher
         required: true
         schema:
-          $ref: '#/definitions/models.Teacher'
+          $ref: '#/definitions/models.TeacherDoc'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.Teacher'
+            $ref: '#/definitions/models.TeacherDoc'
         "400":
           description: Invalid input
           schema:
@@ -1922,7 +2123,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Teacher'
+            $ref: '#/definitions/models.TeacherDoc'
         "400":
           description: Invalid ID
           schema:
@@ -1959,14 +2160,14 @@ paths:
         name: teacher
         required: true
         schema:
-          $ref: '#/definitions/models.Teacher'
+          $ref: '#/definitions/models.TeacherDoc'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Teacher'
+            $ref: '#/definitions/models.TeacherDoc'
         "400":
           description: Invalid input
           schema:
@@ -1998,7 +2199,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Teacher'
+              $ref: '#/definitions/models.TeacherDoc'
             type: array
         "500":
           description: Server error
@@ -2020,14 +2221,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/models.UserDoc'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.User'
+            $ref: '#/definitions/models.UserDoc'
         "400":
           description: Invalid input
           schema:
@@ -2094,7 +2295,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.User'
+            $ref: '#/definitions/models.UserDoc'
         "400":
           description: Invalid ID
           schema:
@@ -2131,14 +2332,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/models.UserDoc'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.User'
+            $ref: '#/definitions/models.UserDoc'
         "400":
           description: Invalid input
           schema:
@@ -2170,7 +2371,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.User'
+              $ref: '#/definitions/models.UserDoc'
             type: array
         "500":
           description: Server error

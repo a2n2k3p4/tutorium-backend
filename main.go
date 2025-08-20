@@ -51,7 +51,13 @@ func main() {
 		})
 	})
 
-	app.Get("/swagger/*", swagger.HandlerDefault)
+	//custom swagger UI
+	app.Get("/swagger/*", swagger.New(swagger.Config{
+		URL:                      "http://localhost:8000/swagger/doc.json", // swagger.json location
+		DeepLinking:              true,
+		DocExpansion:             "false",
+		DefaultModelsExpandDepth: 2, //expand models
+	}))
 
 	handlers.AllRoutes(db, app) // Register admin routes
 	// Define the /users route and handler inline

@@ -22,8 +22,8 @@ func ClassRoutes(app *fiber.App) {
 // @Tags         Classes
 // @Accept       json
 // @Produce      json
-// @Param        class  body      models.Class  true  "Class payload"
-// @Success      201    {object}  models.Class
+// @Param        class  body      models.ClassDoc  true  "Class payload"
+// @Success      201    {object}  models.ClassDoc
 // @Failure      400    {object}  map[string]string  "Invalid input"
 // @Failure      500    {object}  map[string]string  "Server error"
 // @Router       /class [post]
@@ -45,7 +45,7 @@ func CreateClass(c *fiber.Ctx) error {
 // @Description  GetClasses retrieves all Class records with Teacher and Categories relations
 // @Tags         Classes
 // @Produce      json
-// @Success      200    {array}   models.Class
+// @Success      200    {array}   models.ClassDoc
 // @Failure      500    {object}  map[string]string  "Server error"
 // @Router       /classes [get]
 func GetClasses(c *fiber.Ctx) error {
@@ -67,7 +67,7 @@ func findClass(id int, class *models.Class) error {
 // @Tags         Classes
 // @Produce      json
 // @Param        id    path      int  true  "Class ID"
-// @Success      200   {object}  models.Class
+// @Success      200   {object}  models.ClassDoc
 // @Failure      400   {object}  map[string]string  "Invalid ID"
 // @Failure      404   {object}  map[string]string  "Class not found"
 // @Failure      500   {object}  map[string]string  "Server error"
@@ -99,8 +99,8 @@ func GetClass(c *fiber.Ctx) error {
 // @Accept       json
 // @Produce      json
 // @Param        id     path      int           true  "Class ID"
-// @Param        class  body      models.Class  true  "Updated class payload"
-// @Success      200    {object}  models.Class
+// @Param        class  body      models.ClassDoc  true  "Updated class payload"
+// @Success      200    {object}  models.ClassDoc
 // @Failure      400    {object}  map[string]string  "Invalid input"
 // @Failure      404    {object}  map[string]string  "Class not found"
 // @Failure      500    {object}  map[string]string  "Server error"
