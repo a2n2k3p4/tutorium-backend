@@ -22,8 +22,8 @@ func LearnerRoutes(app *fiber.App) {
 // @Tags         Learners
 // @Accept       json
 // @Produce      json
-// @Param        learner  body      models.Learner  true  "Learner payload"
-// @Success      201      {object}  models.Learner
+// @Param        learner  body      models.LearnerDoc  true  "Learner payload"
+// @Success      201      {object}  models.LearnerDoc
 // @Failure      400      {object}  map[string]string  "Invalid input"
 // @Failure      500      {object}  map[string]string  "Server error"
 // @Router       /learner [post]
@@ -46,7 +46,7 @@ func CreateLearner(c *fiber.Ctx) error {
 // @Description  GetLearners retrieves all Learner records
 // @Tags         Learners
 // @Produce      json
-// @Success      200      {array}   models.Learner
+// @Success      200      {array}   models.LearnerDoc
 // @Failure      500      {object}  map[string]string  "Server error"
 // @Router       /learners [get]
 func GetLearners(c *fiber.Ctx) error {
@@ -68,7 +68,7 @@ func findLearner(id int, learner *models.Learner) error {
 // @Tags         Learners
 // @Produce      json
 // @Param        id   path      int  true  "Learner ID"
-// @Success      200  {object}  models.Learner
+// @Success      200  {object}  models.LearnerDoc
 // @Failure      400  {object}  map[string]string  "Invalid ID"
 // @Failure      404  {object}  map[string]string  "Learner not found"
 // @Failure      500  {object}  map[string]string  "Server error"

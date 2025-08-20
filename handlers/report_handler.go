@@ -22,8 +22,8 @@ func ReportRoutes(app *fiber.App) {
 // @Tags         Reports
 // @Accept       json
 // @Produce      json
-// @Param        report  body      models.Report  true  "Report payload"
-// @Success      201     {object}  models.Report
+// @Param        report  body      models.ReportDoc  true  "Report payload"
+// @Success      201     {object}  models.ReportDoc
 // @Failure      400     {object}  map[string]string  "Invalid input"
 // @Failure      500     {object}  map[string]string  "Server error"
 // @Router       /report [post]
@@ -46,7 +46,7 @@ func CreateReport(c *fiber.Ctx) error {
 // @Description  GetReports retrieves all Report records with Reporter and Reported relations
 // @Tags         Reports
 // @Produce      json
-// @Success      200     {array}   models.Report
+// @Success      200     {array}   models.ReportDoc
 // @Failure      500     {object}  map[string]string  "Server error"
 // @Router       /reports [get]
 func GetReports(c *fiber.Ctx) error {
@@ -67,7 +67,7 @@ func findReport(id int, report *models.Report) error {
 // @Tags         Reports
 // @Produce      json
 // @Param        id   path      int  true  "Report ID"
-// @Success      200  {object}  models.Report
+// @Success      200  {object}  models.ReportDoc
 // @Failure      400  {object}  map[string]string  "Invalid ID"
 // @Failure      404  {object}  map[string]string  "Report not found"
 // @Failure      500  {object}  map[string]string  "Server error"
@@ -99,8 +99,8 @@ func GetReport(c *fiber.Ctx) error {
 // @Accept       json
 // @Produce      json
 // @Param        id      path      int             true  "Report ID"
-// @Param        report  body      models.Report   true  "Updated report payload"
-// @Success      200     {object}  models.Report
+// @Param        report  body      models.ReportDoc   true  "Updated report payload"
+// @Success      200     {object}  models.ReportDoc
 // @Failure      400     {object}  map[string]string  "Invalid input"
 // @Failure      404     {object}  map[string]string  "Report not found"
 // @Failure      500     {object}  map[string]string  "Server error"

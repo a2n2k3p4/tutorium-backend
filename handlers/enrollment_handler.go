@@ -22,8 +22,8 @@ func EnrollmentRoutes(app *fiber.App) {
 // @Tags         Enrollments
 // @Accept       json
 // @Produce      json
-// @Param        enrollment  body      models.Enrollment  true  "Enrollment payload"
-// @Success      201         {object}  models.Enrollment
+// @Param        enrollment  body      models.EnrollmentDoc  true  "Enrollment payload"
+// @Success      201         {object}  models.EnrollmentDoc
 // @Failure      400         {object}  map[string]string  "Invalid input"
 // @Failure      500         {object}  map[string]string  "Server error"
 // @Router       /enrollment [post]
@@ -46,7 +46,7 @@ func CreateEnrollment(c *fiber.Ctx) error {
 // @Description  GetEnrollments retrieves all Enrollment records with associated Learner and Class
 // @Tags         Enrollments
 // @Produce      json
-// @Success      200         {array}   models.Enrollment
+// @Success      200         {array}   models.EnrollmentDoc
 // @Failure      500         {object}  map[string]string  "Server error"
 // @Router       /enrollments [get]
 func GetEnrollments(c *fiber.Ctx) error {
@@ -67,7 +67,7 @@ func findEnrollment(id int, enrollment *models.Enrollment) error {
 // @Tags         Enrollments
 // @Produce      json
 // @Param        id   path      int  true  "Enrollment ID"
-// @Success      200  {object}  models.Enrollment
+// @Success      200  {object}  models.EnrollmentDoc
 // @Failure      400  {object}  map[string]string  "Invalid ID"
 // @Failure      404  {object}  map[string]string  "Enrollment not found"
 // @Failure      500  {object}  map[string]string  "Server error"
@@ -99,8 +99,8 @@ func GetEnrollment(c *fiber.Ctx) error {
 // @Accept       json
 // @Produce      json
 // @Param        id           path      int                  true  "Enrollment ID"
-// @Param        enrollment   body      models.Enrollment    true  "Updated enrollment payload"
-// @Success      200          {object}  models.Enrollment
+// @Param        enrollment   body      models.EnrollmentDoc    true  "Updated enrollment payload"
+// @Success      200          {object}  models.EnrollmentDoc
 // @Failure      400          {object}  map[string]string  "Invalid input"
 // @Failure      404          {object}  map[string]string  "Enrollment not found"
 // @Failure      500          {object}  map[string]string  "Server error"
