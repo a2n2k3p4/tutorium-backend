@@ -44,80 +44,93 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            set -e
+            bash -lc '
+              set -e
 
-            # Change to project directory
-            cd ~/tutorium-backend
+              # Change to project directory
+              cd ~/tutorium-backend
 
-            echo "=== Starting deployment ==="
-            echo "Current directory: $(pwd)"
+              echo "=== Starting deployment ==="
+              echo "Current directory: $(pwd)"
 
-            # Check if docker and docker compose are available
-            if ! command -v docker &> /dev/null; then
-                echo "ERROR: Docker is not installed on the server"
-                exit 1
-            fi
+              # Create .env file on the server (needed for docker-compose)
+              echo "=== Creating .env file for docker-compose ==="
+              if [ -f .env.example ]; then
+                  cp .env.example .env
+                  echo "✅ .env file created from .env.example"
+              else
+                  echo "❌ .env.example not found!"
+                  ls -la
+                  exit 1
+              fi
 
-            # Check docker compose command (newer versions use 'docker compose', older use 'docker-compose')
-            if docker compose version &> /dev/null; then
-                DOCKER_COMPOSE="docker compose"
-            elif command -v docker-compose &> /dev/null; then
-                DOCKER_COMPOSE="docker-compose"
-            else
-                echo "ERROR: Docker Compose is not installed on the server"
-                exit 1
-            fi
+              # Check if docker and docker compose are available
+              if ! command -v docker &> /dev/null; then
+                  echo "ERROR: Docker is not installed on the server"
+                  exit 1
+              fi
 
-            echo "Using: $DOCKER_COMPOSE"
+              # Check docker compose command (newer versions use \'docker compose\', older use \'docker-compose\')
+              if docker compose version &> /dev/null; then
+                  DOCKER_COMPOSE="docker compose"
+              elif command -v docker-compose &> /dev/null; then
+                  DOCKER_COMPOSE="docker-compose"
+              else
+                  echo "ERROR: Docker Compose is not installed on the server"
+                  exit 1
+              fi
 
-            # Stop existing containers (ignore errors if no containers are running)
-            echo "=== Stopping existing containers ==="
-            $DOCKER_COMPOSE down --remove-orphans || echo "No existing containers to stop"
+              echo "Using: $DOCKER_COMPOSE"
 
-            # Remove old images to ensure fresh build
-            echo "=== Cleaning up old images ==="
-            docker image prune -f || true
+              # Stop existing containers (ignore errors if no containers are running)
+              echo "=== Stopping existing containers ==="
+              $DOCKER_COMPOSE down --remove-orphans || echo "No existing containers to stop"
 
-            # Pull latest base images
-            echo "=== Pulling latest base images ==="
-            $DOCKER_COMPOSE pull || echo "Some images couldn't be pulled, will build anyway"
+              # Remove old images to ensure fresh build
+              echo "=== Cleaning up old images ==="
+              docker image prune -f || true
 
-            # Build new images
-            echo "=== Building application ==="
-            $DOCKER_COMPOSE build --no-cache --pull
+              # Pull latest base images
+              echo "=== Pulling latest base images ==="
+              $DOCKER_COMPOSE pull || echo "Some images couldn\'t be pulled, will build anyway"
 
-            # Start services
-            echo "=== Starting services ==="
-            $DOCKER_COMPOSE up -d --remove-orphans
+              # Build new images
+              echo "=== Building application ==="
+              $DOCKER_COMPOSE build --no-cache --pull
 
-            # Wait a moment for services to start
-            sleep 10
+              # Start services
+              echo "=== Starting services ==="
+              $DOCKER_COMPOSE up -d --remove-orphans
 
-            # Check container status
-            echo "=== Container status ==="
-            $DOCKER_COMPOSE ps
+              # Wait a moment for services to start
+              sleep 10
 
-            # Check if Go app is healthy
-            echo "=== Checking application health ==="
-            if $DOCKER_COMPOSE ps | grep -q "go_app.*Up"; then
-                echo "✅ Go application is running"
-            else
-                echo "❌ Go application failed to start"
-                echo "=== Application logs ==="
-                $DOCKER_COMPOSE logs go_app
-                exit 1
-            fi
+              # Check container status
+              echo "=== Container status ==="
+              $DOCKER_COMPOSE ps
 
-            # Check if PostgreSQL is healthy
-            if $DOCKER_COMPOSE ps | grep -q "postgres.*Up.*healthy"; then
-                echo "✅ PostgreSQL is running and healthy"
-            else
-                echo "❌ PostgreSQL is not healthy"
-                echo "=== PostgreSQL logs ==="
-                $DOCKER_COMPOSE logs postgres
-                exit 1
-            fi
+              # Check if Go app is healthy
+              echo "=== Checking application health ==="
+              if $DOCKER_COMPOSE ps | grep -q "go_app.*Up"; then
+                  echo "✅ Go application is running"
+              else
+                  echo "❌ Go application failed to start"
+                  echo "=== Application logs ==="
+                  $DOCKER_COMPOSE logs go_app
+                  exit 1
+              fi
 
-            echo "=== Deployment completed successfully ==="
-            echo "Application should be available on port 8000"
-            echo "Database migrations will run automatically when the Go app starts"
+              # Check if PostgreSQL is healthy
+              if $DOCKER_COMPOSE ps | grep -q "postgres.*Up.*healthy"; then
+                  echo "✅ PostgreSQL is running and healthy"
+              else
+                  echo "❌ PostgreSQL is not healthy"
+                  echo "=== PostgreSQL logs ==="
+                  $DOCKER_COMPOSE logs postgres
+                  exit 1
+              fi
+
+              echo "=== Deployment completed successfully ==="
+              echo "Application should be available on port 8000"
+              echo "Database migrations will run automatically when the Go app starts"
+            '
