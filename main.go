@@ -48,7 +48,7 @@ func main() {
 
 	// debug route
 	app.Get("/", func(c *fiber.Ctx) error {
-		// log.Printf("c base url : %s", c.BaseURL())
+		log.Printf("c base url : %s", c.BaseURL())
 		return c.JSON(fiber.Map{
 			"message": "Tutorium Backend API",
 			"swagger": c.BaseURL() + "/swagger/",
