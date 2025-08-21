@@ -17,20 +17,18 @@ import (
 
 // Before running the server, change config/dbserver/config.go to correct connection info
 
-// @title	Tutorium Backend API
-// @version	1.0
-// @description	This is the API for Tutorium Backend system.
-// @termsOfService	http://swagger.io/terms/
+//	@title			Tutorium Backend API
+//	@version		1.0
+//	@description	This is the API for Tutorium Backend system.
+//	@termsOfService	http://swagger.io/terms/
 
-// @contact.name	API Support
-// @contact.url	http://www.swagger.io/support
-// @contact.email	support@swagger.io
+//	@contact.name	API Support
+//	@contact.url	http://www.swagger.io/support
+//	@contact.email	support@swagger.io
 
-// @license.name	AGPL-3.0
-// @license.url	https://www.gnu.org/licenses/agpl-3.0.en.html
+//	@license.name	AGPL-3.0
+//	@license.url	https://www.gnu.org/licenses/agpl-3.0.en.html
 
-// @host	api.tutorium.com
-// @schemes	http https
 func main() {
 	cfg := dbserver.NewConfig()
 

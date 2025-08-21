@@ -17,15 +17,16 @@ func AdminRoutes(app *fiber.App) {
 }
 
 // CreateAdmin godoc
-// @Summary Create a new admin
-// @Description Create a new admin with the provided data
-// @Tags admins
-// @Accept json
-// @Produce json
-// @Param admin body models.AdminDoc true "Admin data"
-// @Success 200 {object} models.AdminDoc
-// @Failure 400 {object} map[string]interface{} "Bad request"
-// @Router /admin [post]
+//
+//	@Summary		Create a new admin
+//	@Description	Create a new admin with the provided data
+//	@Tags			admins
+//	@Accept			json
+//	@Produce		json
+//	@Param			admin	body		models.AdminDoc	true	"Admin data"
+//	@Success		200		{object}	models.AdminDoc
+//	@Failure		400		{object}	map[string]interface{}	"Bad request"
+//	@Router			/admin [post]
 func CreateAdmin(c *fiber.Ctx) error {
 	var admin models.Admin
 
@@ -40,14 +41,15 @@ func CreateAdmin(c *fiber.Ctx) error {
 }
 
 // GetAdmins godoc
-// @Summary Get all admins
-// @Description Retrieve a list of all admins
-// @Tags admins
-// @Accept json
-// @Produce json
-// @Success 200 {array} models.AdminDoc
-// @Failure 404 {object} map[string]interface{} "Admins not found"
-// @Router /admins [get]
+//
+//	@Summary		Get all admins
+//	@Description	Retrieve a list of all admins
+//	@Tags			admins
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{array}		models.AdminDoc
+//	@Failure		404	{object}	map[string]interface{}	"Admins not found"
+//	@Router			/admins [get]
 func GetAdmins(c *fiber.Ctx) error {
 	admins := []models.Admin{}
 	if err := db.Find(&admins).Error; err != nil {
@@ -62,15 +64,16 @@ func findAdmin(id int, admin *models.Admin) error {
 }
 
 // GetAdmin godoc
-// @Summary Get admin by ID
-// @Description Retrieve a specific admin by their ID
-// @Tags admins
-// @Accept json
-// @Produce json
-// @Param id path int true "Admin ID"
-// @Success 200 {object} models.AdminDoc
-// @Failure 400 {object} map[string]interface{} "Bad request - Invalid ID or admin not found"
-// @Router /admin/{id} [get]
+//
+//	@Summary		Get admin by ID
+//	@Description	Retrieve a specific admin by their ID
+//	@Tags			admins
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"Admin ID"
+//	@Success		200	{object}	models.AdminDoc
+//	@Failure		400	{object}	map[string]interface{}	"Bad request - Invalid ID or admin not found"
+//	@Router			/admin/{id} [get]
 func GetAdmin(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -92,16 +95,17 @@ func GetAdmin(c *fiber.Ctx) error {
 }
 
 // DeleteAdmin godoc
-// @Summary Delete admin by ID
-// @Description Delete a specific admin by their ID
-// @Tags admins
-// @Accept json
-// @Produce json
-// @Param id path int true "Admin ID"
-// @Success 200 {object} map[string]interface{} "Successfully deleted admin"
-// @Failure 400 {object} map[string]interface{} "Bad request - Invalid ID or admin not found"
-// @Failure 500 {object} map[string]interface{} "Internal server error during deletion"
-// @Router /admin/{id} [delete]
+//
+//	@Summary		Delete admin by ID
+//	@Description	Delete a specific admin by their ID
+//	@Tags			admins
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int						true	"Admin ID"
+//	@Success		200	{object}	map[string]interface{}	"Successfully deleted admin"
+//	@Failure		400	{object}	map[string]interface{}	"Bad request - Invalid ID or admin not found"
+//	@Failure		500	{object}	map[string]interface{}	"Internal server error during deletion"
+//	@Router			/admin/{id} [delete]
 func DeleteAdmin(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

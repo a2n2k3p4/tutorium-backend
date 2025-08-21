@@ -1,8 +1,4 @@
 {
-    "schemes": [
-        "http",
-        "https"
-    ],
     "swagger": "2.0",
     "info": {
         "description": "This is the API for Tutorium Backend system.",
@@ -19,7 +15,6 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8000",
     "paths": {
         "/admin": {
             "post": {
