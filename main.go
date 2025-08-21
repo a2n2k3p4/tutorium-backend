@@ -8,6 +8,7 @@ import (
 	"github.com/a2n2k3p4/tutorium-backend/handlers"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 
 	// swagger
 	_ "github.com/a2n2k3p4/tutorium-backend/docs"
@@ -43,6 +44,8 @@ func main() {
 	// path
 	app := fiber.New()
 
+	app.Use(cors.New())
+
 	// debug route
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
@@ -51,12 +54,12 @@ func main() {
 		})
 	})
 
-	//custom swagger UI
+	// custom swagger UI
 	app.Get("/swagger/*", swagger.New(swagger.Config{
 		URL:                      "http://localhost:8000/swagger/doc.json", // swagger.json location
 		DeepLinking:              true,
 		DocExpansion:             "false",
-		DefaultModelsExpandDepth: 2, //expand models
+		DefaultModelsExpandDepth: 2, // expand models
 	}))
 
 	handlers.AllRoutes(db, app) // Register admin routes
