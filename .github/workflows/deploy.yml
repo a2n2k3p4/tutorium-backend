@@ -53,6 +53,17 @@ jobs:
               echo "=== Starting deployment ==="
               echo "Current directory: $(pwd)"
 
+              # Create .env file on the server (needed for docker-compose)
+              echo "=== Creating .env file for docker-compose ==="
+              if [ -f .env.example ]; then
+                  cp .env.example .env
+                  echo "✅ .env file created from .env.example"
+              else
+                  echo "❌ .env.example not found!"
+                  ls -la
+                  exit 1
+              fi
+
               # Check if docker and docker compose are available
               if ! command -v docker &> /dev/null; then
                   echo "ERROR: Docker is not installed on the server"
