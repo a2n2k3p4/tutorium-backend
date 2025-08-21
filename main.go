@@ -29,7 +29,7 @@ import (
 // @license.name	AGPL-3.0
 // @license.url	https://www.gnu.org/licenses/agpl-3.0.en.html
 
-// @host	localhost:8000
+// @host	api.tutorium.com
 // @schemes	http https
 func main() {
 	cfg := dbserver.NewConfig()
@@ -48,15 +48,16 @@ func main() {
 
 	// debug route
 	app.Get("/", func(c *fiber.Ctx) error {
+		println("c base url : ", c.BaseURL())
 		return c.JSON(fiber.Map{
 			"message": "Tutorium Backend API",
-			"swagger": "http://localhost:8000/swagger/",
+			"swagger": c.BaseURL() + "/swagger/",
 		})
 	})
 
 	// custom swagger UI
 	app.Get("/swagger/*", swagger.New(swagger.Config{
-		URL:                      "http://localhost:8000/swagger/doc.json", // swagger.json location
+		URL:                      "doc.json", // swagger.json location
 		DeepLinking:              true,
 		DocExpansion:             "false",
 		DefaultModelsExpandDepth: 2, // expand models
@@ -73,7 +74,7 @@ func main() {
 
 	// lg
 	log.Println("Server starting on :8000")
-	log.Println("API endpoint: http://localhost:8000/")
-	log.Println("Swagger UI: http://localhost:8000/swagger/")
+	log.Println("API endpoint: /")
+	log.Println("Swagger UI: /swagger/")
 	log.Fatal(app.Listen(":8000"))
 }
