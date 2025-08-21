@@ -226,7 +226,6 @@ definitions:
         example: 7
         type: integer
     type: object
-host: localhost:8000
 info:
   contact:
     email: support@swagger.io
@@ -2382,7 +2381,4 @@ paths:
       summary: List all users
       tags:
       - Users
-schemes:
-- http
-- https
 swagger: "2.0"
