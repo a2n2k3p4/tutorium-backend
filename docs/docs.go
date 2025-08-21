@@ -44,7 +44,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Admin"
+                            "$ref": "#/definitions/models.AdminDoc"
                         }
                     }
                 ],
@@ -52,7 +52,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Admin"
+                            "$ref": "#/definitions/models.AdminDoc"
                         }
                     },
                     "400": {
@@ -91,7 +91,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Admin"
+                            "$ref": "#/definitions/models.AdminDoc"
                         }
                     },
                     "400": {
@@ -168,7 +168,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Admin"
+                                "$ref": "#/definitions/models.AdminDoc"
                             }
                         }
                     },
@@ -202,7 +202,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.BanDetailsLearner"
+                            "$ref": "#/definitions/models.BanDetailsLearnerDoc"
                         }
                     }
                 ],
@@ -210,7 +210,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.BanDetailsLearner"
+                            "$ref": "#/definitions/models.BanDetailsLearnerDoc"
                         }
                     },
                     "400": {
@@ -257,7 +257,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.BanDetailsLearner"
+                            "$ref": "#/definitions/models.BanDetailsLearnerDoc"
                         }
                     },
                     "400": {
@@ -315,7 +315,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.BanDetailsLearner"
+                            "$ref": "#/definitions/models.BanDetailsLearnerDoc"
                         }
                     }
                 ],
@@ -323,7 +323,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.BanDetailsLearner"
+                            "$ref": "#/definitions/models.BanDetailsLearnerDoc"
                         }
                     },
                     "400": {
@@ -426,7 +426,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.BanDetailsLearner"
+                                "$ref": "#/definitions/models.BanDetailsLearnerDoc"
                             }
                         }
                     },
@@ -462,7 +462,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.BanDetailsTeacher"
+                            "$ref": "#/definitions/models.BanDetailsTeacherDoc"
                         }
                     }
                 ],
@@ -470,7 +470,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.BanDetailsTeacher"
+                            "$ref": "#/definitions/models.BanDetailsTeacherDoc"
                         }
                     },
                     "400": {
@@ -517,7 +517,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.BanDetailsTeacher"
+                            "$ref": "#/definitions/models.BanDetailsTeacherDoc"
                         }
                     },
                     "400": {
@@ -575,7 +575,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.BanDetailsTeacher"
+                            "$ref": "#/definitions/models.BanDetailsTeacherDoc"
                         }
                     }
                 ],
@@ -583,7 +583,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.BanDetailsTeacher"
+                            "$ref": "#/definitions/models.BanDetailsTeacherDoc"
                         }
                     },
                     "400": {
@@ -686,7 +686,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.BanDetailsTeacher"
+                                "$ref": "#/definitions/models.BanDetailsTeacherDoc"
                             }
                         }
                     },
@@ -722,7 +722,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Class"
+                            "$ref": "#/definitions/models.ClassDoc"
                         }
                     }
                 ],
@@ -730,7 +730,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Class"
+                            "$ref": "#/definitions/models.ClassDoc"
                         }
                     },
                     "400": {
@@ -777,7 +777,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Class"
+                            "$ref": "#/definitions/models.ClassDoc"
                         }
                     },
                     "400": {
@@ -835,7 +835,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Class"
+                            "$ref": "#/definitions/models.ClassDoc"
                         }
                     }
                 ],
@@ -843,7 +843,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Class"
+                            "$ref": "#/definitions/models.ClassDoc"
                         }
                     },
                     "400": {
@@ -946,7 +946,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ClassCategory"
+                                "$ref": "#/definitions/models.ClassCategoryDoc"
                             }
                         }
                     },
@@ -982,7 +982,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ClassCategory"
+                            "$ref": "#/definitions/models.ClassCategoryDoc"
                         }
                     }
                 ],
@@ -990,7 +990,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.ClassCategory"
+                            "$ref": "#/definitions/models.ClassCategoryDoc"
                         }
                     },
                     "400": {
@@ -1037,7 +1037,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ClassCategory"
+                            "$ref": "#/definitions/models.ClassCategoryDoc"
                         }
                     },
                     "400": {
@@ -1095,7 +1095,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ClassCategory"
+                            "$ref": "#/definitions/models.ClassCategoryDoc"
                         }
                     }
                 ],
@@ -1103,7 +1103,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ClassCategory"
+                            "$ref": "#/definitions/models.ClassCategoryDoc"
                         }
                     },
                     "400": {
@@ -1210,7 +1210,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ClassSession"
+                            "$ref": "#/definitions/models.ClassSessionDoc"
                         }
                     }
                 ],
@@ -1218,7 +1218,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.ClassSession"
+                            "$ref": "#/definitions/models.ClassSessionDoc"
                         }
                     },
                     "400": {
@@ -1265,7 +1265,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ClassSession"
+                            "$ref": "#/definitions/models.ClassSessionDoc"
                         }
                     },
                     "400": {
@@ -1323,7 +1323,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ClassSession"
+                            "$ref": "#/definitions/models.ClassSessionDoc"
                         }
                     }
                 ],
@@ -1331,7 +1331,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ClassSession"
+                            "$ref": "#/definitions/models.ClassSessionDoc"
                         }
                     },
                     "400": {
@@ -1434,7 +1434,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ClassSession"
+                                "$ref": "#/definitions/models.ClassSessionDoc"
                             }
                         }
                     },
@@ -1466,7 +1466,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Class"
+                                "$ref": "#/definitions/models.ClassDoc"
                             }
                         }
                     },
@@ -1502,7 +1502,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Enrollment"
+                            "$ref": "#/definitions/models.EnrollmentDoc"
                         }
                     }
                 ],
@@ -1510,7 +1510,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Enrollment"
+                            "$ref": "#/definitions/models.EnrollmentDoc"
                         }
                     },
                     "400": {
@@ -1557,7 +1557,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Enrollment"
+                            "$ref": "#/definitions/models.EnrollmentDoc"
                         }
                     },
                     "400": {
@@ -1615,7 +1615,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Enrollment"
+                            "$ref": "#/definitions/models.EnrollmentDoc"
                         }
                     }
                 ],
@@ -1623,7 +1623,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Enrollment"
+                            "$ref": "#/definitions/models.EnrollmentDoc"
                         }
                     },
                     "400": {
@@ -1726,7 +1726,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Enrollment"
+                                "$ref": "#/definitions/models.EnrollmentDoc"
                             }
                         }
                     },
@@ -1762,7 +1762,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Learner"
+                            "$ref": "#/definitions/models.LearnerDoc"
                         }
                     }
                 ],
@@ -1770,7 +1770,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Learner"
+                            "$ref": "#/definitions/models.LearnerDoc"
                         }
                     },
                     "400": {
@@ -1817,7 +1817,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Learner"
+                            "$ref": "#/definitions/models.LearnerDoc"
                         }
                     },
                     "400": {
@@ -1920,7 +1920,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Learner"
+                                "$ref": "#/definitions/models.LearnerDoc"
                             }
                         }
                     },
@@ -1956,7 +1956,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Notification"
+                            "$ref": "#/definitions/models.NotificationDoc"
                         }
                     }
                 ],
@@ -1964,7 +1964,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Notification"
+                            "$ref": "#/definitions/models.NotificationDoc"
                         }
                     },
                     "400": {
@@ -2011,7 +2011,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Notification"
+                            "$ref": "#/definitions/models.NotificationDoc"
                         }
                     },
                     "400": {
@@ -2069,7 +2069,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Notification"
+                            "$ref": "#/definitions/models.NotificationDoc"
                         }
                     }
                 ],
@@ -2077,7 +2077,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Notification"
+                            "$ref": "#/definitions/models.NotificationDoc"
                         }
                     },
                     "400": {
@@ -2180,7 +2180,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Notification"
+                                "$ref": "#/definitions/models.NotificationDoc"
                             }
                         }
                     },
@@ -2216,7 +2216,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Report"
+                            "$ref": "#/definitions/models.ReportDoc"
                         }
                     }
                 ],
@@ -2224,7 +2224,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Report"
+                            "$ref": "#/definitions/models.ReportDoc"
                         }
                     },
                     "400": {
@@ -2271,7 +2271,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Report"
+                            "$ref": "#/definitions/models.ReportDoc"
                         }
                     },
                     "400": {
@@ -2329,7 +2329,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Report"
+                            "$ref": "#/definitions/models.ReportDoc"
                         }
                     }
                 ],
@@ -2337,7 +2337,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Report"
+                            "$ref": "#/definitions/models.ReportDoc"
                         }
                     },
                     "400": {
@@ -2440,7 +2440,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Report"
+                                "$ref": "#/definitions/models.ReportDoc"
                             }
                         }
                     },
@@ -2476,7 +2476,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Review"
+                            "$ref": "#/definitions/models.ReviewDoc"
                         }
                     }
                 ],
@@ -2484,7 +2484,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Review"
+                            "$ref": "#/definitions/models.ReviewDoc"
                         }
                     },
                     "400": {
@@ -2531,7 +2531,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Review"
+                            "$ref": "#/definitions/models.ReviewDoc"
                         }
                     },
                     "400": {
@@ -2589,7 +2589,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Review"
+                            "$ref": "#/definitions/models.ReviewDoc"
                         }
                     }
                 ],
@@ -2597,7 +2597,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Review"
+                            "$ref": "#/definitions/models.ReviewDoc"
                         }
                     },
                     "400": {
@@ -2700,7 +2700,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Review"
+                                "$ref": "#/definitions/models.ReviewDoc"
                             }
                         }
                     },
@@ -2736,7 +2736,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Teacher"
+                            "$ref": "#/definitions/models.TeacherDoc"
                         }
                     }
                 ],
@@ -2744,7 +2744,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Teacher"
+                            "$ref": "#/definitions/models.TeacherDoc"
                         }
                     },
                     "400": {
@@ -2791,7 +2791,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Teacher"
+                            "$ref": "#/definitions/models.TeacherDoc"
                         }
                     },
                     "400": {
@@ -2849,7 +2849,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Teacher"
+                            "$ref": "#/definitions/models.TeacherDoc"
                         }
                     }
                 ],
@@ -2857,7 +2857,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Teacher"
+                            "$ref": "#/definitions/models.TeacherDoc"
                         }
                     },
                     "400": {
@@ -2960,7 +2960,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Teacher"
+                                "$ref": "#/definitions/models.TeacherDoc"
                             }
                         }
                     },
@@ -2996,7 +2996,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.UserDoc"
                         }
                     }
                 ],
@@ -3004,7 +3004,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.UserDoc"
                         }
                     },
                     "400": {
@@ -3051,7 +3051,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.UserDoc"
                         }
                     },
                     "400": {
@@ -3109,7 +3109,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.UserDoc"
                         }
                     }
                 ],
@@ -3117,7 +3117,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.UserDoc"
                         }
                     },
                     "400": {
@@ -3220,7 +3220,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.User"
+                                "$ref": "#/definitions/models.UserDoc"
                             }
                         }
                     },
@@ -3238,44 +3238,320 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.Admin": {
-            "type": "object"
+        "models.AdminDoc": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 43
+                }
+            }
         },
-        "models.BanDetailsLearner": {
-            "type": "object"
+        "models.BanDetailsLearnerDoc": {
+            "type": "object",
+            "properties": {
+                "ban_description": {
+                    "type": "string",
+                    "example": "Spamming inappropriate content"
+                },
+                "ban_end": {
+                    "type": "string",
+                    "example": "2025-08-30T12:00:00Z"
+                },
+                "ban_start": {
+                    "type": "string",
+                    "example": "2025-08-20T12:00:00Z"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "learner_id": {
+                    "type": "integer",
+                    "example": 42
+                }
+            }
         },
-        "models.BanDetailsTeacher": {
-            "type": "object"
+        "models.BanDetailsTeacherDoc": {
+            "type": "object",
+            "properties": {
+                "ban_description": {
+                    "type": "string",
+                    "example": "Repeated policy violations"
+                },
+                "ban_end": {
+                    "type": "string",
+                    "example": "2025-08-30T12:00:00Z"
+                },
+                "ban_start": {
+                    "type": "string",
+                    "example": "2025-08-20T12:00:00Z"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "teacher_id": {
+                    "type": "integer",
+                    "example": 7
+                }
+            }
         },
-        "models.Class": {
-            "type": "object"
+        "models.ClassCategoryDoc": {
+            "type": "object",
+            "properties": {
+                "class_category": {
+                    "type": "string",
+                    "example": "Mathematics"
+                },
+                "classes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ClassDoc"
+                    }
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 3
+                }
+            }
         },
-        "models.ClassCategory": {
-            "type": "object"
+        "models.ClassDoc": {
+            "type": "object",
+            "properties": {
+                "class_description": {
+                    "type": "string",
+                    "example": "Advanced Python programming course"
+                },
+                "enrollment_deadline": {
+                    "type": "string",
+                    "example": "2025-09-10T23:59:59Z"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 21
+                },
+                "learner_limit": {
+                    "type": "integer",
+                    "example": 50
+                },
+                "teacher_id": {
+                    "type": "integer",
+                    "example": 7
+                }
+            }
         },
-        "models.ClassSession": {
-            "type": "object"
+        "models.ClassSessionDoc": {
+            "type": "object",
+            "properties": {
+                "class_finish": {
+                    "type": "string",
+                    "example": "2025-09-05T16:00:00Z"
+                },
+                "class_id": {
+                    "type": "integer",
+                    "example": 12
+                },
+                "class_start": {
+                    "type": "string",
+                    "example": "2025-09-05T14:00:00Z"
+                },
+                "class_status": {
+                    "type": "string",
+                    "example": "Scheduled"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Weekly tutoring session for calculus"
+                },
+                "enrollment_deadline": {
+                    "type": "string",
+                    "example": "2025-09-01T23:59:59Z"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 15
+                }
+            }
         },
-        "models.Enrollment": {
-            "type": "object"
+        "models.EnrollmentDoc": {
+            "type": "object",
+            "properties": {
+                "class_id": {
+                    "type": "integer",
+                    "example": 21
+                },
+                "enrollment_status": {
+                    "type": "string",
+                    "example": "active"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 101
+                },
+                "learner_id": {
+                    "type": "integer",
+                    "example": 42
+                }
+            }
         },
-        "models.Learner": {
-            "type": "object"
+        "models.LearnerDoc": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 42
+                }
+            }
         },
-        "models.Notification": {
-            "type": "object"
+        "models.NotificationDoc": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "notification_date": {
+                    "type": "string",
+                    "example": "2025-08-20T15:04:05Z"
+                },
+                "notification_description": {
+                    "type": "string",
+                    "example": "Your class has been rescheduled"
+                },
+                "notification_type": {
+                    "type": "string",
+                    "example": "System Alert"
+                },
+                "read_flag": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 42
+                }
+            }
         },
-        "models.Report": {
-            "type": "object"
+        "models.ReportDoc": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 12
+                },
+                "report_date": {
+                    "type": "string",
+                    "example": "2025-08-20T14:30:00Z"
+                },
+                "report_description": {
+                    "type": "string",
+                    "example": "User sent inappropriate messages"
+                },
+                "report_picture": {
+                    "type": "string",
+                    "example": "base64-encoded-image-string"
+                },
+                "report_type": {
+                    "type": "string",
+                    "example": "Abuse"
+                },
+                "report_user_id": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "reported_user_id": {
+                    "type": "integer",
+                    "example": 8
+                }
+            }
         },
-        "models.Review": {
-            "type": "object"
+        "models.ReviewDoc": {
+            "type": "object",
+            "properties": {
+                "class_id": {
+                    "type": "integer",
+                    "example": 9
+                },
+                "comment": {
+                    "type": "string",
+                    "example": "This class was very informative and well-structured."
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 101
+                },
+                "learner_id": {
+                    "type": "integer",
+                    "example": 42
+                },
+                "rating": {
+                    "type": "integer",
+                    "example": 5
+                }
+            }
         },
-        "models.Teacher": {
-            "type": "object"
+        "models.TeacherDoc": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Experienced Mathematics teacher specializing in calculus and linear algebra."
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 12
+                }
+            }
         },
-        "models.User": {
-            "type": "object"
+        "models.UserDoc": {
+            "type": "object",
+            "properties": {
+                "admin_id": {
+                    "type": "integer",
+                    "example": 3
+                },
+                "balance": {
+                    "type": "number",
+                    "example": 250.75
+                },
+                "first_name": {
+                    "type": "string",
+                    "example": "Alice"
+                },
+                "gender": {
+                    "type": "string",
+                    "example": "Female"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 101
+                },
+                "last_name": {
+                    "type": "string",
+                    "example": "Smith"
+                },
+                "learner_id": {
+                    "type": "integer",
+                    "example": 42
+                },
+                "phone_number": {
+                    "type": "string",
+                    "example": "+66912345678"
+                },
+                "profile_picture": {
+                    "type": "string",
+                    "example": "\u003cbase64-encoded-image\u003e"
+                },
+                "session_id": {
+                    "type": "string",
+                    "example": "sess-abc123xyz"
+                },
+                "teacher_id": {
+                    "type": "integer",
+                    "example": 7
+                }
+            }
         }
     }
 }`

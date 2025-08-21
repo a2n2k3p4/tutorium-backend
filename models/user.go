@@ -23,3 +23,19 @@ type User struct {
 	Teacher *Teacher `gorm:"foreignKey:TeacherID;references:ID;constraint:OnDelete:SET NULL;"`
 	Admin   *Admin   `gorm:"foreignKey:AdminID;references:ID;constraint:OnDelete:SET NULL;"`
 }
+
+// ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
+
+type UserDoc struct {
+	ID             uint    `json:"id" example:"101"`
+	SessionID      string  `json:"session_id" example:"sess-abc123xyz"`
+	ProfilePicture string  `json:"profile_picture,omitempty" example:"<base64-encoded-image>"`
+	FirstName      string  `json:"first_name" example:"Alice"`
+	LastName       string  `json:"last_name" example:"Smith"`
+	Gender         string  `json:"gender" example:"Female"`
+	PhoneNumber    string  `json:"phone_number" example:"+66912345678"`
+	Balance        float64 `json:"balance" example:"250.75"`
+	LearnerID      *uint   `json:"learner_id,omitempty" example:"42"`
+	TeacherID      *uint   `json:"teacher_id,omitempty" example:"7"`
+	AdminID        *uint   `json:"admin_id,omitempty" example:"3"`
+}

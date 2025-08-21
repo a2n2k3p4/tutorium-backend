@@ -22,8 +22,8 @@ func ClassCategoryRoutes(app *fiber.App) {
 // @Tags         ClassCategories
 // @Accept       json
 // @Produce      json
-// @Param        class_category  body      models.ClassCategory  true  "ClassCategory payload"
-// @Success      201             {object}  models.ClassCategory
+// @Param        class_category  body      models.ClassCategoryDoc  true  "ClassCategory payload"
+// @Success      201             {object}  models.ClassCategoryDoc
 // @Failure      400             {object}  map[string]string    "Invalid input"
 // @Failure      500             {object}  map[string]string    "Server error"
 // @Router       /class_category [post]
@@ -46,7 +46,7 @@ func CreateClassCategory(c *fiber.Ctx) error {
 // @Description  GetClassCategories retrieves all ClassCategory records with Classes relation
 // @Tags         ClassCategories
 // @Produce      json
-// @Success      200             {array}   models.ClassCategory
+// @Success      200             {array}   models.ClassCategoryDoc
 // @Failure      500             {object}  map[string]string    "Server error"
 // @Router       /class_categories [get]
 func GetClassCategories(c *fiber.Ctx) error {
@@ -68,7 +68,7 @@ func findClassCategory(id int, class_category *models.ClassCategory) error {
 // @Tags         ClassCategories
 // @Produce      json
 // @Param        id   path      int                true  "ClassCategory ID"
-// @Success      200  {object}  models.ClassCategory
+// @Success      200  {object}  models.ClassCategoryDoc
 // @Failure      400  {object}  map[string]string  "Invalid ID"
 // @Failure      404  {object}  map[string]string  "ClassCategory not found"
 // @Failure      500  {object}  map[string]string  "Server error"
@@ -100,8 +100,8 @@ func GetClassCategory(c *fiber.Ctx) error {
 // @Accept       json
 // @Produce      json
 // @Param        id              path      int                   true  "ClassCategory ID"
-// @Param        class_category  body      models.ClassCategory  true  "Updated payload"
-// @Success      200             {object}  models.ClassCategory
+// @Param        class_category  body      models.ClassCategoryDoc  true  "Updated payload"
+// @Success      200             {object}  models.ClassCategoryDoc
 // @Failure      400             {object}  map[string]string    "Invalid input"
 // @Failure      404             {object}  map[string]string    "ClassCategory not found"
 // @Failure      500             {object}  map[string]string    "Server error"

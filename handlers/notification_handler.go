@@ -22,8 +22,8 @@ func NotificationRoutes(app *fiber.App) {
 // @Tags         Notifications
 // @Accept       json
 // @Produce      json
-// @Param        notification  body      models.Notification  true  "Notification payload"
-// @Success      201           {object}  models.Notification
+// @Param        notification  body      models.NotificationDoc  true  "Notification payload"
+// @Success      201           {object}  models.NotificationDoc
 // @Failure      400           {object}  map[string]string  "Invalid input"
 // @Failure      500           {object}  map[string]string  "Server error"
 // @Router       /notification [post]
@@ -46,7 +46,7 @@ func CreateNotification(c *fiber.Ctx) error {
 // @Description  GetNotifications retrieves all Notification records with associated User
 // @Tags         Notifications
 // @Produce      json
-// @Success      200           {array}   models.Notification
+// @Success      200           {array}   models.NotificationDoc
 // @Failure      500           {object}  map[string]string  "Server error"
 // @Router       /notifications [get]
 func GetNotifications(c *fiber.Ctx) error {
@@ -67,7 +67,7 @@ func findNotification(id int, notification *models.Notification) error {
 // @Tags         Notifications
 // @Produce      json
 // @Param        id   path      int  true  "Notification ID"
-// @Success      200  {object}  models.Notification
+// @Success      200  {object}  models.NotificationDoc
 // @Failure      400  {object}  map[string]string  "Invalid ID"
 // @Failure      404  {object}  map[string]string  "Notification not found"
 // @Failure      500  {object}  map[string]string  "Server error"
@@ -99,8 +99,8 @@ func GetNotification(c *fiber.Ctx) error {
 // @Accept       json
 // @Produce      json
 // @Param        id            path      int                 true  "Notification ID"
-// @Param        notification  body      models.Notification  true  "Updated notification payload"
-// @Success      200           {object}  models.Notification
+// @Param        notification  body      models.NotificationDoc  true  "Updated notification payload"
+// @Success      200           {object}  models.NotificationDoc
 // @Failure      400           {object}  map[string]string  "Invalid input"
 // @Failure      404           {object}  map[string]string  "Notification not found"
 // @Failure      500           {object}  map[string]string  "Server error"

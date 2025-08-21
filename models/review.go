@@ -14,3 +14,13 @@ type Review struct {
 	Learner Learner `gorm:"foreignKey:LearnerID;references:ID;constraint:OnDelete:CASCADE"`
 	Class   Class   `gorm:"foreignKey:ClassID;references:ID;constraint:OnDelete:CASCADE"`
 }
+
+// ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
+
+type ReviewDoc struct {
+	ID        uint   `json:"id" example:"101"`
+	LearnerID uint   `json:"learner_id" example:"42"`
+	ClassID   uint   `json:"class_id" example:"9"`
+	Rating    int    `json:"rating" example:"5"`
+	Comment   string `json:"comment" example:"This class was very informative and well-structured."`
+}

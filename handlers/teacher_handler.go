@@ -22,8 +22,8 @@ func TeacherRoutes(app *fiber.App) {
 // @Tags         Teachers
 // @Accept       json
 // @Produce      json
-// @Param        teacher  body      models.Teacher  true  "Teacher payload"
-// @Success      201      {object}  models.Teacher
+// @Param        teacher  body      models.TeacherDoc  true  "Teacher payload"
+// @Success      201      {object}  models.TeacherDoc
 // @Failure      400      {object}  map[string]string  "Invalid input"
 // @Failure      500      {object}  map[string]string  "Server error"
 // @Router       /teacher [post]
@@ -46,7 +46,7 @@ func CreateTeacher(c *fiber.Ctx) error {
 // @Description  GetTeachers retrieves all Teacher records
 // @Tags         Teachers
 // @Produce      json
-// @Success      200  {array}   models.Teacher
+// @Success      200  {array}   models.TeacherDoc
 // @Failure      500  {object}  map[string]string  "Server error"
 // @Router       /teachers [get]
 func GetTeachers(c *fiber.Ctx) error {
@@ -68,7 +68,7 @@ func findTeacher(id int, teacher *models.Teacher) error {
 // @Tags         Teachers
 // @Produce      json
 // @Param        id   path      int  true  "Teacher ID"
-// @Success      200  {object}  models.Teacher
+// @Success      200  {object}  models.TeacherDoc
 // @Failure      400  {object}  map[string]string  "Invalid ID"
 // @Failure      404  {object}  map[string]string  "Teacher not found"
 // @Failure      500  {object}  map[string]string  "Server error"
@@ -100,8 +100,8 @@ func GetTeacher(c *fiber.Ctx) error {
 // @Accept       json
 // @Produce      json
 // @Param        id       path      int              true  "Teacher ID"
-// @Param        teacher  body      models.Teacher   true  "Updated teacher payload"
-// @Success      200      {object}  models.Teacher
+// @Param        teacher  body      models.TeacherDoc   true  "Updated teacher payload"
+// @Success      200      {object}  models.TeacherDoc
 // @Failure      400      {object}  map[string]string  "Invalid input"
 // @Failure      404      {object}  map[string]string  "Teacher not found"
 // @Failure      500      {object}  map[string]string  "Server error"

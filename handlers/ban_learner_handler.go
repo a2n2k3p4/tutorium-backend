@@ -22,8 +22,8 @@ func BanLearnerRoutes(app *fiber.App) {
 // @Tags         BanLearners
 // @Accept       json
 // @Produce      json
-// @Param        banlearner  body      models.BanDetailsLearner  true  "Ban Learner Payload"
-// @Success      201         {object}  models.BanDetailsLearner
+// @Param        banlearner  body      models.BanDetailsLearnerDoc  true  "Ban Learner Payload"
+// @Success      201         {object}  models.BanDetailsLearnerDoc
 // @Failure      400         {object}  map[string]string
 // @Failure      500         {object}  map[string]string
 // @Router       /banlearner [post]
@@ -45,7 +45,7 @@ func CreateBanLearner(c *fiber.Ctx) error {
 // @Description  GetBanLearners returns a list of all ban records
 // @Tags         BanLearners
 // @Produce      json
-// @Success      200  {array}   models.BanDetailsLearner
+// @Success      200  {array}   models.BanDetailsLearnerDoc
 // @Failure      500  {object}  map[string]string
 // @Router       /banlearners [get]
 func GetBanLearners(c *fiber.Ctx) error {
@@ -67,7 +67,7 @@ func findBanLearner(id int, banlearner *models.BanDetailsLearner) error {
 // @Tags         BanLearners
 // @Produce      json
 // @Param        id   path      int  true  "Ban Learner ID"
-// @Success      200  {object}  models.BanDetailsLearner
+// @Success      200  {object}  models.BanDetailsLearnerDoc
 // @Failure      400  {object}  map[string]string
 // @Failure      404  {object}  map[string]string
 // @Failure      500  {object}  map[string]string
@@ -99,8 +99,8 @@ func GetBanLearner(c *fiber.Ctx) error {
 // @Accept       json
 // @Produce      json
 // @Param        id           path      int                     true  "Ban Learner ID"
-// @Param        banlearner   body      models.BanDetailsLearner  true  "Updated ban record"
-// @Success      200          {object}  models.BanDetailsLearner
+// @Param        banlearner   body      models.BanDetailsLearnerDoc  true  "Updated ban record"
+// @Success      200          {object}  models.BanDetailsLearnerDoc
 // @Failure      400          {object}  map[string]string
 // @Failure      404          {object}  map[string]string
 // @Failure      500          {object}  map[string]string

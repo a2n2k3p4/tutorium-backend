@@ -22,8 +22,8 @@ func AdminRoutes(app *fiber.App) {
 // @Tags admins
 // @Accept json
 // @Produce json
-// @Param admin body models.Admin true "Admin data"
-// @Success 200 {object} models.Admin
+// @Param admin body models.AdminDoc true "Admin data"
+// @Success 200 {object} models.AdminDoc
 // @Failure 400 {object} map[string]interface{} "Bad request"
 // @Router /admin [post]
 func CreateAdmin(c *fiber.Ctx) error {
@@ -45,7 +45,7 @@ func CreateAdmin(c *fiber.Ctx) error {
 // @Tags admins
 // @Accept json
 // @Produce json
-// @Success 200 {array} models.Admin
+// @Success 200 {array} models.AdminDoc
 // @Failure 404 {object} map[string]interface{} "Admins not found"
 // @Router /admins [get]
 func GetAdmins(c *fiber.Ctx) error {
@@ -68,7 +68,7 @@ func findAdmin(id int, admin *models.Admin) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "Admin ID"
-// @Success 200 {object} models.Admin
+// @Success 200 {object} models.AdminDoc
 // @Failure 400 {object} map[string]interface{} "Bad request - Invalid ID or admin not found"
 // @Router /admin/{id} [get]
 func GetAdmin(c *fiber.Ctx) error {
