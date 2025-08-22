@@ -3,17 +3,22 @@ package handlers
 import (
 	"errors"
 
+	"github.com/a2n2k3p4/tutorium-backend/middleware"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func UserRoutes(app *fiber.App) {
-	app.Post("/user", CreateUser)
-	app.Get("/users", GetUsers)
-	app.Get("/user/:id", GetUser)
-	app.Put("/user/:id", UpdateUser)
-	app.Delete("/user/:id", DeleteUser)
+	user := app.Group("/users", middleware.ProtectedMiddleware())
+	user.Post("/", CreateUser)
+	user.Get("/:id", GetUser)
+	user.Put("/:id", UpdateUser)
+	user.Delete("/:id", DeleteUser)
+
+	userAdmin := user.Group("/", middleware.AdminRequired())
+	userAdmin.Get("/", GetUsers)
 }
 
 // CreateUser godoc
@@ -27,7 +32,7 @@ func UserRoutes(app *fiber.App) {
 //	@Success		201		{object}	models.UserDoc
 //	@Failure		400		{object}	map[string]string	"Invalid input"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/user [post]
+//	@Router			/users [post]
 func CreateUser(c *fiber.Ctx) error {
 	var user models.User
 
@@ -53,7 +58,10 @@ func CreateUser(c *fiber.Ctx) error {
 //	@Router			/users [get]
 func GetUsers(c *fiber.Ctx) error {
 	users := []models.User{}
-	if err := db.Find(&users).Error; err != nil {
+	if err := db.Preload("Learner").
+		Preload("Teacher").
+		Preload("Admin").
+		Find(&users).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
@@ -61,7 +69,10 @@ func GetUsers(c *fiber.Ctx) error {
 }
 
 func findUser(id int, user *models.User) error {
-	return db.First(user, "id = ?", id).Error
+	return db.Preload("Learner").
+		Preload("Teacher").
+		Preload("Admin").
+		First(user, "id = ?", id).Error
 }
 
 // GetUser godoc
@@ -75,7 +86,7 @@ func findUser(id int, user *models.User) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"User not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/user/{id} [get]
+//	@Router			/users/{id} [get]
 func GetUser(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -109,7 +120,7 @@ func GetUser(c *fiber.Ctx) error {
 //	@Failure		400		{object}	map[string]string	"Invalid input"
 //	@Failure		404		{object}	map[string]string	"User not found"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/user/{id} [put]
+//	@Router			/users/{id} [put]
 func UpdateUser(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -142,15 +153,15 @@ func UpdateUser(c *fiber.Ctx) error {
 // DeleteUser godoc
 //
 //	@Summary		Delete a user by ID
-//	@Description	DeleteUser removes a user record by its ID
+//	@Description	DeleteUser removes a user record by its ID along with associated Learner, Teacher, and Admin
 //	@Tags			Users
 //	@Produce		json
 //	@Param			id	path		int					true	"User ID"
-//	@Success		200	{string}	string				"Successfully deleted User"
+//	@Success		200	{string}	string				"Successfully deleted User and associated roles"
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"User not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/user/{id} [delete]
+//	@Router			/users/{id} [delete]
 func DeleteUser(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -168,7 +179,7 @@ func DeleteUser(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	if err = db.Delete(&user).Error; err != nil {
+	if err := db.Select(clause.Associations).Delete(&user).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted User")

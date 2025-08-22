@@ -3,17 +3,21 @@ package handlers
 import (
 	"errors"
 
+	"github.com/a2n2k3p4/tutorium-backend/middleware"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func ClassCategoryRoutes(app *fiber.App) {
-	app.Post("/class_category", CreateClassCategory)
-	app.Get("/class_categories", GetClassCategories)
-	app.Get("/class_category/:id", GetClassCategory)
-	app.Put("/class_category/:id", UpdateClassCategory)
-	app.Delete("/class_category/:id", DeleteClassCategory)
+	classCategory := app.Group("/class_categories")
+	classCategory.Get("/", GetClassCategories)
+	classCategory.Get("/:id", GetClassCategory)
+
+	classCategoryProtected := classCategory.Group("/", middleware.ProtectedMiddleware(), middleware.AdminRequired())
+	classCategoryProtected.Post("/", CreateClassCategory)
+	classCategoryProtected.Put("/:id", UpdateClassCategory)
+	classCategoryProtected.Delete("/:id", DeleteClassCategory)
 }
 
 // CreateClassCategory godoc
@@ -27,7 +31,7 @@ func ClassCategoryRoutes(app *fiber.App) {
 //	@Success		201				{object}	models.ClassCategoryDoc
 //	@Failure		400				{object}	map[string]string	"Invalid input"
 //	@Failure		500				{object}	map[string]string	"Server error"
-//	@Router			/class_category [post]
+//	@Router			/class_categories [post]
 func CreateClassCategory(c *fiber.Ctx) error {
 	var class_category models.ClassCategory
 
@@ -75,7 +79,7 @@ func findClassCategory(id int, class_category *models.ClassCategory) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"ClassCategory not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/class_category/{id} [get]
+//	@Router			/class_categories/{id} [get]
 func GetClassCategory(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -109,7 +113,7 @@ func GetClassCategory(c *fiber.Ctx) error {
 //	@Failure		400				{object}	map[string]string	"Invalid input"
 //	@Failure		404				{object}	map[string]string	"ClassCategory not found"
 //	@Failure		500				{object}	map[string]string	"Server error"
-//	@Router			/class_category/{id} [put]
+//	@Router			/class_categories/{id} [put]
 func UpdateClassCategory(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -151,7 +155,7 @@ func UpdateClassCategory(c *fiber.Ctx) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"ClassCategory not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/class_category/{id} [delete]
+//	@Router			/class_categories/{id} [delete]
 func DeleteClassCategory(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

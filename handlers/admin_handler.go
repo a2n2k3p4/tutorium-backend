@@ -3,17 +3,20 @@ package handlers
 import (
 	"errors"
 
+	"github.com/a2n2k3p4/tutorium-backend/middleware"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func AdminRoutes(app *fiber.App) {
-	app.Post("/admin", CreateAdmin)
-	app.Get("/admins", GetAdmins)
-	app.Get("/admin/:id", GetAdmin)
-	// app.Put("/admin/:id", UpdateAdmin) No application logic for updating admin
-	app.Delete("/admin/:id", DeleteAdmin)
+	admin := app.Group("/admins", middleware.ProtectedMiddleware())
+
+	admin.Post("/", CreateAdmin)
+	admin.Get("/", GetAdmins)
+	admin.Get("/:id", GetAdmin)
+	// admin.Put("/admin/:id", UpdateAdmin) No application logic for updating admin
+	admin.Delete("/:id", DeleteAdmin)
 }
 
 // CreateAdmin godoc
@@ -26,7 +29,7 @@ func AdminRoutes(app *fiber.App) {
 //	@Param			admin	body		models.AdminDoc	true	"Admin data"
 //	@Success		200		{object}	models.AdminDoc
 //	@Failure		400		{object}	map[string]interface{}	"Bad request"
-//	@Router			/admin [post]
+//	@Router			/admins [post]
 func CreateAdmin(c *fiber.Ctx) error {
 	var admin models.Admin
 
@@ -73,7 +76,7 @@ func findAdmin(id int, admin *models.Admin) error {
 //	@Param			id	path		int	true	"Admin ID"
 //	@Success		200	{object}	models.AdminDoc
 //	@Failure		400	{object}	map[string]interface{}	"Bad request - Invalid ID or admin not found"
-//	@Router			/admin/{id} [get]
+//	@Router			/admins/{id} [get]
 func GetAdmin(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -105,7 +108,7 @@ func GetAdmin(c *fiber.Ctx) error {
 //	@Success		200	{object}	map[string]interface{}	"Successfully deleted admin"
 //	@Failure		400	{object}	map[string]interface{}	"Bad request - Invalid ID or admin not found"
 //	@Failure		500	{object}	map[string]interface{}	"Internal server error during deletion"
-//	@Router			/admin/{id} [delete]
+//	@Router			/admins/{id} [delete]
 func DeleteAdmin(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

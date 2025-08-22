@@ -61,7 +61,7 @@ func main() {
 		DefaultModelsExpandDepth: 2, // expand models
 	}))
 
-	handlers.AllRoutes(db, app) // Register admin routes
+	handlers.AllRoutes(app) // Register admin routes
 	// Define the /users route and handler inline
 
 	// เริ่มจากการสร้าง user แล้วการใส่ learner , teacher , admin ให้ user

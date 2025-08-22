@@ -3,17 +3,21 @@ package handlers
 import (
 	"errors"
 
+	"github.com/a2n2k3p4/tutorium-backend/middleware"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func ClassRoutes(app *fiber.App) {
-	app.Post("/class", CreateClass)
-	app.Get("/classes", GetClasses)
-	app.Get("/class/:id", GetClass)
-	app.Put("/class/:id", UpdateClass)
-	app.Delete("/class/:id", DeleteClass)
+	class := app.Group("/classes")
+	class.Get("/", GetClasses)
+	class.Get("/:id", GetClass)
+
+	classProtected := class.Group("/", middleware.ProtectedMiddleware(), middleware.TeacherRequired())
+	classProtected.Post("/", CreateClass)
+	classProtected.Put("/:id", UpdateClass)
+	classProtected.Delete("/:id", DeleteClass)
 }
 
 // CreateClass godoc
@@ -27,7 +31,7 @@ func ClassRoutes(app *fiber.App) {
 //	@Success		201		{object}	models.ClassDoc
 //	@Failure		400		{object}	map[string]string	"Invalid input"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/class [post]
+//	@Router			/classes [post]
 func CreateClass(c *fiber.Ctx) error {
 	var class models.Class
 
@@ -74,7 +78,7 @@ func findClass(id int, class *models.Class) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Class not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/class/{id} [get]
+//	@Router			/classes/{id} [get]
 func GetClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -108,7 +112,7 @@ func GetClass(c *fiber.Ctx) error {
 //	@Failure		400		{object}	map[string]string	"Invalid input"
 //	@Failure		404		{object}	map[string]string	"Class not found"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/class/{id} [put]
+//	@Router			/classes/{id} [put]
 func UpdateClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -150,7 +154,7 @@ func UpdateClass(c *fiber.Ctx) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Class not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/class/{id} [delete]
+//	@Router			/classes/{id} [delete]
 func DeleteClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

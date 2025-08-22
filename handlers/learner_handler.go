@@ -3,17 +3,20 @@ package handlers
 import (
 	"errors"
 
+	"github.com/a2n2k3p4/tutorium-backend/middleware"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func LearnerRoutes(app *fiber.App) {
-	app.Post("/learner", CreateLearner)
-	app.Get("/learners", GetLearners)
-	app.Get("/learner/:id", GetLearner)
-	// app.Put("/learner/:id", UpdateLearner) No application logic for updating learner
-	app.Delete("/learner/:id", DeleteLearner)
+	learner := app.Group("/learners", middleware.ProtectedMiddleware())
+
+	learner.Post("/", CreateLearner)
+	learner.Get("/", GetLearners)
+	learner.Get("/:id", GetLearner)
+	// learner.Put("/:id", UpdateLearner) No application logic for updating learner
+	learner.Delete("/:id", DeleteLearner)
 }
 
 // CreateLearner godoc
@@ -27,7 +30,7 @@ func LearnerRoutes(app *fiber.App) {
 //	@Success		201		{object}	models.LearnerDoc
 //	@Failure		400		{object}	map[string]string	"Invalid input"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/learner [post]
+//	@Router			/learners [post]
 func CreateLearner(c *fiber.Ctx) error {
 	var learner models.Learner
 
@@ -75,7 +78,7 @@ func findLearner(id int, learner *models.Learner) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Learner not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/learner/{id} [get]
+//	@Router			/learners/{id} [get]
 func GetLearner(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -107,7 +110,7 @@ func GetLearner(c *fiber.Ctx) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Learner not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/learner/{id} [delete]
+//	@Router			/learners/{id} [delete]
 func DeleteLearner(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
