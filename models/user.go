@@ -7,7 +7,7 @@ import (
 // Define a struct matching the columns (use pointers for nullable FKs)
 type User struct {
 	gorm.Model
-	SessionID      string `gorm:"size:255"`
+	StudentID      string `gorm:"size:10;uniqueIndex;not null"`
 	ProfilePicture []byte
 	FirstName      string  `gorm:"size:30;not null"`
 	LastName       string  `gorm:"size:30;not null"`
@@ -28,7 +28,7 @@ type User struct {
 
 type UserDoc struct {
 	ID             uint    `json:"id" example:"101"`
-	SessionID      string  `json:"session_id" example:"sess-abc123xyz"`
+	StudentID      string  `json:"student_id" example:"6610505511"`
 	ProfilePicture string  `json:"profile_picture,omitempty" example:"<base64-encoded-image>"`
 	FirstName      string  `json:"first_name" example:"Alice"`
 	LastName       string  `json:"last_name" example:"Smith"`
