@@ -15,13 +15,9 @@ type User struct {
 	PhoneNumber    string  `gorm:"size:20"`
 	Balance        float64 `gorm:"type:numeric(12,2);default:0;check:balance >= 0"`
 
-	LearnerID *uint `gorm:"unique"`
-	TeacherID *uint `gorm:"unique"`
-	AdminID   *uint `gorm:"unique"`
-
-	Learner *Learner `gorm:"foreignKey:LearnerID;references:ID;constraint:OnDelete:SET NULL;"`
-	Teacher *Teacher `gorm:"foreignKey:TeacherID;references:ID;constraint:OnDelete:SET NULL;"`
-	Admin   *Admin   `gorm:"foreignKey:AdminID;references:ID;constraint:OnDelete:SET NULL;"`
+	Learner *Learner
+	Teacher *Teacher
+	Admin   *Admin
 }
 
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
@@ -35,7 +31,4 @@ type UserDoc struct {
 	Gender         string  `json:"gender" example:"Female"`
 	PhoneNumber    string  `json:"phone_number" example:"+66912345678"`
 	Balance        float64 `json:"balance" example:"250.75"`
-	LearnerID      *uint   `json:"learner_id,omitempty" example:"42"`
-	TeacherID      *uint   `json:"teacher_id,omitempty" example:"7"`
-	AdminID        *uint   `json:"admin_id,omitempty" example:"3"`
 }
