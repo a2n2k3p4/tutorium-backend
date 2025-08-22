@@ -3,17 +3,21 @@ package handlers
 import (
 	"errors"
 
+	"github.com/a2n2k3p4/tutorium-backend/middleware"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func NotificationRoutes(app *fiber.App) {
-	app.Post("/notification", CreateNotification)
-	app.Get("/notifications", GetNotifications)
-	app.Get("/notification/:id", GetNotification)
-	app.Put("/notification/:id", UpdateNotification)
-	app.Delete("/notification/:id", DeleteNotification)
+	notification := app.Group("/notification", middleware.ProtectedMiddleware())
+	notification.Get("/", GetNotifications)
+	notification.Get("/:id", GetNotification)
+	notification.Put("/:id", UpdateNotification)
+	notification.Delete("/:id", DeleteNotification)
+
+	notificationAdmin := notification.Group("/", middleware.AdminRequired())
+	notificationAdmin.Post("/", CreateNotification)
 }
 
 // CreateNotification godoc

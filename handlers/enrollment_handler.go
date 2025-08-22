@@ -3,17 +3,20 @@ package handlers
 import (
 	"errors"
 
+	"github.com/a2n2k3p4/tutorium-backend/middleware"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func EnrollmentRoutes(app *fiber.App) {
-	app.Post("/enrollment", CreateEnrollment)
-	app.Get("/enrollments", GetEnrollments)
-	app.Get("/enrollment/:id", GetEnrollment)
-	app.Put("/enrollment/:id", UpdateEnrollment)
-	app.Delete("/enrollment/:id", DeleteEnrollment)
+	enrollment := app.Group("/enrollment", middleware.ProtectedMiddleware(), middleware.LearnerRequired())
+
+	enrollment.Post("/", CreateEnrollment)
+	enrollment.Get("/", GetEnrollments)
+	enrollment.Get("/:id", GetEnrollment)
+	enrollment.Put("/:id", UpdateEnrollment)
+	enrollment.Delete("/:id", DeleteEnrollment)
 }
 
 // CreateEnrollment godoc

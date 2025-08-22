@@ -3,17 +3,20 @@ package handlers
 import (
 	"errors"
 
+	"github.com/a2n2k3p4/tutorium-backend/middleware"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func LearnerRoutes(app *fiber.App) {
-	app.Post("/learner", CreateLearner)
-	app.Get("/learners", GetLearners)
-	app.Get("/learner/:id", GetLearner)
-	// app.Put("/learner/:id", UpdateLearner) No application logic for updating learner
-	app.Delete("/learner/:id", DeleteLearner)
+	learner := app.Group("/learner", middleware.ProtectedMiddleware())
+
+	learner.Post("/", CreateLearner)
+	learner.Get("/", GetLearners)
+	learner.Get("/:id", GetLearner)
+	// learner.Put("/:id", UpdateLearner) No application logic for updating learner
+	learner.Delete("/:id", DeleteLearner)
 }
 
 // CreateLearner godoc

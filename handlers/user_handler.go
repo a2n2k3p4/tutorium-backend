@@ -3,17 +3,21 @@ package handlers
 import (
 	"errors"
 
+	"github.com/a2n2k3p4/tutorium-backend/middleware"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func UserRoutes(app *fiber.App) {
-	app.Post("/user", CreateUser)
-	app.Get("/users", GetUsers)
-	app.Get("/user/:id", GetUser)
-	app.Put("/user/:id", UpdateUser)
-	app.Delete("/user/:id", DeleteUser)
+	user := app.Group("/user", middleware.ProtectedMiddleware())
+	user.Post("/", CreateUser)
+	user.Get("/:id", GetUser)
+	user.Put("/:id", UpdateUser)
+	user.Delete("/:id", DeleteUser)
+
+	userAdmin := user.Group("/", middleware.AdminRequired())
+	userAdmin.Get("/", GetUsers)
 }
 
 // CreateUser godoc

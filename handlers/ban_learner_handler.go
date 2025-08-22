@@ -3,17 +3,20 @@ package handlers
 import (
 	"errors"
 
+	"github.com/a2n2k3p4/tutorium-backend/middleware"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func BanLearnerRoutes(app *fiber.App) {
-	app.Post("/banlearner", CreateBanLearner)
-	app.Get("/banlearners", GetBanLearners)
-	app.Get("/banlearner/:id", GetBanLearner)
-	app.Put("/banlearner/:id", UpdateBanLearner)
-	app.Delete("/banlearner/:id", DeleteBanLearner)
+	banLearner := app.Group("/banlearner", middleware.ProtectedMiddleware(), middleware.AdminRequired())
+
+	banLearner.Post("/", CreateBanLearner)
+	banLearner.Get("/", GetBanLearners)
+	banLearner.Get("/:id", GetBanLearner)
+	banLearner.Put("/:id", UpdateBanLearner)
+	banLearner.Delete("/:id", DeleteBanLearner)
 }
 
 // CreateBanLearner godoc

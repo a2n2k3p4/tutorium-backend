@@ -3,17 +3,21 @@ package handlers
 import (
 	"errors"
 
+	"github.com/a2n2k3p4/tutorium-backend/middleware"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func ReportRoutes(app *fiber.App) {
-	app.Post("/report", CreateReport)
-	app.Get("/reports", GetReports)
-	app.Get("/report/:id", GetReport)
-	app.Put("/report/:id", UpdateReport)
-	app.Delete("/report/:id", DeleteReport)
+	report := app.Group("/report", middleware.ProtectedMiddleware())
+	report.Post("/", CreateReport)
+
+	reportAdmin := report.Group("/", middleware.AdminRequired())
+	reportAdmin.Get("/", GetReports)
+	reportAdmin.Get("/:id", GetReport)
+	reportAdmin.Put("/:id", UpdateReport)
+	reportAdmin.Delete("/:id", DeleteReport)
 }
 
 // CreateReport godoc

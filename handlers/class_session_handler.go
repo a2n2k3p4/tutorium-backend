@@ -3,17 +3,21 @@ package handlers
 import (
 	"errors"
 
+	"github.com/a2n2k3p4/tutorium-backend/middleware"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func ClassSessionRoutes(app *fiber.App) {
-	app.Post("/class_session", CreateClassSession)
-	app.Get("/class_sessions", GetClassSessions)
-	app.Get("/class_session/:id", GetClassSession)
-	app.Put("/class_session/:id", UpdateClassSession)
-	app.Delete("/class_session/:id", DeleteClassSession)
+	classSession := app.Group("/class_session")
+	classSession.Get("/", GetClassSessions)
+	classSession.Get("/:id", GetClassSession)
+
+	classSessionProtected := classSession.Group("/", middleware.ProtectedMiddleware(), middleware.TeacherRequired())
+	classSessionProtected.Post("/", CreateClassSession)
+	classSessionProtected.Put("/:id", UpdateClassSession)
+	classSessionProtected.Delete("/:id", DeleteClassSession)
 }
 
 // CreateClassSession godoc

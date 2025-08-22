@@ -3,17 +3,21 @@ package handlers
 import (
 	"errors"
 
+	"github.com/a2n2k3p4/tutorium-backend/middleware"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func ClassCategoryRoutes(app *fiber.App) {
-	app.Post("/class_category", CreateClassCategory)
-	app.Get("/class_categories", GetClassCategories)
-	app.Get("/class_category/:id", GetClassCategory)
-	app.Put("/class_category/:id", UpdateClassCategory)
-	app.Delete("/class_category/:id", DeleteClassCategory)
+	classCategory := app.Group("/class_category")
+	classCategory.Get("/", GetClassCategories)
+	classCategory.Get("/:id", GetClassCategory)
+
+	classCategoryProtected := classCategory.Group("/", middleware.ProtectedMiddleware(), middleware.AdminRequired())
+	classCategoryProtected.Post("/", CreateClassCategory)
+	classCategoryProtected.Put("/:id", UpdateClassCategory)
+	classCategoryProtected.Delete("/:id", DeleteClassCategory)
 }
 
 // CreateClassCategory godoc

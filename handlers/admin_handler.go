@@ -3,17 +3,20 @@ package handlers
 import (
 	"errors"
 
+	"github.com/a2n2k3p4/tutorium-backend/middleware"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func AdminRoutes(app *fiber.App) {
-	app.Post("/admin", CreateAdmin)
-	app.Get("/admins", GetAdmins)
-	app.Get("/admin/:id", GetAdmin)
-	// app.Put("/admin/:id", UpdateAdmin) No application logic for updating admin
-	app.Delete("/admin/:id", DeleteAdmin)
+	admin := app.Group("/admin", middleware.ProtectedMiddleware())
+
+	admin.Post("/", CreateAdmin)
+	admin.Get("/", GetAdmins)
+	admin.Get("/:id", GetAdmin)
+	// admin.Put("/admin/:id", UpdateAdmin) No application logic for updating admin
+	admin.Delete("/:id", DeleteAdmin)
 }
 
 // CreateAdmin godoc

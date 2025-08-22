@@ -3,17 +3,21 @@ package handlers
 import (
 	"errors"
 
+	"github.com/a2n2k3p4/tutorium-backend/middleware"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func ReviewRoutes(app *fiber.App) {
-	app.Post("/review", CreateReview)
-	app.Get("/reviews", GetReviews)
-	app.Get("/review/:id", GetReview)
-	app.Put("/review/:id", UpdateReview)
-	app.Delete("/review/:id", DeleteReview)
+	review := app.Group("/review")
+	review.Get("/", GetReviews)
+	review.Get("/:id", GetReview)
+
+	reviewLearner := review.Group("/", middleware.ProtectedMiddleware(), middleware.LearnerRequired())
+	reviewLearner.Post("/", CreateReview)
+	reviewLearner.Put("/:id", UpdateReview)
+	reviewLearner.Delete("/:id", DeleteReview)
 }
 
 // CreateReview godoc
