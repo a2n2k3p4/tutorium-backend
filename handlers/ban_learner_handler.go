@@ -20,16 +20,17 @@ func BanLearnerRoutes(app *fiber.App) {
 }
 
 // CreateBanLearner godoc
-// @Summary      Create a new banned learner record
-// @Description  CreateBanLearner creates a new ban record for a learner
-// @Tags         BanLearners
-// @Accept       json
-// @Produce      json
-// @Param        banlearner  body      models.BanDetailsLearnerDoc  true  "Ban Learner Payload"
-// @Success      201         {object}  models.BanDetailsLearnerDoc
-// @Failure      400         {object}  map[string]string
-// @Failure      500         {object}  map[string]string
-// @Router       /banlearner [post]
+//
+//	@Summary		Create a new banned learner record
+//	@Description	CreateBanLearner creates a new ban record for a learner
+//	@Tags			BanLearners
+//	@Accept			json
+//	@Produce		json
+//	@Param			banlearner	body		models.BanDetailsLearnerDoc	true	"Ban Learner Payload"
+//	@Success		201			{object}	models.BanDetailsLearnerDoc
+//	@Failure		400			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Router			/banlearner [post]
 func CreateBanLearner(c *fiber.Ctx) error {
 	var banlearner models.BanDetailsLearner
 
@@ -44,13 +45,14 @@ func CreateBanLearner(c *fiber.Ctx) error {
 }
 
 // GetBanLearners godoc
-// @Summary      Get all banned learners
-// @Description  GetBanLearners returns a list of all ban records
-// @Tags         BanLearners
-// @Produce      json
-// @Success      200  {array}   models.BanDetailsLearnerDoc
-// @Failure      500  {object}  map[string]string
-// @Router       /banlearners [get]
+//
+//	@Summary		Get all banned learners
+//	@Description	GetBanLearners returns a list of all ban records
+//	@Tags			BanLearners
+//	@Produce		json
+//	@Success		200	{array}		models.BanDetailsLearnerDoc
+//	@Failure		500	{object}	map[string]string
+//	@Router			/banlearners [get]
 func GetBanLearners(c *fiber.Ctx) error {
 	banlearners := []models.BanDetailsLearner{}
 	if err := db.Preload("Learner").Find(&banlearners).Error; err != nil {
@@ -65,16 +67,17 @@ func findBanLearner(id int, banlearner *models.BanDetailsLearner) error {
 }
 
 // GetBanLearner godoc
-// @Summary      Get a banned learner by ID
-// @Description  GetBanLearner returns a single ban record by ID
-// @Tags         BanLearners
-// @Produce      json
-// @Param        id   path      int  true  "Ban Learner ID"
-// @Success      200  {object}  models.BanDetailsLearnerDoc
-// @Failure      400  {object}  map[string]string
-// @Failure      404  {object}  map[string]string
-// @Failure      500  {object}  map[string]string
-// @Router       /banlearner/{id} [get]
+//
+//	@Summary		Get a banned learner by ID
+//	@Description	GetBanLearner returns a single ban record by ID
+//	@Tags			BanLearners
+//	@Produce		json
+//	@Param			id	path		int	true	"Ban Learner ID"
+//	@Success		200	{object}	models.BanDetailsLearnerDoc
+//	@Failure		400	{object}	map[string]string
+//	@Failure		404	{object}	map[string]string
+//	@Failure		500	{object}	map[string]string
+//	@Router			/banlearner/{id} [get]
 func GetBanLearner(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -96,18 +99,19 @@ func GetBanLearner(c *fiber.Ctx) error {
 }
 
 // UpdateBanLearner godoc
-// @Summary      Update a banned learner record
-// @Description  UpdateBanLearner modifies an existing ban record
-// @Tags         BanLearners
-// @Accept       json
-// @Produce      json
-// @Param        id           path      int                     true  "Ban Learner ID"
-// @Param        banlearner   body      models.BanDetailsLearnerDoc  true  "Updated ban record"
-// @Success      200          {object}  models.BanDetailsLearnerDoc
-// @Failure      400          {object}  map[string]string
-// @Failure      404          {object}  map[string]string
-// @Failure      500          {object}  map[string]string
-// @Router       /banlearner/{id} [put]
+//
+//	@Summary		Update a banned learner record
+//	@Description	UpdateBanLearner modifies an existing ban record
+//	@Tags			BanLearners
+//	@Accept			json
+//	@Produce		json
+//	@Param			id			path		int							true	"Ban Learner ID"
+//	@Param			banlearner	body		models.BanDetailsLearnerDoc	true	"Updated ban record"
+//	@Success		200			{object}	models.BanDetailsLearnerDoc
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Router			/banlearner/{id} [put]
 func UpdateBanLearner(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -139,16 +143,17 @@ func UpdateBanLearner(c *fiber.Ctx) error {
 }
 
 // DeleteBanLearner godoc
-// @Summary      Delete a banned learner record
-// @Description  DeleteBanLearner deletes a ban record by ID
-// @Tags         BanLearners
-// @Produce      json
-// @Param        id   path      int  true  "Ban Learner ID"
-// @Success      200  {string}  string  "Successfully deleted ban learner"
-// @Failure      400  {object}  map[string]string
-// @Failure      404  {object}  map[string]string
-// @Failure      500  {object}  map[string]string
-// @Router       /banlearner/{id} [delete]
+//
+//	@Summary		Delete a banned learner record
+//	@Description	DeleteBanLearner deletes a ban record by ID
+//	@Tags			BanLearners
+//	@Produce		json
+//	@Param			id	path		int		true	"Ban Learner ID"
+//	@Success		200	{string}	string	"Successfully deleted ban learner"
+//	@Failure		400	{object}	map[string]string
+//	@Failure		404	{object}	map[string]string
+//	@Failure		500	{object}	map[string]string
+//	@Router			/banlearner/{id} [delete]
 func DeleteBanLearner(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

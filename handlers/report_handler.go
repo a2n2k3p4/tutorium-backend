@@ -21,16 +21,17 @@ func ReportRoutes(app *fiber.App) {
 }
 
 // CreateReport godoc
-// @Summary      Create a new report
-// @Description  CreateReport creates a new Report record
-// @Tags         Reports
-// @Accept       json
-// @Produce      json
-// @Param        report  body      models.ReportDoc  true  "Report payload"
-// @Success      201     {object}  models.ReportDoc
-// @Failure      400     {object}  map[string]string  "Invalid input"
-// @Failure      500     {object}  map[string]string  "Server error"
-// @Router       /report [post]
+//
+//	@Summary		Create a new report
+//	@Description	CreateReport creates a new Report record
+//	@Tags			Reports
+//	@Accept			json
+//	@Produce		json
+//	@Param			report	body		models.ReportDoc	true	"Report payload"
+//	@Success		201		{object}	models.ReportDoc
+//	@Failure		400		{object}	map[string]string	"Invalid input"
+//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Router			/report [post]
 func CreateReport(c *fiber.Ctx) error {
 	var report models.Report
 
@@ -46,13 +47,14 @@ func CreateReport(c *fiber.Ctx) error {
 }
 
 // GetReports godoc
-// @Summary      List all reports
-// @Description  GetReports retrieves all Report records with Reporter and Reported relations
-// @Tags         Reports
-// @Produce      json
-// @Success      200     {array}   models.ReportDoc
-// @Failure      500     {object}  map[string]string  "Server error"
-// @Router       /reports [get]
+//
+//	@Summary		List all reports
+//	@Description	GetReports retrieves all Report records with Reporter and Reported relations
+//	@Tags			Reports
+//	@Produce		json
+//	@Success		200	{array}		models.ReportDoc
+//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Router			/reports [get]
 func GetReports(c *fiber.Ctx) error {
 	reports := []models.Report{}
 	if err := db.Preload("Reporter").Preload("Reported").Find(&reports).Error; err != nil {
@@ -66,16 +68,17 @@ func findReport(id int, report *models.Report) error {
 }
 
 // GetReport godoc
-// @Summary      Get report by ID
-// @Description  GetReport retrieves a single Report by its ID, including Reporter and Reported
-// @Tags         Reports
-// @Produce      json
-// @Param        id   path      int  true  "Report ID"
-// @Success      200  {object}  models.ReportDoc
-// @Failure      400  {object}  map[string]string  "Invalid ID"
-// @Failure      404  {object}  map[string]string  "Report not found"
-// @Failure      500  {object}  map[string]string  "Server error"
-// @Router       /report/{id} [get]
+//
+//	@Summary		Get report by ID
+//	@Description	GetReport retrieves a single Report by its ID, including Reporter and Reported
+//	@Tags			Reports
+//	@Produce		json
+//	@Param			id	path		int	true	"Report ID"
+//	@Success		200	{object}	models.ReportDoc
+//	@Failure		400	{object}	map[string]string	"Invalid ID"
+//	@Failure		404	{object}	map[string]string	"Report not found"
+//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Router			/report/{id} [get]
 func GetReport(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -97,18 +100,19 @@ func GetReport(c *fiber.Ctx) error {
 }
 
 // UpdateReport godoc
-// @Summary      Update an existing report
-// @Description  UpdateReport updates a Report record by its ID
-// @Tags         Reports
-// @Accept       json
-// @Produce      json
-// @Param        id      path      int             true  "Report ID"
-// @Param        report  body      models.ReportDoc   true  "Updated report payload"
-// @Success      200     {object}  models.ReportDoc
-// @Failure      400     {object}  map[string]string  "Invalid input"
-// @Failure      404     {object}  map[string]string  "Report not found"
-// @Failure      500     {object}  map[string]string  "Server error"
-// @Router       /report/{id} [put]
+//
+//	@Summary		Update an existing report
+//	@Description	UpdateReport updates a Report record by its ID
+//	@Tags			Reports
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int					true	"Report ID"
+//	@Param			report	body		models.ReportDoc	true	"Updated report payload"
+//	@Success		200		{object}	models.ReportDoc
+//	@Failure		400		{object}	map[string]string	"Invalid input"
+//	@Failure		404		{object}	map[string]string	"Report not found"
+//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Router			/report/{id} [put]
 func UpdateReport(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -139,16 +143,17 @@ func UpdateReport(c *fiber.Ctx) error {
 }
 
 // DeleteReport godoc
-// @Summary      Delete a report by ID
-// @Description  DeleteReport removes a Report record by its ID
-// @Tags         Reports
-// @Produce      json
-// @Param        id   path      int  true  "Report ID"
-// @Success      200  {string}  string  "Successfully deleted Report"
-// @Failure      400  {object}  map[string]string  "Invalid ID"
-// @Failure      404  {object}  map[string]string  "Report not found"
-// @Failure      500  {object}  map[string]string  "Server error"
-// @Router       /report/{id} [delete]
+//
+//	@Summary		Delete a report by ID
+//	@Description	DeleteReport removes a Report record by its ID
+//	@Tags			Reports
+//	@Produce		json
+//	@Param			id	path		int					true	"Report ID"
+//	@Success		200	{string}	string				"Successfully deleted Report"
+//	@Failure		400	{object}	map[string]string	"Invalid ID"
+//	@Failure		404	{object}	map[string]string	"Report not found"
+//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Router			/report/{id} [delete]
 func DeleteReport(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

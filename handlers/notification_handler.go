@@ -21,16 +21,17 @@ func NotificationRoutes(app *fiber.App) {
 }
 
 // CreateNotification godoc
-// @Summary      Create a new notification
-// @Description  CreateNotification creates a new Notification record
-// @Tags         Notifications
-// @Accept       json
-// @Produce      json
-// @Param        notification  body      models.NotificationDoc  true  "Notification payload"
-// @Success      201           {object}  models.NotificationDoc
-// @Failure      400           {object}  map[string]string  "Invalid input"
-// @Failure      500           {object}  map[string]string  "Server error"
-// @Router       /notification [post]
+//
+//	@Summary		Create a new notification
+//	@Description	CreateNotification creates a new Notification record
+//	@Tags			Notifications
+//	@Accept			json
+//	@Produce		json
+//	@Param			notification	body		models.NotificationDoc	true	"Notification payload"
+//	@Success		201				{object}	models.NotificationDoc
+//	@Failure		400				{object}	map[string]string	"Invalid input"
+//	@Failure		500				{object}	map[string]string	"Server error"
+//	@Router			/notification [post]
 func CreateNotification(c *fiber.Ctx) error {
 	var notification models.Notification
 
@@ -46,13 +47,14 @@ func CreateNotification(c *fiber.Ctx) error {
 }
 
 // GetNotifications godoc
-// @Summary      List all notifications
-// @Description  GetNotifications retrieves all Notification records with associated User
-// @Tags         Notifications
-// @Produce      json
-// @Success      200           {array}   models.NotificationDoc
-// @Failure      500           {object}  map[string]string  "Server error"
-// @Router       /notifications [get]
+//
+//	@Summary		List all notifications
+//	@Description	GetNotifications retrieves all Notification records with associated User
+//	@Tags			Notifications
+//	@Produce		json
+//	@Success		200	{array}		models.NotificationDoc
+//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Router			/notifications [get]
 func GetNotifications(c *fiber.Ctx) error {
 	var notifications []models.Notification
 	if err := db.Preload("User").Find(&notifications).Error; err != nil {
@@ -66,16 +68,17 @@ func findNotification(id int, notification *models.Notification) error {
 }
 
 // GetNotification godoc
-// @Summary      Get notification by ID
-// @Description  GetNotification retrieves a single Notification by its ID, including the User
-// @Tags         Notifications
-// @Produce      json
-// @Param        id   path      int  true  "Notification ID"
-// @Success      200  {object}  models.NotificationDoc
-// @Failure      400  {object}  map[string]string  "Invalid ID"
-// @Failure      404  {object}  map[string]string  "Notification not found"
-// @Failure      500  {object}  map[string]string  "Server error"
-// @Router       /notification/{id} [get]
+//
+//	@Summary		Get notification by ID
+//	@Description	GetNotification retrieves a single Notification by its ID, including the User
+//	@Tags			Notifications
+//	@Produce		json
+//	@Param			id	path		int	true	"Notification ID"
+//	@Success		200	{object}	models.NotificationDoc
+//	@Failure		400	{object}	map[string]string	"Invalid ID"
+//	@Failure		404	{object}	map[string]string	"Notification not found"
+//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Router			/notification/{id} [get]
 func GetNotification(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -97,18 +100,19 @@ func GetNotification(c *fiber.Ctx) error {
 }
 
 // UpdateNotification godoc
-// @Summary      Update an existing notification
-// @Description  UpdateNotification updates a Notification record by its ID
-// @Tags         Notifications
-// @Accept       json
-// @Produce      json
-// @Param        id            path      int                 true  "Notification ID"
-// @Param        notification  body      models.NotificationDoc  true  "Updated notification payload"
-// @Success      200           {object}  models.NotificationDoc
-// @Failure      400           {object}  map[string]string  "Invalid input"
-// @Failure      404           {object}  map[string]string  "Notification not found"
-// @Failure      500           {object}  map[string]string  "Server error"
-// @Router       /notification/{id} [put]
+//
+//	@Summary		Update an existing notification
+//	@Description	UpdateNotification updates a Notification record by its ID
+//	@Tags			Notifications
+//	@Accept			json
+//	@Produce		json
+//	@Param			id				path		int						true	"Notification ID"
+//	@Param			notification	body		models.NotificationDoc	true	"Updated notification payload"
+//	@Success		200				{object}	models.NotificationDoc
+//	@Failure		400				{object}	map[string]string	"Invalid input"
+//	@Failure		404				{object}	map[string]string	"Notification not found"
+//	@Failure		500				{object}	map[string]string	"Server error"
+//	@Router			/notification/{id} [put]
 func UpdateNotification(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -139,16 +143,17 @@ func UpdateNotification(c *fiber.Ctx) error {
 }
 
 // DeleteNotification godoc
-// @Summary      Delete a notification by ID
-// @Description  DeleteNotification removes a Notification record by its ID
-// @Tags         Notifications
-// @Produce      json
-// @Param        id   path      int  true  "Notification ID"
-// @Success      200  {string}  string  "Successfully deleted notification"
-// @Failure      400  {object}  map[string]string  "Invalid ID"
-// @Failure      404  {object}  map[string]string  "Notification not found"
-// @Failure      500  {object}  map[string]string  "Server error"
-// @Router       /notification/{id} [delete]
+//
+//	@Summary		Delete a notification by ID
+//	@Description	DeleteNotification removes a Notification record by its ID
+//	@Tags			Notifications
+//	@Produce		json
+//	@Param			id	path		int					true	"Notification ID"
+//	@Success		200	{string}	string				"Successfully deleted notification"
+//	@Failure		400	{object}	map[string]string	"Invalid ID"
+//	@Failure		404	{object}	map[string]string	"Notification not found"
+//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Router			/notification/{id} [delete]
 func DeleteNotification(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

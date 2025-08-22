@@ -20,16 +20,17 @@ func BanTeacherRoutes(app *fiber.App) {
 }
 
 // CreateBanTeacher godoc
-// @Summary      Create a new ban record for a teacher
-// @Description  CreateBanTeacher creates a new BanDetailsTeacher entry
-// @Tags         BanTeachers
-// @Accept       json
-// @Produce      json
-// @Param        banteacher  body      models.BanDetailsTeacherDoc  true  "BanTeacher payload"
-// @Success      201         {object}  models.BanDetailsTeacherDoc
-// @Failure      400         {object}  map[string]string         "Invalid input"
-// @Failure      500         {object}  map[string]string         "Server error"
-// @Router       /banteacher [post]
+//
+//	@Summary		Create a new ban record for a teacher
+//	@Description	CreateBanTeacher creates a new BanDetailsTeacher entry
+//	@Tags			BanTeachers
+//	@Accept			json
+//	@Produce		json
+//	@Param			banteacher	body		models.BanDetailsTeacherDoc	true	"BanTeacher payload"
+//	@Success		201			{object}	models.BanDetailsTeacherDoc
+//	@Failure		400			{object}	map[string]string	"Invalid input"
+//	@Failure		500			{object}	map[string]string	"Server error"
+//	@Router			/banteacher [post]
 func CreateBanTeacher(c *fiber.Ctx) error {
 	var banteacher models.BanDetailsTeacher
 
@@ -44,13 +45,14 @@ func CreateBanTeacher(c *fiber.Ctx) error {
 }
 
 // GetBanTeachers godoc
-// @Summary      List all ban records for teachers
-// @Description  GetBanTeachers retrieves all BanDetailsTeacher entries with associated Teacher
-// @Tags         BanTeachers
-// @Produce      json
-// @Success      200  {array}   models.BanDetailsTeacherDoc
-// @Failure      500  {object}  map[string]string  "Server error"
-// @Router       /banteachers [get]
+//
+//	@Summary		List all ban records for teachers
+//	@Description	GetBanTeachers retrieves all BanDetailsTeacher entries with associated Teacher
+//	@Tags			BanTeachers
+//	@Produce		json
+//	@Success		200	{array}		models.BanDetailsTeacherDoc
+//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Router			/banteachers [get]
 func GetBanTeachers(c *fiber.Ctx) error {
 	banteachers := []models.BanDetailsTeacher{}
 	if err := db.Preload("Teacher").Find(&banteachers).Error; err != nil {
@@ -65,16 +67,17 @@ func findBanTeacher(id int, banteacher *models.BanDetailsTeacher) error {
 }
 
 // GetBanTeacher godoc
-// @Summary      Get ban record by ID
-// @Description  GetBanTeacher retrieves a single BanDetailsTeacher by its ID
-// @Tags         BanTeachers
-// @Produce      json
-// @Param        id   path      int  true  "BanTeacher ID"
-// @Success      200  {object}  models.BanDetailsTeacherDoc
-// @Failure      400  {object}  map[string]string  "Invalid ID"
-// @Failure      404  {object}  map[string]string  "BanTeacher not found"
-// @Failure      500  {object}  map[string]string  "Server error"
-// @Router       /banteacher/{id} [get]
+//
+//	@Summary		Get ban record by ID
+//	@Description	GetBanTeacher retrieves a single BanDetailsTeacher by its ID
+//	@Tags			BanTeachers
+//	@Produce		json
+//	@Param			id	path		int	true	"BanTeacher ID"
+//	@Success		200	{object}	models.BanDetailsTeacherDoc
+//	@Failure		400	{object}	map[string]string	"Invalid ID"
+//	@Failure		404	{object}	map[string]string	"BanTeacher not found"
+//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Router			/banteacher/{id} [get]
 func GetBanTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -96,18 +99,19 @@ func GetBanTeacher(c *fiber.Ctx) error {
 }
 
 // UpdateBanTeacher godoc
-// @Summary      Update a ban record by ID
-// @Description  UpdateBanTeacher updates an existing BanDetailsTeacher
-// @Tags         BanTeachers
-// @Accept       json
-// @Produce      json
-// @Param        id           path      int                     true  "BanTeacher ID"
-// @Param        banteacher   body      models.BanDetailsTeacherDoc  true  "Updated payload"
-// @Success      200          {object}  models.BanDetailsTeacherDoc
-// @Failure      400          {object}  map[string]string         "Invalid input or not found"
-// @Failure      404          {object}  map[string]string         "BanTeacher not found"
-// @Failure      500          {object}  map[string]string         "Server error"
-// @Router       /banteacher/{id} [put]
+//
+//	@Summary		Update a ban record by ID
+//	@Description	UpdateBanTeacher updates an existing BanDetailsTeacher
+//	@Tags			BanTeachers
+//	@Accept			json
+//	@Produce		json
+//	@Param			id			path		int							true	"BanTeacher ID"
+//	@Param			banteacher	body		models.BanDetailsTeacherDoc	true	"Updated payload"
+//	@Success		200			{object}	models.BanDetailsTeacherDoc
+//	@Failure		400			{object}	map[string]string	"Invalid input or not found"
+//	@Failure		404			{object}	map[string]string	"BanTeacher not found"
+//	@Failure		500			{object}	map[string]string	"Server error"
+//	@Router			/banteacher/{id} [put]
 func UpdateBanTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -138,16 +142,17 @@ func UpdateBanTeacher(c *fiber.Ctx) error {
 }
 
 // DeleteBanTeacher godoc
-// @Summary      Delete a ban record by ID
-// @Description  DeleteBanTeacher removes a BanDetailsTeacher record by its ID
-// @Tags         BanTeachers
-// @Produce      json
-// @Param        id   path      int  true  "BanTeacher ID"
-// @Success      200  {string}  string  "Successfully deleted ban teacher"
-// @Failure      400  {object}  map[string]string  "Invalid ID"
-// @Failure      404  {object}  map[string]string  "BanTeacher not found"
-// @Failure      500  {object}  map[string]string  "Server error"
-// @Router       /banteacher/{id} [delete]
+//
+//	@Summary		Delete a ban record by ID
+//	@Description	DeleteBanTeacher removes a BanDetailsTeacher record by its ID
+//	@Tags			BanTeachers
+//	@Produce		json
+//	@Param			id	path		int					true	"BanTeacher ID"
+//	@Success		200	{string}	string				"Successfully deleted ban teacher"
+//	@Failure		400	{object}	map[string]string	"Invalid ID"
+//	@Failure		404	{object}	map[string]string	"BanTeacher not found"
+//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Router			/banteacher/{id} [delete]
 func DeleteBanTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
