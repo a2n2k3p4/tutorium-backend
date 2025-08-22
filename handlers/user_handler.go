@@ -7,6 +7,7 @@ import (
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func UserRoutes(app *fiber.App) {
@@ -141,11 +142,11 @@ func UpdateUser(c *fiber.Ctx) error {
 
 // DeleteUser godoc
 // @Summary      Delete a user by ID
-// @Description  DeleteUser removes a user record by its ID
+// @Description  DeleteUser removes a user record by its ID along with associated Learner, Teacher, and Admin
 // @Tags         Users
 // @Produce      json
 // @Param        id   path      int  true  "User ID"
-// @Success      200  {string}  string  "Successfully deleted User"
+// @Success      200  {string}  string  "Successfully deleted User and associated roles"
 // @Failure      400  {object}  map[string]string  "Invalid ID"
 // @Failure      404  {object}  map[string]string  "User not found"
 // @Failure      500  {object}  map[string]string  "Server error"
@@ -167,7 +168,7 @@ func DeleteUser(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	if err = db.Delete(&user).Error; err != nil {
+	if err := db.Select(clause.Associations).Delete(&user).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted User")
