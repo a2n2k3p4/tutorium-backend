@@ -31,7 +31,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.PORT }}
-          source: "./"
+          source: ".,!.git"
           target: "~/tutorium-backend"
           overwrite: true
           strip_components: 0
