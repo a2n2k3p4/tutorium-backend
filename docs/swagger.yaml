@@ -4,6 +4,9 @@ definitions:
       id:
         example: 43
         type: integer
+      user_id:
+        example: 5
+        type: integer
     type: object
   models.BanDetailsLearnerDoc:
     properties:
@@ -116,6 +119,9 @@ definitions:
       id:
         example: 42
         type: integer
+      user_id:
+        example: 5
+        type: integer
     type: object
   models.NotificationDoc:
     properties:
@@ -189,12 +195,12 @@ definitions:
       id:
         example: 12
         type: integer
+      user_id:
+        example: 5
+        type: integer
     type: object
   models.UserDoc:
     properties:
-      admin_id:
-        example: 3
-        type: integer
       balance:
         example: 250.75
         type: number
@@ -210,21 +216,15 @@ definitions:
       last_name:
         example: Smith
         type: string
-      learner_id:
-        example: 42
-        type: integer
       phone_number:
         example: "+66912345678"
         type: string
       profile_picture:
         example: <base64-encoded-image>
         type: string
-      session_id:
-        example: sess-abc123xyz
+      student_id:
+        example: "6610505511"
         type: string
-      teacher_id:
-        example: 7
-        type: integer
     type: object
 info:
   contact:
@@ -239,7 +239,28 @@ info:
   title: Tutorium Backend API
   version: "1.0"
 paths:
-  /admin:
+  /admins:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all admins
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.AdminDoc'
+            type: array
+        "404":
+          description: Admins not found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all admins
+      tags:
+      - admins
     post:
       consumes:
       - application/json
@@ -266,7 +287,7 @@ paths:
       summary: Create a new admin
       tags:
       - admins
-  /admin/{id}:
+  /admins/{id}:
     delete:
       consumes:
       - application/json
@@ -323,11 +344,9 @@ paths:
       summary: Get admin by ID
       tags:
       - admins
-  /admins:
+  /banlearners:
     get:
-      consumes:
-      - application/json
-      description: Retrieve a list of all admins
+      description: GetBanLearners returns a list of all ban records
       produces:
       - application/json
       responses:
@@ -335,17 +354,17 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.AdminDoc'
+              $ref: '#/definitions/models.BanDetailsLearnerDoc'
             type: array
-        "404":
-          description: Admins not found
+        "500":
+          description: Internal Server Error
           schema:
-            additionalProperties: true
+            additionalProperties:
+              type: string
             type: object
-      summary: Get all admins
+      summary: Get all banned learners
       tags:
-      - admins
-  /banlearner:
+      - BanLearners
     post:
       consumes:
       - application/json
@@ -379,7 +398,7 @@ paths:
       summary: Create a new banned learner record
       tags:
       - BanLearners
-  /banlearner/{id}:
+  /banlearners/{id}:
     delete:
       description: DeleteBanLearner deletes a ban record by ID
       parameters:
@@ -496,9 +515,10 @@ paths:
       summary: Update a banned learner record
       tags:
       - BanLearners
-  /banlearners:
+  /banteachers:
     get:
-      description: GetBanLearners returns a list of all ban records
+      description: GetBanTeachers retrieves all BanDetailsTeacher entries with associated
+        Teacher
       produces:
       - application/json
       responses:
@@ -506,18 +526,17 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.BanDetailsLearnerDoc'
+              $ref: '#/definitions/models.BanDetailsTeacherDoc'
             type: array
         "500":
-          description: Internal Server Error
+          description: Server error
           schema:
             additionalProperties:
               type: string
             type: object
-      summary: Get all banned learners
+      summary: List all ban records for teachers
       tags:
-      - BanLearners
-  /banteacher:
+      - BanTeachers
     post:
       consumes:
       - application/json
@@ -551,7 +570,7 @@ paths:
       summary: Create a new ban record for a teacher
       tags:
       - BanTeachers
-  /banteacher/{id}:
+  /banteachers/{id}:
     delete:
       description: DeleteBanTeacher removes a BanDetailsTeacher record by its ID
       parameters:
@@ -668,180 +687,6 @@ paths:
       summary: Update a ban record by ID
       tags:
       - BanTeachers
-  /banteachers:
-    get:
-      description: GetBanTeachers retrieves all BanDetailsTeacher entries with associated
-        Teacher
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.BanDetailsTeacherDoc'
-            type: array
-        "500":
-          description: Server error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: List all ban records for teachers
-      tags:
-      - BanTeachers
-  /class:
-    post:
-      consumes:
-      - application/json
-      description: CreateClass creates a new Class record
-      parameters:
-      - description: Class payload
-        in: body
-        name: class
-        required: true
-        schema:
-          $ref: '#/definitions/models.ClassDoc'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.ClassDoc'
-        "400":
-          description: Invalid input
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Server error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Create a new class
-      tags:
-      - Classes
-  /class/{id}:
-    delete:
-      description: DeleteClass removes a Class record by its ID
-      parameters:
-      - description: Class ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successfully deleted class
-          schema:
-            type: string
-        "400":
-          description: Invalid ID
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Class not found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Server error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Delete a class by ID
-      tags:
-      - Classes
-    get:
-      description: GetClass retrieves a single Class by its ID, including Teacher
-        and Categories
-      parameters:
-      - description: Class ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.ClassDoc'
-        "400":
-          description: Invalid ID
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Class not found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Server error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Get class by ID
-      tags:
-      - Classes
-    put:
-      consumes:
-      - application/json
-      description: UpdateClass updates a Class record by its ID
-      parameters:
-      - description: Class ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Updated class payload
-        in: body
-        name: class
-        required: true
-        schema:
-          $ref: '#/definitions/models.ClassDoc'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.ClassDoc'
-        "400":
-          description: Invalid input
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Class not found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Server error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Update an existing class
-      tags:
-      - Classes
   /class_categories:
     get:
       description: GetClassCategories retrieves all ClassCategory records with Classes
@@ -864,7 +709,6 @@ paths:
       summary: List all class categories
       tags:
       - ClassCategories
-  /class_category:
     post:
       consumes:
       - application/json
@@ -898,7 +742,7 @@ paths:
       summary: Create a new class category
       tags:
       - ClassCategories
-  /class_category/{id}:
+  /class_categories/{id}:
     delete:
       description: DeleteClassCategory removes a ClassCategory record by its ID
       parameters:
@@ -1016,7 +860,28 @@ paths:
       summary: Update an existing class category
       tags:
       - ClassCategories
-  /class_session:
+  /class_sessions:
+    get:
+      description: GetClassSessions retrieves all ClassSession records with Class
+        relation
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ClassSessionDoc'
+            type: array
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all class sessions
+      tags:
+      - ClassSessions
     post:
       consumes:
       - application/json
@@ -1050,7 +915,7 @@ paths:
       summary: Create a new class session
       tags:
       - ClassSessions
-  /class_session/{id}:
+  /class_sessions/{id}:
     delete:
       description: DeleteClassSession removes a ClassSession record by its ID
       parameters:
@@ -1168,28 +1033,6 @@ paths:
       summary: Update an existing class session
       tags:
       - ClassSessions
-  /class_sessions:
-    get:
-      description: GetClassSessions retrieves all ClassSession records with Class
-        relation
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.ClassSessionDoc'
-            type: array
-        "500":
-          description: Server error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: List all class sessions
-      tags:
-      - ClassSessions
   /classes:
     get:
       description: GetClasses retrieves all Class records with Teacher and Categories
@@ -1212,7 +1055,179 @@ paths:
       summary: List all classes
       tags:
       - Classes
-  /enrollment:
+    post:
+      consumes:
+      - application/json
+      description: CreateClass creates a new Class record
+      parameters:
+      - description: Class payload
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.ClassDoc'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ClassDoc'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new class
+      tags:
+      - Classes
+  /classes/{id}:
+    delete:
+      description: DeleteClass removes a Class record by its ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted class
+          schema:
+            type: string
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Class not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a class by ID
+      tags:
+      - Classes
+    get:
+      description: GetClass retrieves a single Class by its ID, including Teacher
+        and Categories
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ClassDoc'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Class not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get class by ID
+      tags:
+      - Classes
+    put:
+      consumes:
+      - application/json
+      description: UpdateClass updates a Class record by its ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated class payload
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.ClassDoc'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ClassDoc'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Class not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing class
+      tags:
+      - Classes
+  /enrollments:
+    get:
+      description: GetEnrollments retrieves all Enrollment records with associated
+        Learner and Class
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.EnrollmentDoc'
+            type: array
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all enrollments
+      tags:
+      - Enrollments
     post:
       consumes:
       - application/json
@@ -1246,7 +1261,7 @@ paths:
       summary: Create a new enrollment
       tags:
       - Enrollments
-  /enrollment/{id}:
+  /enrollments/{id}:
     delete:
       description: DeleteEnrollment removes an Enrollment record by its ID
       parameters:
@@ -1364,10 +1379,9 @@ paths:
       summary: Update an existing enrollment
       tags:
       - Enrollments
-  /enrollments:
+  /learners:
     get:
-      description: GetEnrollments retrieves all Enrollment records with associated
-        Learner and Class
+      description: GetLearners retrieves all Learner records
       produces:
       - application/json
       responses:
@@ -1375,7 +1389,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.EnrollmentDoc'
+              $ref: '#/definitions/models.LearnerDoc'
             type: array
         "500":
           description: Server error
@@ -1383,10 +1397,9 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: List all enrollments
+      summary: List all learners
       tags:
-      - Enrollments
-  /learner:
+      - Learners
     post:
       consumes:
       - application/json
@@ -1420,7 +1433,7 @@ paths:
       summary: Create a new learner
       tags:
       - Learners
-  /learner/{id}:
+  /learners/{id}:
     delete:
       description: DeleteLearner removes a Learner record by its ID
       parameters:
@@ -1493,9 +1506,10 @@ paths:
       summary: Get learner by ID
       tags:
       - Learners
-  /learners:
+  /notifications:
     get:
-      description: GetLearners retrieves all Learner records
+      description: GetNotifications retrieves all Notification records with associated
+        User
       produces:
       - application/json
       responses:
@@ -1503,7 +1517,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.LearnerDoc'
+              $ref: '#/definitions/models.NotificationDoc'
             type: array
         "500":
           description: Server error
@@ -1511,10 +1525,9 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: List all learners
+      summary: List all notifications
       tags:
-      - Learners
-  /notification:
+      - Notifications
     post:
       consumes:
       - application/json
@@ -1548,7 +1561,7 @@ paths:
       summary: Create a new notification
       tags:
       - Notifications
-  /notification/{id}:
+  /notifications/{id}:
     delete:
       description: DeleteNotification removes a Notification record by its ID
       parameters:
@@ -1666,10 +1679,10 @@ paths:
       summary: Update an existing notification
       tags:
       - Notifications
-  /notifications:
+  /reports:
     get:
-      description: GetNotifications retrieves all Notification records with associated
-        User
+      description: GetReports retrieves all Report records with Reporter and Reported
+        relations
       produces:
       - application/json
       responses:
@@ -1677,7 +1690,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.NotificationDoc'
+              $ref: '#/definitions/models.ReportDoc'
             type: array
         "500":
           description: Server error
@@ -1685,10 +1698,9 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: List all notifications
+      summary: List all reports
       tags:
-      - Notifications
-  /report:
+      - Reports
     post:
       consumes:
       - application/json
@@ -1722,7 +1734,7 @@ paths:
       summary: Create a new report
       tags:
       - Reports
-  /report/{id}:
+  /reports/{id}:
     delete:
       description: DeleteReport removes a Report record by its ID
       parameters:
@@ -1840,10 +1852,10 @@ paths:
       summary: Update an existing report
       tags:
       - Reports
-  /reports:
+  /reviews:
     get:
-      description: GetReports retrieves all Report records with Reporter and Reported
-        relations
+      description: GetReviews retrieves all Review records with related Learner and
+        Class
       produces:
       - application/json
       responses:
@@ -1851,7 +1863,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ReportDoc'
+              $ref: '#/definitions/models.ReviewDoc'
             type: array
         "500":
           description: Server error
@@ -1859,10 +1871,9 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: List all reports
+      summary: List all reviews
       tags:
-      - Reports
-  /review:
+      - Reviews
     post:
       consumes:
       - application/json
@@ -1896,7 +1907,7 @@ paths:
       summary: Create a new review
       tags:
       - Reviews
-  /review/{id}:
+  /reviews/{id}:
     delete:
       description: DeleteReview removes a Review record by its ID
       parameters:
@@ -2015,10 +2026,9 @@ paths:
       summary: Update an existing review
       tags:
       - Reviews
-  /reviews:
+  /teachers:
     get:
-      description: GetReviews retrieves all Review records with related Learner and
-        Class
+      description: GetTeachers retrieves all Teacher records
       produces:
       - application/json
       responses:
@@ -2026,7 +2036,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ReviewDoc'
+              $ref: '#/definitions/models.TeacherDoc'
             type: array
         "500":
           description: Server error
@@ -2034,10 +2044,9 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: List all reviews
+      summary: List all teachers
       tags:
-      - Reviews
-  /teacher:
+      - Teachers
     post:
       consumes:
       - application/json
@@ -2071,7 +2080,7 @@ paths:
       summary: Create a new teacher
       tags:
       - Teachers
-  /teacher/{id}:
+  /teachers/{id}:
     delete:
       description: DeleteTeacher removes a Teacher record by its ID
       parameters:
@@ -2188,9 +2197,9 @@ paths:
       summary: Update an existing teacher
       tags:
       - Teachers
-  /teachers:
+  /users:
     get:
-      description: GetTeachers retrieves all Teacher records
+      description: GetUsers retrieves all user records
       produces:
       - application/json
       responses:
@@ -2198,7 +2207,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.TeacherDoc'
+              $ref: '#/definitions/models.UserDoc'
             type: array
         "500":
           description: Server error
@@ -2206,10 +2215,9 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: List all teachers
+      summary: List all users
       tags:
-      - Teachers
-  /user:
+      - Users
     post:
       consumes:
       - application/json
@@ -2243,9 +2251,10 @@ paths:
       summary: Create a new user
       tags:
       - Users
-  /user/{id}:
+  /users/{id}:
     delete:
-      description: DeleteUser removes a user record by its ID
+      description: DeleteUser removes a user record by its ID along with associated
+        Learner, Teacher, and Admin
       parameters:
       - description: User ID
         in: path
@@ -2256,7 +2265,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Successfully deleted User
+          description: Successfully deleted User and associated roles
           schema:
             type: string
         "400":
@@ -2358,27 +2367,6 @@ paths:
               type: string
             type: object
       summary: Update an existing user
-      tags:
-      - Users
-  /users:
-    get:
-      description: GetUsers retrieves all user records
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.UserDoc'
-            type: array
-        "500":
-          description: Server error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: List all users
       tags:
       - Users
 swagger: "2.0"

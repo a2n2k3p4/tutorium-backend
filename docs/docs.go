@@ -24,7 +24,38 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/admin": {
+        "/admins": {
+            "get": {
+                "description": "Retrieve a list of all admins",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admins"
+                ],
+                "summary": "Get all admins",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.AdminDoc"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Admins not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new admin with the provided data",
                 "consumes": [
@@ -65,7 +96,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/{id}": {
+        "/admins/{id}": {
             "get": {
                 "description": "Retrieve a specific admin by their ID",
                 "consumes": [
@@ -149,40 +180,37 @@ const docTemplate = `{
                 }
             }
         },
-        "/admins": {
+        "/banlearners": {
             "get": {
-                "description": "Retrieve a list of all admins",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "GetBanLearners returns a list of all ban records",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "admins"
+                    "BanLearners"
                 ],
-                "summary": "Get all admins",
+                "summary": "Get all banned learners",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.AdminDoc"
+                                "$ref": "#/definitions/models.BanDetailsLearnerDoc"
                             }
                         }
                     },
-                    "404": {
-                        "description": "Admins not found",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": true
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
-            }
-        },
-        "/banlearner": {
+            },
             "post": {
                 "description": "CreateBanLearner creates a new ban record for a learner",
                 "consumes": [
@@ -234,7 +262,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/banlearner/{id}": {
+        "/banlearners/{id}": {
             "get": {
                 "description": "GetBanLearner returns a single ban record by ID",
                 "produces": [
@@ -410,28 +438,28 @@ const docTemplate = `{
                 }
             }
         },
-        "/banlearners": {
+        "/banteachers": {
             "get": {
-                "description": "GetBanLearners returns a list of all ban records",
+                "description": "GetBanTeachers retrieves all BanDetailsTeacher entries with associated Teacher",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "BanLearners"
+                    "BanTeachers"
                 ],
-                "summary": "Get all banned learners",
+                "summary": "List all ban records for teachers",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.BanDetailsLearnerDoc"
+                                "$ref": "#/definitions/models.BanDetailsTeacherDoc"
                             }
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -440,9 +468,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/banteacher": {
+            },
             "post": {
                 "description": "CreateBanTeacher creates a new BanDetailsTeacher entry",
                 "consumes": [
@@ -494,7 +520,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/banteacher/{id}": {
+        "/banteachers/{id}": {
             "get": {
                 "description": "GetBanTeacher retrieves a single BanDetailsTeacher by its ID",
                 "produces": [
@@ -670,266 +696,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/banteachers": {
-            "get": {
-                "description": "GetBanTeachers retrieves all BanDetailsTeacher entries with associated Teacher",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "BanTeachers"
-                ],
-                "summary": "List all ban records for teachers",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.BanDetailsTeacherDoc"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/class": {
-            "post": {
-                "description": "CreateClass creates a new Class record",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Classes"
-                ],
-                "summary": "Create a new class",
-                "parameters": [
-                    {
-                        "description": "Class payload",
-                        "name": "class",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ClassDoc"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.ClassDoc"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid input",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/class/{id}": {
-            "get": {
-                "description": "GetClass retrieves a single Class by its ID, including Teacher and Categories",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Classes"
-                ],
-                "summary": "Get class by ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Class ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.ClassDoc"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid ID",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Class not found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "UpdateClass updates a Class record by its ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Classes"
-                ],
-                "summary": "Update an existing class",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Class ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Updated class payload",
-                        "name": "class",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ClassDoc"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.ClassDoc"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid input",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Class not found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "DeleteClass removes a Class record by its ID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Classes"
-                ],
-                "summary": "Delete a class by ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Class ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successfully deleted class",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid ID",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Class not found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/class_categories": {
             "get": {
                 "description": "GetClassCategories retrieves all ClassCategory records with Classes relation",
@@ -960,9 +726,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/class_category": {
+            },
             "post": {
                 "description": "CreateClassCategory creates a new ClassCategory record",
                 "consumes": [
@@ -1014,7 +778,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/class_category/{id}": {
+        "/class_categories/{id}": {
             "get": {
                 "description": "GetClassCategory retrieves a single ClassCategory by its ID, including Classes",
                 "produces": [
@@ -1190,7 +954,37 @@ const docTemplate = `{
                 }
             }
         },
-        "/class_session": {
+        "/class_sessions": {
+            "get": {
+                "description": "GetClassSessions retrieves all ClassSession records with Class relation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ClassSessions"
+                ],
+                "summary": "List all class sessions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ClassSessionDoc"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "CreateClassSession creates a new ClassSession record",
                 "consumes": [
@@ -1242,7 +1036,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/class_session/{id}": {
+        "/class_sessions/{id}": {
             "get": {
                 "description": "GetClassSession retrieves a single ClassSession by its ID, including Class",
                 "produces": [
@@ -1418,38 +1212,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/class_sessions": {
-            "get": {
-                "description": "GetClassSessions retrieves all ClassSession records with Class relation",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "ClassSessions"
-                ],
-                "summary": "List all class sessions",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.ClassSessionDoc"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/classes": {
             "get": {
                 "description": "GetClasses retrieves all Class records with Teacher and Categories relations",
@@ -1480,9 +1242,265 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "description": "CreateClass creates a new Class record",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Classes"
+                ],
+                "summary": "Create a new class",
+                "parameters": [
+                    {
+                        "description": "Class payload",
+                        "name": "class",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ClassDoc"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.ClassDoc"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
             }
         },
-        "/enrollment": {
+        "/classes/{id}": {
+            "get": {
+                "description": "GetClass retrieves a single Class by its ID, including Teacher and Categories",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Classes"
+                ],
+                "summary": "Get class by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Class ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ClassDoc"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Class not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "UpdateClass updates a Class record by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Classes"
+                ],
+                "summary": "Update an existing class",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Class ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated class payload",
+                        "name": "class",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ClassDoc"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ClassDoc"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Class not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "DeleteClass removes a Class record by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Classes"
+                ],
+                "summary": "Delete a class by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Class ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted class",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Class not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/enrollments": {
+            "get": {
+                "description": "GetEnrollments retrieves all Enrollment records with associated Learner and Class",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Enrollments"
+                ],
+                "summary": "List all enrollments",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.EnrollmentDoc"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "CreateEnrollment creates a new Enrollment record",
                 "consumes": [
@@ -1534,7 +1552,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/enrollment/{id}": {
+        "/enrollments/{id}": {
             "get": {
                 "description": "GetEnrollment retrieves a single Enrollment by its ID, including related Learner and Class",
                 "produces": [
@@ -1710,23 +1728,23 @@ const docTemplate = `{
                 }
             }
         },
-        "/enrollments": {
+        "/learners": {
             "get": {
-                "description": "GetEnrollments retrieves all Enrollment records with associated Learner and Class",
+                "description": "GetLearners retrieves all Learner records",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Enrollments"
+                    "Learners"
                 ],
-                "summary": "List all enrollments",
+                "summary": "List all learners",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.EnrollmentDoc"
+                                "$ref": "#/definitions/models.LearnerDoc"
                             }
                         }
                     },
@@ -1740,9 +1758,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/learner": {
+            },
             "post": {
                 "description": "CreateLearner creates a new Learner record",
                 "consumes": [
@@ -1794,7 +1810,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/learner/{id}": {
+        "/learners/{id}": {
             "get": {
                 "description": "GetLearner retrieves a single Learner by its ID",
                 "produces": [
@@ -1904,23 +1920,23 @@ const docTemplate = `{
                 }
             }
         },
-        "/learners": {
+        "/notifications": {
             "get": {
-                "description": "GetLearners retrieves all Learner records",
+                "description": "GetNotifications retrieves all Notification records with associated User",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Learners"
+                    "Notifications"
                 ],
-                "summary": "List all learners",
+                "summary": "List all notifications",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.LearnerDoc"
+                                "$ref": "#/definitions/models.NotificationDoc"
                             }
                         }
                     },
@@ -1934,9 +1950,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/notification": {
+            },
             "post": {
                 "description": "CreateNotification creates a new Notification record",
                 "consumes": [
@@ -1988,7 +2002,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/notification/{id}": {
+        "/notifications/{id}": {
             "get": {
                 "description": "GetNotification retrieves a single Notification by its ID, including the User",
                 "produces": [
@@ -2164,23 +2178,23 @@ const docTemplate = `{
                 }
             }
         },
-        "/notifications": {
+        "/reports": {
             "get": {
-                "description": "GetNotifications retrieves all Notification records with associated User",
+                "description": "GetReports retrieves all Report records with Reporter and Reported relations",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Notifications"
+                    "Reports"
                 ],
-                "summary": "List all notifications",
+                "summary": "List all reports",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.NotificationDoc"
+                                "$ref": "#/definitions/models.ReportDoc"
                             }
                         }
                     },
@@ -2194,9 +2208,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/report": {
+            },
             "post": {
                 "description": "CreateReport creates a new Report record",
                 "consumes": [
@@ -2248,7 +2260,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/report/{id}": {
+        "/reports/{id}": {
             "get": {
                 "description": "GetReport retrieves a single Report by its ID, including Reporter and Reported",
                 "produces": [
@@ -2424,23 +2436,23 @@ const docTemplate = `{
                 }
             }
         },
-        "/reports": {
+        "/reviews": {
             "get": {
-                "description": "GetReports retrieves all Report records with Reporter and Reported relations",
+                "description": "GetReviews retrieves all Review records with related Learner and Class",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Reports"
+                    "Reviews"
                 ],
-                "summary": "List all reports",
+                "summary": "List all reviews",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ReportDoc"
+                                "$ref": "#/definitions/models.ReviewDoc"
                             }
                         }
                     },
@@ -2454,9 +2466,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/review": {
+            },
             "post": {
                 "description": "CreateReview creates a new Review record with rating validation",
                 "consumes": [
@@ -2508,7 +2518,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/review/{id}": {
+        "/reviews/{id}": {
             "get": {
                 "description": "GetReview retrieves a single Review by its ID, including related Learner and Class",
                 "produces": [
@@ -2684,23 +2694,23 @@ const docTemplate = `{
                 }
             }
         },
-        "/reviews": {
+        "/teachers": {
             "get": {
-                "description": "GetReviews retrieves all Review records with related Learner and Class",
+                "description": "GetTeachers retrieves all Teacher records",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Reviews"
+                    "Teachers"
                 ],
-                "summary": "List all reviews",
+                "summary": "List all teachers",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ReviewDoc"
+                                "$ref": "#/definitions/models.TeacherDoc"
                             }
                         }
                     },
@@ -2714,9 +2724,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/teacher": {
+            },
             "post": {
                 "description": "CreateTeacher creates a new Teacher record",
                 "consumes": [
@@ -2768,7 +2776,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/teacher/{id}": {
+        "/teachers/{id}": {
             "get": {
                 "description": "GetTeacher retrieves a single Teacher by its ID",
                 "produces": [
@@ -2944,23 +2952,23 @@ const docTemplate = `{
                 }
             }
         },
-        "/teachers": {
+        "/users": {
             "get": {
-                "description": "GetTeachers retrieves all Teacher records",
+                "description": "GetUsers retrieves all user records",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Teachers"
+                    "Users"
                 ],
-                "summary": "List all teachers",
+                "summary": "List all users",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.TeacherDoc"
+                                "$ref": "#/definitions/models.UserDoc"
                             }
                         }
                     },
@@ -2974,9 +2982,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/user": {
+            },
             "post": {
                 "description": "CreateUser creates a new user record",
                 "consumes": [
@@ -3028,7 +3034,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/{id}": {
+        "/users/{id}": {
             "get": {
                 "description": "GetUser retrieves a single user by its ID",
                 "produces": [
@@ -3150,7 +3156,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "DeleteUser removes a user record by its ID",
+                "description": "DeleteUser removes a user record by its ID along with associated Learner, Teacher, and Admin",
                 "produces": [
                     "application/json"
                 ],
@@ -3169,7 +3175,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successfully deleted User",
+                        "description": "Successfully deleted User and associated roles",
                         "schema": {
                             "type": "string"
                         }
@@ -3203,38 +3209,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/users": {
-            "get": {
-                "description": "GetUsers retrieves all user records",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "List all users",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.UserDoc"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -3244,6 +3218,10 @@ const docTemplate = `{
                 "id": {
                     "type": "integer",
                     "example": 43
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 5
                 }
             }
         },
@@ -3401,6 +3379,10 @@ const docTemplate = `{
                 "id": {
                     "type": "integer",
                     "example": 42
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 5
                 }
             }
         },
@@ -3501,16 +3483,16 @@ const docTemplate = `{
                 "id": {
                     "type": "integer",
                     "example": 12
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 5
                 }
             }
         },
         "models.UserDoc": {
             "type": "object",
             "properties": {
-                "admin_id": {
-                    "type": "integer",
-                    "example": 3
-                },
                 "balance": {
                     "type": "number",
                     "example": 250.75
@@ -3531,10 +3513,6 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Smith"
                 },
-                "learner_id": {
-                    "type": "integer",
-                    "example": 42
-                },
                 "phone_number": {
                     "type": "string",
                     "example": "+66912345678"
@@ -3543,13 +3521,9 @@ const docTemplate = `{
                     "type": "string",
                     "example": "\u003cbase64-encoded-image\u003e"
                 },
-                "session_id": {
+                "student_id": {
                     "type": "string",
-                    "example": "sess-abc123xyz"
-                },
-                "teacher_id": {
-                    "type": "integer",
-                    "example": 7
+                    "example": "6610505511"
                 }
             }
         }
