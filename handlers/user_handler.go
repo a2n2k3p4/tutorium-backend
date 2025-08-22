@@ -56,7 +56,10 @@ func CreateUser(c *fiber.Ctx) error {
 // @Router       /users [get]
 func GetUsers(c *fiber.Ctx) error {
 	users := []models.User{}
-	if err := db.Find(&users).Error; err != nil {
+	if err := db.Preload("Learner").
+		Preload("Teacher").
+		Preload("Admin").
+		Find(&users).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
@@ -64,7 +67,10 @@ func GetUsers(c *fiber.Ctx) error {
 }
 
 func findUser(id int, user *models.User) error {
-	return db.First(user, "id = ?", id).Error
+	return db.Preload("Learner").
+		Preload("Teacher").
+		Preload("Admin").
+		First(user, "id = ?", id).Error
 }
 
 // GetUser godoc
