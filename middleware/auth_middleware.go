@@ -68,7 +68,7 @@ func AdminRequired() fiber.Handler {
 		if !ok {
 			return c.Status(401).JSON(fiber.Map{"error": "authentication required"})
 		}
-		if (user.AdminID == nil || *user.AdminID == 0) && user.Admin == nil {
+		if user.Admin == nil {
 			return c.Status(403).JSON(fiber.Map{"error": "admin access required"})
 		}
 		return c.Next()
@@ -81,7 +81,7 @@ func TeacherRequired() fiber.Handler {
 		if !ok {
 			return c.Status(401).JSON(fiber.Map{"error": "authentication required"})
 		}
-		if (user.TeacherID == nil || *user.TeacherID == 0) && user.Teacher == nil {
+		if user.Teacher == nil {
 			return c.Status(403).JSON(fiber.Map{"error": "teacher access required"})
 		}
 		return c.Next()
@@ -94,7 +94,7 @@ func LearnerRequired() fiber.Handler {
 		if !ok {
 			return c.Status(401).JSON(fiber.Map{"error": "authentication required"})
 		}
-		if (user.LearnerID == nil || *user.LearnerID == 0) && user.Learner == nil {
+		if user.Learner == nil {
 			return c.Status(403).JSON(fiber.Map{"error": "learner access required"})
 		}
 		return c.Next()
