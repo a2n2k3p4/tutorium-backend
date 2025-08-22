@@ -10,7 +10,7 @@ import (
 )
 
 func AdminRoutes(app *fiber.App) {
-	admin := app.Group("/admin", middleware.ProtectedMiddleware())
+	admin := app.Group("/admins", middleware.ProtectedMiddleware())
 
 	admin.Post("/", CreateAdmin)
 	admin.Get("/", GetAdmins)
@@ -29,7 +29,7 @@ func AdminRoutes(app *fiber.App) {
 //	@Param			admin	body		models.AdminDoc	true	"Admin data"
 //	@Success		200		{object}	models.AdminDoc
 //	@Failure		400		{object}	map[string]interface{}	"Bad request"
-//	@Router			/admin [post]
+//	@Router			/admins [post]
 func CreateAdmin(c *fiber.Ctx) error {
 	var admin models.Admin
 
@@ -76,7 +76,7 @@ func findAdmin(id int, admin *models.Admin) error {
 //	@Param			id	path		int	true	"Admin ID"
 //	@Success		200	{object}	models.AdminDoc
 //	@Failure		400	{object}	map[string]interface{}	"Bad request - Invalid ID or admin not found"
-//	@Router			/admin/{id} [get]
+//	@Router			/admins/{id} [get]
 func GetAdmin(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -108,7 +108,7 @@ func GetAdmin(c *fiber.Ctx) error {
 //	@Success		200	{object}	map[string]interface{}	"Successfully deleted admin"
 //	@Failure		400	{object}	map[string]interface{}	"Bad request - Invalid ID or admin not found"
 //	@Failure		500	{object}	map[string]interface{}	"Internal server error during deletion"
-//	@Router			/admin/{id} [delete]
+//	@Router			/admins/{id} [delete]
 func DeleteAdmin(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

@@ -10,7 +10,7 @@ import (
 )
 
 func ClassRoutes(app *fiber.App) {
-	class := app.Group("/class")
+	class := app.Group("/classes")
 	class.Get("/", GetClasses)
 	class.Get("/:id", GetClass)
 
@@ -31,7 +31,7 @@ func ClassRoutes(app *fiber.App) {
 //	@Success		201		{object}	models.ClassDoc
 //	@Failure		400		{object}	map[string]string	"Invalid input"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/class [post]
+//	@Router			/classes [post]
 func CreateClass(c *fiber.Ctx) error {
 	var class models.Class
 
@@ -78,7 +78,7 @@ func findClass(id int, class *models.Class) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Class not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/class/{id} [get]
+//	@Router			/classes/{id} [get]
 func GetClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -112,7 +112,7 @@ func GetClass(c *fiber.Ctx) error {
 //	@Failure		400		{object}	map[string]string	"Invalid input"
 //	@Failure		404		{object}	map[string]string	"Class not found"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/class/{id} [put]
+//	@Router			/classes/{id} [put]
 func UpdateClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -154,7 +154,7 @@ func UpdateClass(c *fiber.Ctx) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Class not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/class/{id} [delete]
+//	@Router			/classes/{id} [delete]
 func DeleteClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

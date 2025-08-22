@@ -10,7 +10,7 @@ import (
 )
 
 func BanLearnerRoutes(app *fiber.App) {
-	banLearner := app.Group("/banlearner", middleware.ProtectedMiddleware(), middleware.AdminRequired())
+	banLearner := app.Group("/banlearners", middleware.ProtectedMiddleware(), middleware.AdminRequired())
 
 	banLearner.Post("/", CreateBanLearner)
 	banLearner.Get("/", GetBanLearners)
@@ -30,7 +30,7 @@ func BanLearnerRoutes(app *fiber.App) {
 //	@Success		201			{object}	models.BanDetailsLearnerDoc
 //	@Failure		400			{object}	map[string]string
 //	@Failure		500			{object}	map[string]string
-//	@Router			/banlearner [post]
+//	@Router			/banlearners [post]
 func CreateBanLearner(c *fiber.Ctx) error {
 	var banlearner models.BanDetailsLearner
 
@@ -77,7 +77,7 @@ func findBanLearner(id int, banlearner *models.BanDetailsLearner) error {
 //	@Failure		400	{object}	map[string]string
 //	@Failure		404	{object}	map[string]string
 //	@Failure		500	{object}	map[string]string
-//	@Router			/banlearner/{id} [get]
+//	@Router			/banlearners/{id} [get]
 func GetBanLearner(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -111,7 +111,7 @@ func GetBanLearner(c *fiber.Ctx) error {
 //	@Failure		400			{object}	map[string]string
 //	@Failure		404			{object}	map[string]string
 //	@Failure		500			{object}	map[string]string
-//	@Router			/banlearner/{id} [put]
+//	@Router			/banlearners/{id} [put]
 func UpdateBanLearner(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -153,7 +153,7 @@ func UpdateBanLearner(c *fiber.Ctx) error {
 //	@Failure		400	{object}	map[string]string
 //	@Failure		404	{object}	map[string]string
 //	@Failure		500	{object}	map[string]string
-//	@Router			/banlearner/{id} [delete]
+//	@Router			/banlearners/{id} [delete]
 func DeleteBanLearner(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

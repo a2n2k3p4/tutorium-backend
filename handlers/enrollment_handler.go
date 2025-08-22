@@ -10,7 +10,7 @@ import (
 )
 
 func EnrollmentRoutes(app *fiber.App) {
-	enrollment := app.Group("/enrollment", middleware.ProtectedMiddleware(), middleware.LearnerRequired())
+	enrollment := app.Group("/enrollments", middleware.ProtectedMiddleware(), middleware.LearnerRequired())
 
 	enrollment.Post("/", CreateEnrollment)
 	enrollment.Get("/", GetEnrollments)
@@ -30,7 +30,7 @@ func EnrollmentRoutes(app *fiber.App) {
 //	@Success		201			{object}	models.EnrollmentDoc
 //	@Failure		400			{object}	map[string]string	"Invalid input"
 //	@Failure		500			{object}	map[string]string	"Server error"
-//	@Router			/enrollment [post]
+//	@Router			/enrollments [post]
 func CreateEnrollment(c *fiber.Ctx) error {
 	var enrollment models.Enrollment
 
@@ -77,7 +77,7 @@ func findEnrollment(id int, enrollment *models.Enrollment) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Enrollment not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/enrollment/{id} [get]
+//	@Router			/enrollments/{id} [get]
 func GetEnrollment(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -111,7 +111,7 @@ func GetEnrollment(c *fiber.Ctx) error {
 //	@Failure		400			{object}	map[string]string	"Invalid input"
 //	@Failure		404			{object}	map[string]string	"Enrollment not found"
 //	@Failure		500			{object}	map[string]string	"Server error"
-//	@Router			/enrollment/{id} [put]
+//	@Router			/enrollments/{id} [put]
 func UpdateEnrollment(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -153,7 +153,7 @@ func UpdateEnrollment(c *fiber.Ctx) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Enrollment not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/enrollment/{id} [delete]
+//	@Router			/enrollments/{id} [delete]
 func DeleteEnrollment(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

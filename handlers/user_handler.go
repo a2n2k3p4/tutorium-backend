@@ -11,7 +11,7 @@ import (
 )
 
 func UserRoutes(app *fiber.App) {
-	user := app.Group("/user", middleware.ProtectedMiddleware())
+	user := app.Group("/users", middleware.ProtectedMiddleware())
 	user.Post("/", CreateUser)
 	user.Get("/:id", GetUser)
 	user.Put("/:id", UpdateUser)
@@ -32,7 +32,7 @@ func UserRoutes(app *fiber.App) {
 //	@Success		201		{object}	models.UserDoc
 //	@Failure		400		{object}	map[string]string	"Invalid input"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/user [post]
+//	@Router			/users [post]
 func CreateUser(c *fiber.Ctx) error {
 	var user models.User
 
@@ -86,7 +86,7 @@ func findUser(id int, user *models.User) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"User not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/user/{id} [get]
+//	@Router			/users/{id} [get]
 func GetUser(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -120,7 +120,7 @@ func GetUser(c *fiber.Ctx) error {
 //	@Failure		400		{object}	map[string]string	"Invalid input"
 //	@Failure		404		{object}	map[string]string	"User not found"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/user/{id} [put]
+//	@Router			/users/{id} [put]
 func UpdateUser(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -161,7 +161,7 @@ func UpdateUser(c *fiber.Ctx) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"User not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/user/{id} [delete]
+//	@Router			/users/{id} [delete]
 func DeleteUser(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

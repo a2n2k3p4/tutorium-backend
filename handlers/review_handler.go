@@ -10,7 +10,7 @@ import (
 )
 
 func ReviewRoutes(app *fiber.App) {
-	review := app.Group("/review")
+	review := app.Group("/reviews")
 	review.Get("/", GetReviews)
 	review.Get("/:id", GetReview)
 
@@ -31,7 +31,7 @@ func ReviewRoutes(app *fiber.App) {
 //	@Success		201		{object}	models.ReviewDoc
 //	@Failure		400		{object}	map[string]string	"Invalid input or rating out of range"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/review [post]
+//	@Router			/reviews [post]
 func CreateReview(c *fiber.Ctx) error {
 	var review models.Review
 
@@ -82,7 +82,7 @@ func findReview(id int, review *models.Review) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Review not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/review/{id} [get]
+//	@Router			/reviews/{id} [get]
 func GetReview(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -116,7 +116,7 @@ func GetReview(c *fiber.Ctx) error {
 //	@Failure		400		{object}	map[string]string	"Invalid input or rating out of range"
 //	@Failure		404		{object}	map[string]string	"Review not found"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/review/{id} [put]
+//	@Router			/reviews/{id} [put]
 func UpdateReview(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -167,7 +167,7 @@ func UpdateReview(c *fiber.Ctx) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Review not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/review/{id} [delete]
+//	@Router			/reviews/{id} [delete]
 func DeleteReview(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

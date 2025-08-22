@@ -10,7 +10,7 @@ import (
 )
 
 func BanTeacherRoutes(app *fiber.App) {
-	banTeacher := app.Group("/banteacher", middleware.ProtectedMiddleware(), middleware.AdminRequired())
+	banTeacher := app.Group("/banteachers", middleware.ProtectedMiddleware(), middleware.AdminRequired())
 
 	banTeacher.Post("/", CreateBanTeacher)
 	banTeacher.Get("/", GetBanTeachers)
@@ -30,7 +30,7 @@ func BanTeacherRoutes(app *fiber.App) {
 //	@Success		201			{object}	models.BanDetailsTeacherDoc
 //	@Failure		400			{object}	map[string]string	"Invalid input"
 //	@Failure		500			{object}	map[string]string	"Server error"
-//	@Router			/banteacher [post]
+//	@Router			/banteachers [post]
 func CreateBanTeacher(c *fiber.Ctx) error {
 	var banteacher models.BanDetailsTeacher
 
@@ -77,7 +77,7 @@ func findBanTeacher(id int, banteacher *models.BanDetailsTeacher) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"BanTeacher not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/banteacher/{id} [get]
+//	@Router			/banteachers/{id} [get]
 func GetBanTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -111,7 +111,7 @@ func GetBanTeacher(c *fiber.Ctx) error {
 //	@Failure		400			{object}	map[string]string	"Invalid input or not found"
 //	@Failure		404			{object}	map[string]string	"BanTeacher not found"
 //	@Failure		500			{object}	map[string]string	"Server error"
-//	@Router			/banteacher/{id} [put]
+//	@Router			/banteachers/{id} [put]
 func UpdateBanTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -152,7 +152,7 @@ func UpdateBanTeacher(c *fiber.Ctx) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"BanTeacher not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/banteacher/{id} [delete]
+//	@Router			/banteachers/{id} [delete]
 func DeleteBanTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

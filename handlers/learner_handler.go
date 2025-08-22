@@ -10,7 +10,7 @@ import (
 )
 
 func LearnerRoutes(app *fiber.App) {
-	learner := app.Group("/learner", middleware.ProtectedMiddleware())
+	learner := app.Group("/learners", middleware.ProtectedMiddleware())
 
 	learner.Post("/", CreateLearner)
 	learner.Get("/", GetLearners)
@@ -30,7 +30,7 @@ func LearnerRoutes(app *fiber.App) {
 //	@Success		201		{object}	models.LearnerDoc
 //	@Failure		400		{object}	map[string]string	"Invalid input"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/learner [post]
+//	@Router			/learners [post]
 func CreateLearner(c *fiber.Ctx) error {
 	var learner models.Learner
 
@@ -78,7 +78,7 @@ func findLearner(id int, learner *models.Learner) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Learner not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/learner/{id} [get]
+//	@Router			/learners/{id} [get]
 func GetLearner(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -110,7 +110,7 @@ func GetLearner(c *fiber.Ctx) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Learner not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/learner/{id} [delete]
+//	@Router			/learners/{id} [delete]
 func DeleteLearner(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

@@ -10,7 +10,7 @@ import (
 )
 
 func ReportRoutes(app *fiber.App) {
-	report := app.Group("/report", middleware.ProtectedMiddleware())
+	report := app.Group("/reports", middleware.ProtectedMiddleware())
 	report.Post("/", CreateReport)
 
 	reportAdmin := report.Group("/", middleware.AdminRequired())
@@ -31,7 +31,7 @@ func ReportRoutes(app *fiber.App) {
 //	@Success		201		{object}	models.ReportDoc
 //	@Failure		400		{object}	map[string]string	"Invalid input"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/report [post]
+//	@Router			/reports [post]
 func CreateReport(c *fiber.Ctx) error {
 	var report models.Report
 
@@ -78,7 +78,7 @@ func findReport(id int, report *models.Report) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Report not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/report/{id} [get]
+//	@Router			/reports/{id} [get]
 func GetReport(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -112,7 +112,7 @@ func GetReport(c *fiber.Ctx) error {
 //	@Failure		400		{object}	map[string]string	"Invalid input"
 //	@Failure		404		{object}	map[string]string	"Report not found"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/report/{id} [put]
+//	@Router			/reports/{id} [put]
 func UpdateReport(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -153,7 +153,7 @@ func UpdateReport(c *fiber.Ctx) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Report not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/report/{id} [delete]
+//	@Router			/reports/{id} [delete]
 func DeleteReport(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

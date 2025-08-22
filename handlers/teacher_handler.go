@@ -10,7 +10,7 @@ import (
 )
 
 func TeacherRoutes(app *fiber.App) {
-	teacher := app.Group("/teacher")
+	teacher := app.Group("/teachers")
 	teacher.Get("/", GetTeachers)
 	teacher.Get("/:id", GetTeacher)
 
@@ -31,7 +31,7 @@ func TeacherRoutes(app *fiber.App) {
 //	@Success		201		{object}	models.TeacherDoc
 //	@Failure		400		{object}	map[string]string	"Invalid input"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/teacher [post]
+//	@Router			/teachers [post]
 func CreateTeacher(c *fiber.Ctx) error {
 	var teacher models.Teacher
 
@@ -79,7 +79,7 @@ func findTeacher(id int, teacher *models.Teacher) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Teacher not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/teacher/{id} [get]
+//	@Router			/teachers/{id} [get]
 func GetTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -113,7 +113,7 @@ func GetTeacher(c *fiber.Ctx) error {
 //	@Failure		400		{object}	map[string]string	"Invalid input"
 //	@Failure		404		{object}	map[string]string	"Teacher not found"
 //	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/teacher/{id} [put]
+//	@Router			/teachers/{id} [put]
 func UpdateTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -154,7 +154,7 @@ func UpdateTeacher(c *fiber.Ctx) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Teacher not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/teacher/{id} [delete]
+//	@Router			/teachers/{id} [delete]
 func DeleteTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

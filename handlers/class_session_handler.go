@@ -10,7 +10,7 @@ import (
 )
 
 func ClassSessionRoutes(app *fiber.App) {
-	classSession := app.Group("/class_session")
+	classSession := app.Group("/class_sessions")
 	classSession.Get("/", GetClassSessions)
 	classSession.Get("/:id", GetClassSession)
 
@@ -31,7 +31,7 @@ func ClassSessionRoutes(app *fiber.App) {
 //	@Success		201				{object}	models.ClassSessionDoc
 //	@Failure		400				{object}	map[string]string	"Invalid input"
 //	@Failure		500				{object}	map[string]string	"Server error"
-//	@Router			/class_session [post]
+//	@Router			/class_sessions [post]
 func CreateClassSession(c *fiber.Ctx) error {
 	var class_session models.ClassSession
 
@@ -79,7 +79,7 @@ func findClassSession(id int, class_session *models.ClassSession) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"ClassSession not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/class_session/{id} [get]
+//	@Router			/class_sessions/{id} [get]
 func GetClassSession(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -113,7 +113,7 @@ func GetClassSession(c *fiber.Ctx) error {
 //	@Failure		400				{object}	map[string]string	"Invalid input"
 //	@Failure		404				{object}	map[string]string	"ClassSession not found"
 //	@Failure		500				{object}	map[string]string	"Server error"
-//	@Router			/class_session/{id} [put]
+//	@Router			/class_sessions/{id} [put]
 func UpdateClassSession(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -155,7 +155,7 @@ func UpdateClassSession(c *fiber.Ctx) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"ClassSession not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/class_session/{id} [delete]
+//	@Router			/class_sessions/{id} [delete]
 func DeleteClassSession(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

@@ -10,7 +10,7 @@ import (
 )
 
 func NotificationRoutes(app *fiber.App) {
-	notification := app.Group("/notification", middleware.ProtectedMiddleware())
+	notification := app.Group("/notifications", middleware.ProtectedMiddleware())
 	notification.Get("/", GetNotifications)
 	notification.Get("/:id", GetNotification)
 	notification.Put("/:id", UpdateNotification)
@@ -31,7 +31,7 @@ func NotificationRoutes(app *fiber.App) {
 //	@Success		201				{object}	models.NotificationDoc
 //	@Failure		400				{object}	map[string]string	"Invalid input"
 //	@Failure		500				{object}	map[string]string	"Server error"
-//	@Router			/notification [post]
+//	@Router			/notifications [post]
 func CreateNotification(c *fiber.Ctx) error {
 	var notification models.Notification
 
@@ -78,7 +78,7 @@ func findNotification(id int, notification *models.Notification) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Notification not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/notification/{id} [get]
+//	@Router			/notifications/{id} [get]
 func GetNotification(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -112,7 +112,7 @@ func GetNotification(c *fiber.Ctx) error {
 //	@Failure		400				{object}	map[string]string	"Invalid input"
 //	@Failure		404				{object}	map[string]string	"Notification not found"
 //	@Failure		500				{object}	map[string]string	"Server error"
-//	@Router			/notification/{id} [put]
+//	@Router			/notifications/{id} [put]
 func UpdateNotification(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -153,7 +153,7 @@ func UpdateNotification(c *fiber.Ctx) error {
 //	@Failure		400	{object}	map[string]string	"Invalid ID"
 //	@Failure		404	{object}	map[string]string	"Notification not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/notification/{id} [delete]
+//	@Router			/notifications/{id} [delete]
 func DeleteNotification(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
