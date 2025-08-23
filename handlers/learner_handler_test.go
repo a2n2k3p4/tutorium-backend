@@ -31,7 +31,7 @@ func TestCreateLearner_OK(t *testing.T) {
 	mock.ExpectCommit()
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodPost, "/learners/", bytes.NewReader([]byte(`{}`)))
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -67,7 +67,7 @@ func TestCreateLearner_BadRequest(t *testing.T) {
 	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodPost, "/learners/", bytes.NewBufferString(`{invalid-json}`))
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -101,7 +101,7 @@ func TestCreateLearner_DBError(t *testing.T) {
 	mock.ExpectRollback()
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodPost, "/learners/", bytes.NewReader([]byte(`{}`)))
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -138,7 +138,7 @@ func TestGetLearners_OK(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1).AddRow(2))
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, "/learners/", nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -176,7 +176,7 @@ func TestGetLearners_DBError(t *testing.T) {
 		WillReturnError(fmt.Errorf("select failed"))
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, "/learners/", nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -214,7 +214,7 @@ func TestGetLearner_OK(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(learnerID))
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/learners/%d", learnerID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -257,7 +257,7 @@ func TestGetLearner_NotFound(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{"id"}))
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/learners/%d", learnerID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -290,7 +290,7 @@ func TestGetLearner_DBError(t *testing.T) {
 		WillReturnError(fmt.Errorf("select failed"))
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/learners/%d", learnerID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -318,7 +318,7 @@ func TestGetLearner_BadRequest(t *testing.T) {
 	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, "/learners/not-an-int", nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -360,7 +360,7 @@ func TestDeleteLearner_OK_SoftDelete(t *testing.T) {
 	mock.ExpectCommit()
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/learners/%d", learnerID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -395,7 +395,7 @@ func TestDeleteLearner_NotFound(t *testing.T) {
 		WithArgs(learnerID, 1).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}))
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/learners/%d", learnerID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -434,7 +434,7 @@ func TestDeleteLearner_DBError(t *testing.T) {
 	mock.ExpectRollback()
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/learners/%d", learnerID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -463,7 +463,7 @@ func TestDeleteLearner_BadRequest(t *testing.T) {
 	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, "/learners/not-an-int", nil)
 	req.Header.Set("Authorization", "Bearer "+token)

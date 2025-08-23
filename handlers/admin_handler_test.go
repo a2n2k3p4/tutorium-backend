@@ -31,7 +31,7 @@ func TestCreateAdmin_OK(t *testing.T) {
 	mock.ExpectCommit()
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodPost, "/admins/", bytes.NewReader([]byte(`{}`)))
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -67,7 +67,7 @@ func TestCreateAdmin_BadRequest(t *testing.T) {
 	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodPost, "/admins/", bytes.NewBufferString(`{invalid-json}`))
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -101,7 +101,7 @@ func TestCreateAdmin_DBError(t *testing.T) {
 	mock.ExpectRollback()
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodPost, "/admins/", bytes.NewReader([]byte(`{}`)))
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -138,7 +138,7 @@ func TestGetAdmins_OK(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1).AddRow(2))
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, "/admins/", nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -176,7 +176,7 @@ func TestGetAdmins_DBError(t *testing.T) {
 		WillReturnError(fmt.Errorf("select failed"))
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, "/admins/", nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -214,7 +214,7 @@ func TestGetAdmin_OK(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(adminID))
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/admins/%d", adminID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -257,7 +257,7 @@ func TestGetAdmin_NotFound(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{"id"}))
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/admins/%d", adminID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -290,7 +290,7 @@ func TestGetAdmin_DBError(t *testing.T) {
 		WillReturnError(fmt.Errorf("select failed"))
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/admins/%d", adminID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -318,7 +318,7 @@ func TestGetAdmin_BadRequest(t *testing.T) {
 	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, "/admins/not-an-int", nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -360,7 +360,7 @@ func TestDeleteAdmin_OK_SoftDelete(t *testing.T) {
 	mock.ExpectCommit()
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/admins/%d", adminID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -395,7 +395,7 @@ func TestDeleteAdmin_NotFound(t *testing.T) {
 		WithArgs(adminID, 1).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}))
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/admins/%d", adminID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -434,7 +434,7 @@ func TestDeleteAdmin_DBError(t *testing.T) {
 	mock.ExpectRollback()
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/admins/%d", adminID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -463,7 +463,7 @@ func TestDeleteAdmin_BadRequest(t *testing.T) {
 	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, "/admins/not-an-int", nil)
 	req.Header.Set("Authorization", "Bearer "+token)

@@ -31,7 +31,7 @@ func TestCreateTeacher_OK(t *testing.T) {
 	mock.ExpectCommit()
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodPost, "/teachers/", bytes.NewReader([]byte(`{}`)))
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -67,7 +67,7 @@ func TestCreateTeacher_BadRequest(t *testing.T) {
 	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodPost, "/teachers/", bytes.NewBufferString(`{invalid-json}`))
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -101,7 +101,7 @@ func TestCreateTeacher_DBError(t *testing.T) {
 	mock.ExpectRollback()
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodPost, "/teachers/", bytes.NewReader([]byte(`{}`)))
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -322,7 +322,7 @@ func TestDeleteTeacher_OK_SoftDelete(t *testing.T) {
 	mock.ExpectCommit()
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/teachers/%d", teacherID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -357,7 +357,7 @@ func TestDeleteTeacher_NotFound(t *testing.T) {
 		WithArgs(teacherID, 1).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}))
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/teachers/%d", teacherID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -396,7 +396,7 @@ func TestDeleteTeacher_DBError(t *testing.T) {
 	mock.ExpectRollback()
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/teachers/%d", teacherID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -425,7 +425,7 @@ func TestDeleteTeacher_BadRequest(t *testing.T) {
 	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, fileSecret, uint(userID))
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, "/teachers/not-an-int", nil)
 	req.Header.Set("Authorization", "Bearer "+token)
