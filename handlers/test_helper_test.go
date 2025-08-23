@@ -13,10 +13,10 @@ import (
 	"gorm.io/gorm"
 )
 
-var fileSecret = []byte("secret")
+const secretString = "secret"
 
 func init() {
-	middlewares.SetSecretProvider(func() []byte { return fileSecret })
+	middlewares.SetSecretProvider(func() []byte { return []byte(secretString) })
 }
 
 func setupMockGorm(t *testing.T) (sqlmock.Sqlmock, *gorm.DB, func()) {
