@@ -75,22 +75,6 @@ func makeJWT(t *testing.T, userID uint) string {
 	return s
 }
 
-func make_wrong_JWT(t *testing.T, userID uint) string {
-	t.Helper()
-	secret := []byte("")
-	claims := jwt.MapClaims{
-		"user_id": userID,
-		"iat":     time.Now().Unix(),
-		"exp":     time.Now().Add(1 * time.Hour).Unix(),
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	s, err := token.SignedString(secret)
-	if err != nil {
-		t.Fatalf("sign token: %v", err)
-	}
-	return s
-}
-
 func preloadUserForAuth(mock sqlmock.Sqlmock, userID uint) {
 	mock.ExpectQuery(`SELECT \* FROM "users" WHERE "users"\."id" = \$1 AND "users"\."deleted_at" IS NULL ORDER BY "users"\."id" LIMIT .*`).
 		WithArgs(userID, 1).
