@@ -75,20 +75,38 @@ func makeJWT(t *testing.T, userID uint) string {
 	return s
 }
 
-func preloadUserForAuth(mock sqlmock.Sqlmock, userID uint) {
+func preloadUserForAuth(mock sqlmock.Sqlmock, userID uint, hasAdmin bool, hasTeacher bool, hasLearner bool) {
+	mock.MatchExpectationsInOrder(false)
+
 	mock.ExpectQuery(`SELECT \* FROM "users" WHERE "users"\."id" = \$1 AND "users"\."deleted_at" IS NULL ORDER BY "users"\."id" LIMIT .*`).
 		WithArgs(userID, 1).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(userID))
+	if hasAdmin {
+		mock.ExpectQuery(`SELECT \* FROM "admins" WHERE "admins"\."user_id" = \$1 AND "admins"\."deleted_at" IS NULL`).
+			WithArgs(userID).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "user_id"}).AddRow(99, userID))
+	} else {
+		mock.ExpectQuery(`SELECT \* FROM "admins" WHERE "admins"\."user_id" = \$1 AND "admins"\."deleted_at" IS NULL`).
+			WithArgs(userID).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}))
+	}
+	if hasTeacher {
+		mock.ExpectQuery(`SELECT \* FROM "teachers" WHERE "teachers"\."user_id" = \$1 AND "teachers"\."deleted_at" IS NULL`).
+			WithArgs(userID).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "user_id"}).AddRow(99, userID))
+	} else {
+		mock.ExpectQuery(`SELECT \* FROM "teachers" WHERE "teachers"\."user_id" = \$1 AND "teachers"\."deleted_at" IS NULL`).
+			WithArgs(userID).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}))
+	}
+	if hasLearner {
+		mock.ExpectQuery(`SELECT \* FROM "learners" WHERE "learners"\."user_id" = \$1 AND "learners"\."deleted_at" IS NULL`).
+			WithArgs(userID).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "user_id"}).AddRow(99, userID))
+	} else {
+		mock.ExpectQuery(`SELECT \* FROM "learners" WHERE "learners"\."user_id" = \$1 AND "learners"\."deleted_at" IS NULL`).
+			WithArgs(userID).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}))
+	}
 
-	mock.ExpectQuery(`SELECT \* FROM "admins" WHERE "admins"\."user_id" = \$1 AND "admins"\."deleted_at" IS NULL`).
-		WithArgs(userID).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}))
-
-	mock.ExpectQuery(`SELECT \* FROM "learners" WHERE "learners"\."user_id" = \$1 AND "learners"\."deleted_at" IS NULL`).
-		WithArgs(userID).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}))
-
-	mock.ExpectQuery(`SELECT \* FROM "teachers" WHERE "teachers"\."user_id" = \$1 AND "teachers"\."deleted_at" IS NULL`).
-		WithArgs(userID).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}))
 }

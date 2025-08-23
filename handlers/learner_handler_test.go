@@ -22,7 +22,7 @@ func TestCreateLearner_OK(t *testing.T) {
 	userID := 42
 
 	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: insert learners
 	mock.ExpectBegin()
@@ -64,7 +64,7 @@ func TestCreateLearner_BadRequest(t *testing.T) {
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp()
 	token := makeJWT(t, uint(userID))
@@ -93,7 +93,7 @@ func TestCreateLearner_DBError(t *testing.T) {
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	mock.ExpectBegin()
 	mock.ExpectQuery(`INSERT INTO "learners".*RETURNING "id"`).
@@ -131,7 +131,7 @@ func TestGetLearners_OK(t *testing.T) {
 	userID := 42
 
 	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: list learners
 	mock.ExpectQuery(`SELECT .* FROM "learners".*`).
@@ -170,7 +170,7 @@ func TestGetLearners_DBError(t *testing.T) {
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	mock.ExpectQuery(`SELECT .* FROM "learners".*`).
 		WillReturnError(fmt.Errorf("select failed"))
@@ -206,7 +206,7 @@ func TestGetLearner_OK(t *testing.T) {
 	learnerID := 7
 
 	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: find by id
 	mock.ExpectQuery(`SELECT \* FROM "learners" WHERE id = \$1 AND "learners"\."deleted_at" IS NULL ORDER BY "learners"\."id" LIMIT .*`).
@@ -249,7 +249,7 @@ func TestGetLearner_NotFound(t *testing.T) {
 	learnerID := 999
 
 	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: not found (empty rowset)
 	mock.ExpectQuery(`SELECT \* FROM "learners" WHERE id = \$1 AND "learners"\."deleted_at" IS NULL ORDER BY "learners"\."id" LIMIT .*`).
@@ -283,7 +283,7 @@ func TestGetLearner_DBError(t *testing.T) {
 	userID := 42
 	learnerID := 7
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	mock.ExpectQuery(`SELECT \* FROM "learners" WHERE id = \$1 AND "learners"\."deleted_at" IS NULL ORDER BY "learners"\."id" LIMIT .*`).
 		WithArgs(learnerID, 1).
@@ -315,7 +315,7 @@ func TestGetLearner_BadRequest(t *testing.T) {
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp()
 	token := makeJWT(t, uint(userID))
@@ -347,7 +347,7 @@ func TestDeleteLearner_OK_SoftDelete(t *testing.T) {
 	learnerID := 5
 
 	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: find then soft-delete
 	mock.ExpectQuery(`SELECT \* FROM "learners" WHERE id = \$1 AND "learners"\."deleted_at" IS NULL ORDER BY "learners"\."id" LIMIT .*`).
@@ -388,7 +388,7 @@ func TestDeleteLearner_NotFound(t *testing.T) {
 	learnerID := 12345
 
 	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: not found on SELECT
 	mock.ExpectQuery(`SELECT \* FROM "learners" WHERE id = \$1 AND "learners"\."deleted_at" IS NULL ORDER BY "learners"\."id" LIMIT .*`).
@@ -421,7 +421,7 @@ func TestDeleteLearner_DBError(t *testing.T) {
 	userID := 42
 	learnerID := 5
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Found, then UPDATE fails -> rollback
 	mock.ExpectQuery(`SELECT \* FROM "learners" WHERE id = \$1 AND "learners"\."deleted_at" IS NULL ORDER BY "learners"\."id" LIMIT .*`).
@@ -460,7 +460,7 @@ func TestDeleteLearner_BadRequest(t *testing.T) {
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp()
 	token := makeJWT(t, uint(userID))

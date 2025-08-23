@@ -22,7 +22,7 @@ func TestCreateAdmin_OK(t *testing.T) {
 	userID := 42
 
 	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: insert admins
 	mock.ExpectBegin()
@@ -64,7 +64,7 @@ func TestCreateAdmin_BadRequest(t *testing.T) {
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp()
 	token := makeJWT(t, uint(userID))
@@ -93,7 +93,7 @@ func TestCreateAdmin_DBError(t *testing.T) {
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	mock.ExpectBegin()
 	mock.ExpectQuery(`INSERT INTO "admins".*RETURNING "id"`).
@@ -131,7 +131,7 @@ func TestGetAdmins_OK(t *testing.T) {
 	userID := 42
 
 	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: list admins
 	mock.ExpectQuery(`SELECT .* FROM "admins".*`).
@@ -170,7 +170,7 @@ func TestGetAdmins_DBError(t *testing.T) {
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	mock.ExpectQuery(`SELECT .* FROM "admins".*`).
 		WillReturnError(fmt.Errorf("select failed"))
@@ -206,7 +206,7 @@ func TestGetAdmin_OK(t *testing.T) {
 	adminID := 7
 
 	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: find by id
 	mock.ExpectQuery(`SELECT \* FROM "admins" WHERE id = \$1 AND "admins"\."deleted_at" IS NULL ORDER BY "admins"\."id" LIMIT .*`).
@@ -249,7 +249,7 @@ func TestGetAdmin_NotFound(t *testing.T) {
 	adminID := 999
 
 	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: not found (empty rowset)
 	mock.ExpectQuery(`SELECT \* FROM "admins" WHERE id = \$1 AND "admins"\."deleted_at" IS NULL ORDER BY "admins"\."id" LIMIT .*`).
@@ -283,7 +283,7 @@ func TestGetAdmin_DBError(t *testing.T) {
 	userID := 42
 	adminID := 7
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	mock.ExpectQuery(`SELECT \* FROM "admins" WHERE id = \$1 AND "admins"\."deleted_at" IS NULL ORDER BY "admins"\."id" LIMIT .*`).
 		WithArgs(adminID, 1).
@@ -315,7 +315,7 @@ func TestGetAdmin_BadRequest(t *testing.T) {
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp()
 	token := makeJWT(t, uint(userID))
@@ -347,7 +347,7 @@ func TestDeleteAdmin_OK_SoftDelete(t *testing.T) {
 	adminID := 5
 
 	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: find then soft-delete
 	mock.ExpectQuery(`SELECT \* FROM "admins" WHERE id = \$1 AND "admins"\."deleted_at" IS NULL ORDER BY "admins"\."id" LIMIT .*`).
@@ -388,7 +388,7 @@ func TestDeleteAdmin_NotFound(t *testing.T) {
 	adminID := 12345
 
 	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: not found on SELECT
 	mock.ExpectQuery(`SELECT \* FROM "admins" WHERE id = \$1 AND "admins"\."deleted_at" IS NULL ORDER BY "admins"\."id" LIMIT .*`).
@@ -421,7 +421,7 @@ func TestDeleteAdmin_DBError(t *testing.T) {
 	userID := 42
 	adminID := 5
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Found, then UPDATE fails -> rollback
 	mock.ExpectQuery(`SELECT \* FROM "admins" WHERE id = \$1 AND "admins"\."deleted_at" IS NULL ORDER BY "admins"\."id" LIMIT .*`).
@@ -460,7 +460,7 @@ func TestDeleteAdmin_BadRequest(t *testing.T) {
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp()
 	token := makeJWT(t, uint(userID))
