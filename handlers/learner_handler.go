@@ -3,14 +3,14 @@ package handlers
 import (
 	"errors"
 
-	"github.com/a2n2k3p4/tutorium-backend/middleware"
+	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func LearnerRoutes(app *fiber.App) {
-	learner := app.Group("/learners", middleware.ProtectedMiddleware())
+	learner := app.Group("/learners", middlewares.ProtectedMiddleware())
 
 	learner.Post("/", CreateLearner)
 	learner.Get("/", GetLearners)
@@ -37,6 +37,10 @@ func CreateLearner(c *fiber.Ctx) error {
 	if err := c.BodyParser(&learner); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	if err := db.Create(&learner).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -56,6 +60,11 @@ func CreateLearner(c *fiber.Ctx) error {
 //	@Router			/learners [get]
 func GetLearners(c *fiber.Ctx) error {
 	learners := []models.Learner{}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	if err := db.Find(&learners).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
@@ -63,7 +72,7 @@ func GetLearners(c *fiber.Ctx) error {
 	return c.Status(200).JSON(learners)
 }
 
-func findLearner(id int, learner *models.Learner) error {
+func findLearner(db *gorm.DB, id int, learner *models.Learner) error {
 	return db.First(learner, "id = ?", id).Error
 }
 
@@ -87,8 +96,12 @@ func GetLearner(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findLearner(id, &learner)
+	err = findLearner(db, id, &learner)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("Learner not found")
@@ -119,8 +132,12 @@ func DeleteLearner(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findLearner(id, &learner)
+	err = findLearner(db, id, &learner)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("Learner not found")

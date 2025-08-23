@@ -3,14 +3,14 @@ package handlers
 import (
 	"errors"
 
-	"github.com/a2n2k3p4/tutorium-backend/middleware"
+	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func EnrollmentRoutes(app *fiber.App) {
-	enrollment := app.Group("/enrollments", middleware.ProtectedMiddleware(), middleware.LearnerRequired())
+	enrollment := app.Group("/enrollments", middlewares.ProtectedMiddleware(), middlewares.LearnerRequired())
 
 	enrollment.Post("/", CreateEnrollment)
 	enrollment.Get("/", GetEnrollments)
@@ -37,6 +37,10 @@ func CreateEnrollment(c *fiber.Ctx) error {
 	if err := c.BodyParser(&enrollment); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	if err := db.Create(&enrollment).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -56,13 +60,18 @@ func CreateEnrollment(c *fiber.Ctx) error {
 //	@Router			/enrollments [get]
 func GetEnrollments(c *fiber.Ctx) error {
 	enrollments := []models.Enrollment{}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	if err := db.Preload("Learner").Preload("Class").Find(&enrollments).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON(enrollments)
 }
 
-func findEnrollment(id int, enrollment *models.Enrollment) error {
+func findEnrollment(db *gorm.DB, id int, enrollment *models.Enrollment) error {
 	return db.Preload("Learner").Preload("Class").First(enrollment, "id = ?", id).Error
 }
 
@@ -86,8 +95,12 @@ func GetEnrollment(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findEnrollment(id, &enrollment)
+	err = findEnrollment(db, id, &enrollment)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("enrollment not found")
@@ -120,8 +133,12 @@ func UpdateEnrollment(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findEnrollment(id, &enrollment)
+	err = findEnrollment(db, id, &enrollment)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("enrollment not found")
@@ -162,8 +179,12 @@ func DeleteEnrollment(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findEnrollment(id, &enrollment)
+	err = findEnrollment(db, id, &enrollment)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("enrollment not found")

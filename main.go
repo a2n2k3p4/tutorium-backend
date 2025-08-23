@@ -6,6 +6,7 @@ import (
 	// module name "github.com/a2n2k3p4/tutorium-backend"
 	"github.com/a2n2k3p4/tutorium-backend/config/dbserver" // store functions related to connecting to PostgreSQL
 	"github.com/a2n2k3p4/tutorium-backend/handlers"
+	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -41,6 +42,8 @@ func main() {
 
 	// path
 	app := fiber.New()
+
+	app.Use(middlewares.DBMiddleware(db))
 
 	app.Use(cors.New())
 

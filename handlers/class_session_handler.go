@@ -3,7 +3,7 @@ package handlers
 import (
 	"errors"
 
-	"github.com/a2n2k3p4/tutorium-backend/middleware"
+	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -14,7 +14,7 @@ func ClassSessionRoutes(app *fiber.App) {
 	classSession.Get("/", GetClassSessions)
 	classSession.Get("/:id", GetClassSession)
 
-	classSessionProtected := classSession.Group("/", middleware.ProtectedMiddleware(), middleware.TeacherRequired())
+	classSessionProtected := classSession.Group("/", middlewares.ProtectedMiddleware(), middlewares.TeacherRequired())
 	classSessionProtected.Post("/", CreateClassSession)
 	classSessionProtected.Put("/:id", UpdateClassSession)
 	classSessionProtected.Delete("/:id", DeleteClassSession)
@@ -38,6 +38,10 @@ func CreateClassSession(c *fiber.Ctx) error {
 	if err := c.BodyParser(&class_session); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	if err := db.Create(&class_session).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -57,6 +61,11 @@ func CreateClassSession(c *fiber.Ctx) error {
 //	@Router			/class_sessions [get]
 func GetClassSessions(c *fiber.Ctx) error {
 	class_sessions := []models.ClassSession{}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	if err := db.Preload("Class").Find(&class_sessions).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
@@ -64,7 +73,7 @@ func GetClassSessions(c *fiber.Ctx) error {
 	return c.Status(200).JSON(class_sessions)
 }
 
-func findClassSession(id int, class_session *models.ClassSession) error {
+func findClassSession(db *gorm.DB, id int, class_session *models.ClassSession) error {
 	return db.Preload("Class").First(class_session, "id = ?", id).Error
 }
 
@@ -88,8 +97,12 @@ func GetClassSession(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findClassSession(id, &class_session)
+	err = findClassSession(db, id, &class_session)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("class_session not found")
@@ -122,8 +135,12 @@ func UpdateClassSession(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findClassSession(id, &class_session)
+	err = findClassSession(db, id, &class_session)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("class_session not found")
@@ -164,8 +181,12 @@ func DeleteClassSession(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findClassSession(id, &class_session)
+	err = findClassSession(db, id, &class_session)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("class_session not found")
