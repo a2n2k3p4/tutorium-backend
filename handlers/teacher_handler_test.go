@@ -15,7 +15,7 @@ import (
 
 // code 201
 func TestCreateTeacher_OK(t *testing.T) {
-	mock, cleanup := setupMockGorm(t)
+	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 
 	mock.MatchExpectationsInOrder(false)
@@ -30,8 +30,8 @@ func TestCreateTeacher_OK(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 	mock.ExpectCommit()
 
-	app := setupApp()
-	token := makeJWT(t, uint(userID))
+	app := setupApp(gdb)
+	token := makeJWT(t, fileSecret, uint(userID))
 
 	req := httptest.NewRequest(http.MethodPost, "/teachers/", bytes.NewReader([]byte(`{}`)))
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -59,15 +59,15 @@ func TestCreateTeacher_OK(t *testing.T) {
 
 // code 400
 func TestCreateTeacher_BadRequest(t *testing.T) {
-	mock, cleanup := setupMockGorm(t)
+	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
 
 	preloadUserForAuth(mock, uint(userID), false, false, false)
 
-	app := setupApp()
-	token := makeJWT(t, uint(userID))
+	app := setupApp(gdb)
+	token := makeJWT(t, fileSecret, uint(userID))
 
 	req := httptest.NewRequest(http.MethodPost, "/teachers/", bytes.NewBufferString(`{invalid-json}`))
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -88,7 +88,7 @@ func TestCreateTeacher_BadRequest(t *testing.T) {
 
 // code 500
 func TestCreateTeacher_DBError(t *testing.T) {
-	mock, cleanup := setupMockGorm(t)
+	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
@@ -100,8 +100,8 @@ func TestCreateTeacher_DBError(t *testing.T) {
 		WillReturnError(fmt.Errorf("db insert failed"))
 	mock.ExpectRollback()
 
-	app := setupApp()
-	token := makeJWT(t, uint(userID))
+	app := setupApp(gdb)
+	token := makeJWT(t, fileSecret, uint(userID))
 
 	req := httptest.NewRequest(http.MethodPost, "/teachers/", bytes.NewReader([]byte(`{}`)))
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -123,14 +123,14 @@ func TestCreateTeacher_DBError(t *testing.T) {
 /* ------------------ GetTeachers ------------------ */
 //code 200
 func TestGetTeachers_OK(t *testing.T) {
-	mock, cleanup := setupMockGorm(t)
+	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 
 	// Handler: list teachers
 	mock.ExpectQuery(`SELECT .* FROM "teachers".*`).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1).AddRow(2))
 
-	app := setupApp()
+	app := setupApp(gdb)
 
 	req := httptest.NewRequest(http.MethodGet, "/teachers/", nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -156,13 +156,13 @@ func TestGetTeachers_OK(t *testing.T) {
 
 // code 500
 func TestGetTeachers_DBError(t *testing.T) {
-	mock, cleanup := setupMockGorm(t)
+	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 
 	mock.ExpectQuery(`SELECT .* FROM "teachers".*`).
 		WillReturnError(fmt.Errorf("select failed"))
 
-	app := setupApp()
+	app := setupApp(gdb)
 
 	req := httptest.NewRequest(http.MethodGet, "/teachers/", nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -183,7 +183,7 @@ func TestGetTeachers_DBError(t *testing.T) {
 /* ------------------ GetTeacher ------------------ */
 //code 200
 func TestGetTeacher_OK(t *testing.T) {
-	mock, cleanup := setupMockGorm(t)
+	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 
 	teacherID := 7
@@ -193,7 +193,7 @@ func TestGetTeacher_OK(t *testing.T) {
 		WithArgs(teacherID, 1).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(teacherID))
 
-	app := setupApp()
+	app := setupApp(gdb)
 
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/teachers/%d", teacherID), nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -220,7 +220,7 @@ func TestGetTeacher_OK(t *testing.T) {
 // code 404
 func TestGetTeacher_NotFound(t *testing.T) {
 
-	mock, cleanup := setupMockGorm(t)
+	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 
 	teacherID := 999
@@ -230,7 +230,7 @@ func TestGetTeacher_NotFound(t *testing.T) {
 		WithArgs(teacherID, 1).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}))
 
-	app := setupApp()
+	app := setupApp(gdb)
 
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/teachers/%d", teacherID), nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -250,7 +250,7 @@ func TestGetTeacher_NotFound(t *testing.T) {
 
 // code 500
 func TestGetTeacher_DBError(t *testing.T) {
-	mock, cleanup := setupMockGorm(t)
+	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 	teacherID := 7
 
@@ -258,7 +258,7 @@ func TestGetTeacher_DBError(t *testing.T) {
 		WithArgs(teacherID, 1).
 		WillReturnError(fmt.Errorf("select failed"))
 
-	app := setupApp()
+	app := setupApp(gdb)
 
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/teachers/%d", teacherID), nil)
 
@@ -277,10 +277,10 @@ func TestGetTeacher_DBError(t *testing.T) {
 
 // code 400
 func TestGetTeacher_BadRequest(t *testing.T) {
-	mock, cleanup := setupMockGorm(t)
+	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 
-	app := setupApp()
+	app := setupApp(gdb)
 
 	req := httptest.NewRequest(http.MethodGet, "/teachers/not-an-int", nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -301,7 +301,7 @@ func TestGetTeacher_BadRequest(t *testing.T) {
 /* ------------------ DeleteTeachers ------------------ */
 //code 200
 func TestDeleteTeacher_OK_SoftDelete(t *testing.T) {
-	mock, cleanup := setupMockGorm(t)
+	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 
 	mock.MatchExpectationsInOrder(false)
@@ -321,8 +321,8 @@ func TestDeleteTeacher_OK_SoftDelete(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
 
-	app := setupApp()
-	token := makeJWT(t, uint(userID))
+	app := setupApp(gdb)
+	token := makeJWT(t, fileSecret, uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/teachers/%d", teacherID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -342,7 +342,7 @@ func TestDeleteTeacher_OK_SoftDelete(t *testing.T) {
 
 // code 404
 func TestDeleteTeacher_NotFound(t *testing.T) {
-	mock, cleanup := setupMockGorm(t)
+	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 
 	mock.MatchExpectationsInOrder(false)
@@ -356,8 +356,8 @@ func TestDeleteTeacher_NotFound(t *testing.T) {
 	mock.ExpectQuery(`SELECT \* FROM "teachers" WHERE id = \$1 AND "teachers"\."deleted_at" IS NULL ORDER BY "teachers"\."id" LIMIT .*`).
 		WithArgs(teacherID, 1).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}))
-	app := setupApp()
-	token := makeJWT(t, uint(userID))
+	app := setupApp(gdb)
+	token := makeJWT(t, fileSecret, uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/teachers/%d", teacherID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -377,7 +377,7 @@ func TestDeleteTeacher_NotFound(t *testing.T) {
 
 // code 500
 func TestDeleteTeacher_DBError(t *testing.T) {
-	mock, cleanup := setupMockGorm(t)
+	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
@@ -395,8 +395,8 @@ func TestDeleteTeacher_DBError(t *testing.T) {
 		WillReturnError(fmt.Errorf("update failed"))
 	mock.ExpectRollback()
 
-	app := setupApp()
-	token := makeJWT(t, uint(userID))
+	app := setupApp(gdb)
+	token := makeJWT(t, fileSecret, uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/teachers/%d", teacherID), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -417,15 +417,15 @@ func TestDeleteTeacher_DBError(t *testing.T) {
 // code 400
 func TestDeleteTeacher_BadRequest(t *testing.T) {
 
-	mock, cleanup := setupMockGorm(t)
+	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
 
 	preloadUserForAuth(mock, uint(userID), false, false, false)
 
-	app := setupApp()
-	token := makeJWT(t, uint(userID))
+	app := setupApp(gdb)
+	token := makeJWT(t, fileSecret, uint(userID))
 
 	req := httptest.NewRequest(http.MethodDelete, "/teachers/not-an-int", nil)
 	req.Header.Set("Authorization", "Bearer "+token)

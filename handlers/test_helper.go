@@ -2,43 +2,36 @@ package handlers
 
 import (
 	"io"
-	"log"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/a2n2k3p4/tutorium-backend/config/dbserver"
+	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func setupMockGorm(t *testing.T) (sqlmock.Sqlmock, func()) {
-	t.Helper()
+var fileSecret = []byte("secret")
 
-	sqlDB, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherRegexp))
-	if err != nil {
-		t.Fatalf("sqlmock.New: %v", err)
-	}
-	gdb, err := gorm.Open(postgres.New(postgres.Config{
-		Conn:                 sqlDB,
-		PreferSimpleProtocol: true,
-	}), &gorm.Config{})
-	if err != nil {
-		t.Fatalf("gorm.Open: %v", err)
-	}
-	// Point global DB used by middleware/handlers
-	dbserver.DB = gdb
-
-	cleanup := func() { _ = sqlDB.Close() }
-	return mock, cleanup
+func init() {
+	middlewares.SetSecretProvider(func() []byte { return fileSecret })
 }
 
-func setupApp() *fiber.App {
+func setupMockGorm(t *testing.T) (sqlmock.Sqlmock, *gorm.DB, func()) {
+	t.Helper()
+	sqlDB, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherRegexp))
+	gdb, _ := gorm.Open(postgres.New(postgres.Config{Conn: sqlDB, PreferSimpleProtocol: true}), &gorm.Config{})
+	cleanup := func() { _ = sqlDB.Close() }
+	return mock, gdb, cleanup
+}
+
+func setupApp(gdb *gorm.DB) *fiber.App {
 	app := fiber.New()
+	// inject mocked DB into request context
+	app.Use(middlewares.DBMiddleware(gdb))
+	// now mount routes
 	AllRoutes(app)
 	return app
 }
@@ -52,27 +45,21 @@ func readBody(t *testing.T, r io.Reader) []byte {
 	return b
 }
 
-func makeJWT(t *testing.T, userID uint) string {
+func makeJWT(t *testing.T, secret []byte, userID uint) string {
 	t.Helper()
-	if err := godotenv.Load("../.env"); err != nil {
-		log.Println(".env file not found, using system environment variables")
-	}
-	secretStr := os.Getenv("JWT_SECRET")
-	if secretStr == "" {
-		log.Fatal("JWT_SECRET environment variable is not set")
-	}
-	secret := []byte(secretStr)
+
 	claims := jwt.MapClaims{
 		"user_id": userID,
-		"iat":     time.Now().Unix(),
-		"exp":     time.Now().Add(1 * time.Hour).Unix(),
+		"iat":     time.Now().UTC().Unix(),
+		"exp":     time.Now().UTC().Add(time.Hour).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	s, err := token.SignedString(secret)
+
+	signed, err := token.SignedString(secret)
 	if err != nil {
 		t.Fatalf("sign token: %v", err)
 	}
-	return s
+	return signed
 }
 
 func preloadUserForAuth(mock sqlmock.Sqlmock, userID uint, hasAdmin bool, hasTeacher bool, hasLearner bool) {
