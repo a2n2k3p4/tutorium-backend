@@ -11,8 +11,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var DB *gorm.DB
-
 type Config struct {
 	DBUser     string
 	DBPassword string
@@ -43,7 +41,6 @@ func ConnectDB(cfg *Config) (*gorm.DB, error) {
 		return nil, fmt.Errorf("database ping failed: %w", err)
 	}
 
-	DB = db
 	return db, nil
 }
 
