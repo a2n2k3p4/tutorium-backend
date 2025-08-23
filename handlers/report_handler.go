@@ -3,17 +3,17 @@ package handlers
 import (
 	"errors"
 
-	"github.com/a2n2k3p4/tutorium-backend/middleware"
+	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func ReportRoutes(app *fiber.App) {
-	report := app.Group("/reports", middleware.ProtectedMiddleware())
+	report := app.Group("/reports", middlewares.ProtectedMiddleware())
 	report.Post("/", CreateReport)
 
-	reportAdmin := report.Group("/", middleware.AdminRequired())
+	reportAdmin := report.Group("/", middlewares.AdminRequired())
 	reportAdmin.Get("/", GetReports)
 	reportAdmin.Get("/:id", GetReport)
 	reportAdmin.Put("/:id", UpdateReport)
@@ -38,6 +38,10 @@ func CreateReport(c *fiber.Ctx) error {
 	if err := c.BodyParser(&report); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	if err := db.Create(&report).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -57,13 +61,18 @@ func CreateReport(c *fiber.Ctx) error {
 //	@Router			/reports [get]
 func GetReports(c *fiber.Ctx) error {
 	reports := []models.Report{}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	if err := db.Preload("Reporter").Preload("Reported").Find(&reports).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON(reports)
 }
 
-func findReport(id int, report *models.Report) error {
+func findReport(db *gorm.DB, id int, report *models.Report) error {
 	return db.Preload("Reporter").Preload("Reported").First(report, "id = ?", id).Error
 }
 
@@ -87,8 +96,12 @@ func GetReport(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findReport(id, &report)
+	err = findReport(db, id, &report)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("report not found")
@@ -121,8 +134,12 @@ func UpdateReport(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findReport(id, &report)
+	err = findReport(db, id, &report)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("report not found")
@@ -162,8 +179,12 @@ func DeleteReport(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findReport(id, &report)
+	err = findReport(db, id, &report)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("report not found")

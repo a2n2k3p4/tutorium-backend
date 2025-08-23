@@ -3,7 +3,7 @@ package handlers
 import (
 	"errors"
 
-	"github.com/a2n2k3p4/tutorium-backend/middleware"
+	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -11,13 +11,13 @@ import (
 )
 
 func UserRoutes(app *fiber.App) {
-	user := app.Group("/users", middleware.ProtectedMiddleware())
+	user := app.Group("/users", middlewares.ProtectedMiddleware())
 	user.Post("/", CreateUser)
 	user.Get("/:id", GetUser)
 	user.Put("/:id", UpdateUser)
 	user.Delete("/:id", DeleteUser)
 
-	userAdmin := user.Group("/", middleware.AdminRequired())
+	userAdmin := user.Group("/", middlewares.AdminRequired())
 	userAdmin.Get("/", GetUsers)
 }
 
@@ -39,6 +39,10 @@ func CreateUser(c *fiber.Ctx) error {
 	if err := c.BodyParser(&user); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	if err := db.Create(&user).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -58,6 +62,11 @@ func CreateUser(c *fiber.Ctx) error {
 //	@Router			/users [get]
 func GetUsers(c *fiber.Ctx) error {
 	users := []models.User{}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	if err := db.Preload("Learner").
 		Preload("Teacher").
 		Preload("Admin").
@@ -68,7 +77,7 @@ func GetUsers(c *fiber.Ctx) error {
 	return c.Status(200).JSON(users)
 }
 
-func findUser(id int, user *models.User) error {
+func findUser(db *gorm.DB, id int, user *models.User) error {
 	return db.Preload("Learner").
 		Preload("Teacher").
 		Preload("Admin").
@@ -95,8 +104,12 @@ func GetUser(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findUser(id, &user)
+	err = findUser(db, id, &user)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("user not found")
@@ -129,8 +142,12 @@ func UpdateUser(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findUser(id, &user)
+	err = findUser(db, id, &user)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("user not found")
@@ -170,8 +187,12 @@ func DeleteUser(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findUser(id, &user)
+	err = findUser(db, id, &user)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("user not found")

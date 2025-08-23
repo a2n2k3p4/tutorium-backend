@@ -3,7 +3,7 @@ package handlers
 import (
 	"errors"
 
-	"github.com/a2n2k3p4/tutorium-backend/middleware"
+	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -14,7 +14,7 @@ func ClassRoutes(app *fiber.App) {
 	class.Get("/", GetClasses)
 	class.Get("/:id", GetClass)
 
-	classProtected := class.Group("/", middleware.ProtectedMiddleware(), middleware.TeacherRequired())
+	classProtected := class.Group("/", middlewares.ProtectedMiddleware(), middlewares.TeacherRequired())
 	classProtected.Post("/", CreateClass)
 	classProtected.Put("/:id", UpdateClass)
 	classProtected.Delete("/:id", DeleteClass)
@@ -38,6 +38,10 @@ func CreateClass(c *fiber.Ctx) error {
 	if err := c.BodyParser(&class); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	if err := db.Create(&class).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -56,6 +60,11 @@ func CreateClass(c *fiber.Ctx) error {
 //	@Router			/classes [get]
 func GetClasses(c *fiber.Ctx) error {
 	classes := []models.Class{}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	if err := db.Preload("Teacher").Preload("Categories").Find(&classes).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
@@ -63,7 +72,7 @@ func GetClasses(c *fiber.Ctx) error {
 	return c.Status(200).JSON(classes)
 }
 
-func findClass(id int, class *models.Class) error {
+func findClass(db *gorm.DB, id int, class *models.Class) error {
 	return db.Preload("Teacher").Preload("Categories").First(class, "id = ?", id).Error
 }
 
@@ -87,8 +96,12 @@ func GetClass(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findClass(id, &class)
+	err = findClass(db, id, &class)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("class not found")
@@ -121,8 +134,12 @@ func UpdateClass(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findClass(id, &class)
+	err = findClass(db, id, &class)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("class not found")
@@ -163,8 +180,12 @@ func DeleteClass(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findClass(id, &class)
+	err = findClass(db, id, &class)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("class not found")

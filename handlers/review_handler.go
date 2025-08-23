@@ -3,7 +3,7 @@ package handlers
 import (
 	"errors"
 
-	"github.com/a2n2k3p4/tutorium-backend/middleware"
+	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -14,7 +14,7 @@ func ReviewRoutes(app *fiber.App) {
 	review.Get("/", GetReviews)
 	review.Get("/:id", GetReview)
 
-	reviewLearner := review.Group("/", middleware.ProtectedMiddleware(), middleware.LearnerRequired())
+	reviewLearner := review.Group("/", middlewares.ProtectedMiddleware(), middlewares.LearnerRequired())
 	reviewLearner.Post("/", CreateReview)
 	reviewLearner.Put("/:id", UpdateReview)
 	reviewLearner.Delete("/:id", DeleteReview)
@@ -42,6 +42,10 @@ func CreateReview(c *fiber.Ctx) error {
 	if review.Rating < 1 || review.Rating > 5 {
 		return c.Status(400).JSON("Rating must be between 1 and 5")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	if err := db.Create(&review).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -61,13 +65,18 @@ func CreateReview(c *fiber.Ctx) error {
 //	@Router			/reviews [get]
 func GetReviews(c *fiber.Ctx) error {
 	var reviews []models.Review
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	if err := db.Preload("Learner").Preload("Class").Find(&reviews).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON(reviews)
 }
 
-func findReview(id int, review *models.Review) error {
+func findReview(db *gorm.DB, id int, review *models.Review) error {
 	return db.Preload("Learner").Preload("Class").First(review, "id = ?", id).Error
 }
 
@@ -91,8 +100,12 @@ func GetReview(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findReview(id, &review)
+	err = findReview(db, id, &review)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("review not found")
@@ -125,8 +138,12 @@ func UpdateReview(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findReview(id, &review)
+	err = findReview(db, id, &review)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("review not found")
@@ -176,8 +193,12 @@ func DeleteReview(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findReview(id, &review)
+	err = findReview(db, id, &review)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("review not found")

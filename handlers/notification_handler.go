@@ -3,20 +3,20 @@ package handlers
 import (
 	"errors"
 
-	"github.com/a2n2k3p4/tutorium-backend/middleware"
+	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func NotificationRoutes(app *fiber.App) {
-	notification := app.Group("/notifications", middleware.ProtectedMiddleware())
+	notification := app.Group("/notifications", middlewares.ProtectedMiddleware())
 	notification.Get("/", GetNotifications)
 	notification.Get("/:id", GetNotification)
 	notification.Put("/:id", UpdateNotification)
 	notification.Delete("/:id", DeleteNotification)
 
-	notificationAdmin := notification.Group("/", middleware.AdminRequired())
+	notificationAdmin := notification.Group("/", middlewares.AdminRequired())
 	notificationAdmin.Post("/", CreateNotification)
 }
 
@@ -38,6 +38,10 @@ func CreateNotification(c *fiber.Ctx) error {
 	if err := c.BodyParser(&notification); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	if err := db.Create(&notification).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -57,13 +61,18 @@ func CreateNotification(c *fiber.Ctx) error {
 //	@Router			/notifications [get]
 func GetNotifications(c *fiber.Ctx) error {
 	var notifications []models.Notification
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	if err := db.Preload("User").Find(&notifications).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON(notifications)
 }
 
-func findNotification(id int, notification *models.Notification) error {
+func findNotification(db *gorm.DB, id int, notification *models.Notification) error {
 	return db.Preload("User").First(notification, "id = ?", id).Error
 }
 
@@ -87,8 +96,12 @@ func GetNotification(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findNotification(id, &notification)
+	err = findNotification(db, id, &notification)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("notification not found")
@@ -121,8 +134,12 @@ func UpdateNotification(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findNotification(id, &notification)
+	err = findNotification(db, id, &notification)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("notification not found")
@@ -162,8 +179,12 @@ func DeleteNotification(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findNotification(id, &notification)
+	err = findNotification(db, id, &notification)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("notification not found")

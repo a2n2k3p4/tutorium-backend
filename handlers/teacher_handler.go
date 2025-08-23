@@ -3,7 +3,7 @@ package handlers
 import (
 	"errors"
 
-	"github.com/a2n2k3p4/tutorium-backend/middleware"
+	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -14,7 +14,7 @@ func TeacherRoutes(app *fiber.App) {
 	teacher.Get("/", GetTeachers)
 	teacher.Get("/:id", GetTeacher)
 
-	teacherProtected := teacher.Group("/", middleware.ProtectedMiddleware())
+	teacherProtected := teacher.Group("/", middlewares.ProtectedMiddleware())
 	teacherProtected.Post("/", CreateTeacher)
 	teacherProtected.Put("/:id", UpdateTeacher)
 	teacherProtected.Delete("/:id", DeleteTeacher)
@@ -38,6 +38,10 @@ func CreateTeacher(c *fiber.Ctx) error {
 	if err := c.BodyParser(&teacher); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	if err := db.Create(&teacher).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -57,6 +61,11 @@ func CreateTeacher(c *fiber.Ctx) error {
 //	@Router			/teachers [get]
 func GetTeachers(c *fiber.Ctx) error {
 	teachers := []models.Teacher{}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	if err := db.Find(&teachers).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
@@ -64,7 +73,7 @@ func GetTeachers(c *fiber.Ctx) error {
 	return c.Status(200).JSON(teachers)
 }
 
-func findTeacher(id int, teacher *models.Teacher) error {
+func findTeacher(db *gorm.DB, id int, teacher *models.Teacher) error {
 	return db.First(teacher, "id = ?", id).Error
 }
 
@@ -88,8 +97,12 @@ func GetTeacher(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findTeacher(id, &teacher)
+	err = findTeacher(db, id, &teacher)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("teacher not found")
@@ -122,8 +135,12 @@ func UpdateTeacher(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findTeacher(id, &teacher)
+	err = findTeacher(db, id, &teacher)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("teacher not found")
@@ -163,8 +180,12 @@ func DeleteTeacher(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findTeacher(id, &teacher)
+	err = findTeacher(db, id, &teacher)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("teacher not found")

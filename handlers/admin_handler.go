@@ -3,14 +3,14 @@ package handlers
 import (
 	"errors"
 
-	"github.com/a2n2k3p4/tutorium-backend/middleware"
+	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func AdminRoutes(app *fiber.App) {
-	admin := app.Group("/admins", middleware.ProtectedMiddleware())
+	admin := app.Group("/admins", middlewares.ProtectedMiddleware())
 
 	admin.Post("/", CreateAdmin)
 	admin.Get("/", GetAdmins)
@@ -37,6 +37,11 @@ func CreateAdmin(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	if err := db.Create(&admin).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
@@ -55,6 +60,11 @@ func CreateAdmin(c *fiber.Ctx) error {
 //	@Router			/admins [get]
 func GetAdmins(c *fiber.Ctx) error {
 	admins := []models.Admin{}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	if err := db.Find(&admins).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
@@ -62,7 +72,7 @@ func GetAdmins(c *fiber.Ctx) error {
 	return c.Status(200).JSON(admins)
 }
 
-func findAdmin(id int, admin *models.Admin) error {
+func findAdmin(db *gorm.DB, id int, admin *models.Admin) error {
 	return db.First(admin, "id = ?", id).Error
 }
 
@@ -86,7 +96,12 @@ func GetAdmin(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findAdmin(id, &admin)
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	err = findAdmin(db, id, &admin)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("admin not found")
@@ -118,7 +133,12 @@ func DeleteAdmin(c *fiber.Ctx) error {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
 
-	err = findAdmin(id, &admin)
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	err = findAdmin(db, id, &admin)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("admin not found")
