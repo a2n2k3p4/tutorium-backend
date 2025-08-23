@@ -46,8 +46,6 @@ func makeJWT(t *testing.T, userID uint) string {
 	return s
 }
 
-// Stubs the queries done by ProtectedMiddleware().
-// Set hasAdmin/hasTeacher/hasLearner to control role presence.
 func preloadUserForAuth(mock sqlmock.Sqlmock, userID uint, hasAdmin, hasTeacher, hasLearner bool) {
 	mock.MatchExpectationsInOrder(false)
 
@@ -64,7 +62,7 @@ func preloadUserForAuth(mock sqlmock.Sqlmock, userID uint, hasAdmin, hasTeacher,
 	} else {
 		mock.ExpectQuery(`SELECT \* FROM "admins" WHERE "admins"\."user_id" = \$1 AND "admins"\."deleted_at" IS NULL`).
 			WithArgs(userID).
-			WillReturnRows(sqlmock.NewRows([]string{"id"})) // empty
+			WillReturnRows(sqlmock.NewRows([]string{"id"}))
 	}
 
 	// Learner preload
@@ -97,7 +95,7 @@ func TestProtectedMiddleware_MissingToken_401(t *testing.T) {
 	defer cleanup()
 
 	app := fiber.New()
-	app.Use(DBMiddleware(gdb)) // provide DB to middleware
+	app.Use(DBMiddleware(gdb))
 	app.Get("/secure", ProtectedMiddleware(), func(c *fiber.Ctx) error { return c.SendStatus(200) })
 
 	req := httptest.NewRequest(http.MethodGet, "/secure", nil)
@@ -221,6 +219,30 @@ func TestTeacherRequired_Success_200(t *testing.T) {
 	}
 }
 
+func TestTeacherRequired_Forbidden_403(t *testing.T) {
+	mock, gdb, cleanup := setupMockGorm(t)
+	defer cleanup()
+
+	userID := uint(9)
+	preloadUserForAuth(mock, userID, false, false, false) // no Teacher
+
+	app := fiber.New()
+	app.Use(DBMiddleware(gdb))
+	app.Get("/teacher-only", ProtectedMiddleware(), TeacherRequired(), func(c *fiber.Ctx) error {
+		return c.SendStatus(200)
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/teacher-only", nil)
+	req.Header.Set("Authorization", "Bearer "+makeJWT(t, userID))
+	resp, _ := app.Test(req, -1)
+	if resp.StatusCode != http.StatusForbidden {
+		t.Fatalf("status=%d want=%d", resp.StatusCode, http.StatusForbidden)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Fatalf("unmet expectations: %v", err)
+	}
+}
+
 func TestLearnerRequired_Success_200(t *testing.T) {
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
@@ -239,6 +261,30 @@ func TestLearnerRequired_Success_200(t *testing.T) {
 	resp, _ := app.Test(req, -1)
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("status=%d want=%d", resp.StatusCode, http.StatusOK)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Fatalf("unmet expectations: %v", err)
+	}
+}
+
+func TestLearnerRequired_Forbidden_403(t *testing.T) {
+	mock, gdb, cleanup := setupMockGorm(t)
+	defer cleanup()
+
+	userID := uint(9)
+	preloadUserForAuth(mock, userID, false, false, false) // no Learner
+
+	app := fiber.New()
+	app.Use(DBMiddleware(gdb))
+	app.Get("/learner-only", ProtectedMiddleware(), LearnerRequired(), func(c *fiber.Ctx) error {
+		return c.SendStatus(200)
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/learner-only", nil)
+	req.Header.Set("Authorization", "Bearer "+makeJWT(t, userID))
+	resp, _ := app.Test(req, -1)
+	if resp.StatusCode != http.StatusForbidden {
+		t.Fatalf("status=%d want=%d", resp.StatusCode, http.StatusForbidden)
 	}
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("unmet expectations: %v", err)
