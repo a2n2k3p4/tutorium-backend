@@ -22,7 +22,7 @@ func TestCreateTeacher_OK(t *testing.T) {
 	userID := 42
 
 	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: insert teachers
 	mock.ExpectBegin()
@@ -64,7 +64,7 @@ func TestCreateTeacher_BadRequest(t *testing.T) {
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp()
 	token := makeJWT(t, uint(userID))
@@ -93,7 +93,7 @@ func TestCreateTeacher_DBError(t *testing.T) {
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	mock.ExpectBegin()
 	mock.ExpectQuery(`INSERT INTO "teachers".*RETURNING "id"`).
@@ -309,7 +309,7 @@ func TestDeleteTeacher_OK_SoftDelete(t *testing.T) {
 	teacherID := 5
 
 	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: find then soft-delete
 	mock.ExpectQuery(`SELECT \* FROM "teachers" WHERE id = \$1 AND "teachers"\."deleted_at" IS NULL ORDER BY "teachers"\."id" LIMIT .*`).
@@ -350,7 +350,7 @@ func TestDeleteTeacher_NotFound(t *testing.T) {
 	teacherID := 12345
 
 	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: not found on SELECT
 	mock.ExpectQuery(`SELECT \* FROM "teachers" WHERE id = \$1 AND "teachers"\."deleted_at" IS NULL ORDER BY "teachers"\."id" LIMIT .*`).
@@ -383,7 +383,7 @@ func TestDeleteTeacher_DBError(t *testing.T) {
 	userID := 42
 	teacherID := 5
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Found, then UPDATE fails -> rollback
 	mock.ExpectQuery(`SELECT \* FROM "teachers" WHERE id = \$1 AND "teachers"\."deleted_at" IS NULL ORDER BY "teachers"\."id" LIMIT .*`).
@@ -422,7 +422,7 @@ func TestDeleteTeacher_BadRequest(t *testing.T) {
 	mock.MatchExpectationsInOrder(false)
 	userID := 42
 
-	preloadUserForAuth(mock, uint(userID))
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	app := setupApp()
 	token := makeJWT(t, uint(userID))
