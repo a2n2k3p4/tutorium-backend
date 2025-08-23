@@ -480,3 +480,91 @@ func TestDeleteAdmin_BadRequest(t *testing.T) {
 		t.Fatalf("unmet expectations: %v", err)
 	}
 }
+
+/* ------------------ Auth middleware------------------ */
+
+// code 401
+func TestAdmins_Auth_NoToken(t *testing.T) {
+
+	_, cleanup := setupMockGorm(t)
+	defer cleanup()
+
+	app := setupApp()
+
+	req := httptest.NewRequest(http.MethodGet, "/admins/", nil)
+	resp, err := app.Test(req, -1)
+	if err != nil {
+		t.Fatalf("app.Test: %v", err)
+	}
+	if resp.StatusCode != http.StatusUnauthorized {
+		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusUnauthorized)
+	}
+}
+
+// code 401
+func TestAdmins_Auth_BadToken(t *testing.T) {
+	_, cleanup := setupMockGorm(t)
+	defer cleanup()
+
+	app := setupApp()
+
+	req := httptest.NewRequest(http.MethodGet, "/admins/", nil)
+	req.Header.Set("Authorization", "Bearer not-a-jwt")
+	resp, err := app.Test(req, -1)
+	if err != nil {
+		t.Fatalf("app.Test: %v", err)
+	}
+	if resp.StatusCode != http.StatusUnauthorized {
+		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusUnauthorized)
+	}
+}
+
+// code 401
+func TestAdmins_Auth_WrongSecret(t *testing.T) {
+	_, cleanup := setupMockGorm(t)
+	defer cleanup()
+	userID := 42
+
+	app := setupApp()
+
+	token := make_wrong_JWT(t, uint(userID))
+
+	req := httptest.NewRequest(http.MethodGet, "/admins/", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	resp, err := app.Test(req, -1)
+	if err != nil {
+		t.Fatalf("app.Test: %v", err)
+	}
+	if resp.StatusCode != http.StatusUnauthorized {
+		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusUnauthorized)
+	}
+}
+
+// code 401
+func TestAdmins_Auth_UserNotFound_401(t *testing.T) {
+	mock, cleanup := setupMockGorm(t)
+	defer cleanup()
+
+	mock.MatchExpectationsInOrder(false)
+	mock.ExpectQuery(`SELECT \* FROM "users" WHERE "users"\."id" = \$1 AND "users"\."deleted_at" IS NULL ORDER BY "users"\."id" LIMIT .*`).
+		WithArgs(42, 1).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}))
+
+	app := setupApp()
+
+	token := makeJWT(t, 42)
+	req := httptest.NewRequest(http.MethodGet, "/admins/", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	resp, err := app.Test(req, -1)
+	if err != nil {
+		t.Fatalf("app.Test: %v", err)
+	}
+	if resp.StatusCode != http.StatusUnauthorized {
+		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusUnauthorized)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Fatalf("unmet expectations: %v", err)
+	}
+}
