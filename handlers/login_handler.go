@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -59,6 +60,10 @@ func LoginHandler(c *fiber.Ctx) error {
 		if err := validateImageBytes(profileBytes); err != nil {
 			return c.Status(400).JSON(fiber.Map{"error": "invalid profile_picture", "detail": err.Error()})
 		}
+	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
 	}
 
 	var user models.User

@@ -3,14 +3,14 @@ package handlers
 import (
 	"errors"
 
-	"github.com/a2n2k3p4/tutorium-backend/middleware"
+	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func BanTeacherRoutes(app *fiber.App) {
-	banTeacher := app.Group("/banteachers", middleware.ProtectedMiddleware(), middleware.AdminRequired())
+	banTeacher := app.Group("/banteachers", middlewares.ProtectedMiddleware(), middlewares.AdminRequired())
 
 	banTeacher.Post("/", CreateBanTeacher)
 	banTeacher.Get("/", GetBanTeachers)
@@ -37,6 +37,10 @@ func CreateBanTeacher(c *fiber.Ctx) error {
 	if err := c.BodyParser(&banteacher); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	if err := db.Create(&banteacher).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -55,6 +59,11 @@ func CreateBanTeacher(c *fiber.Ctx) error {
 //	@Router			/banteachers [get]
 func GetBanTeachers(c *fiber.Ctx) error {
 	banteachers := []models.BanDetailsTeacher{}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	if err := db.Preload("Teacher").Find(&banteachers).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
@@ -62,7 +71,7 @@ func GetBanTeachers(c *fiber.Ctx) error {
 	return c.Status(200).JSON(banteachers)
 }
 
-func findBanTeacher(id int, banteacher *models.BanDetailsTeacher) error {
+func findBanTeacher(db *gorm.DB, id int, banteacher *models.BanDetailsTeacher) error {
 	return db.Preload("Teacher").First(banteacher, "id = ?", id).Error
 }
 
@@ -86,8 +95,12 @@ func GetBanTeacher(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findBanTeacher(id, &banteacher)
+	err = findBanTeacher(db, id, &banteacher)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("banteacher not found")
@@ -120,8 +133,12 @@ func UpdateBanTeacher(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findBanTeacher(id, &banteacher)
+	err = findBanTeacher(db, id, &banteacher)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("banteacher not found")
@@ -161,8 +178,12 @@ func DeleteBanTeacher(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 
-	err = findBanTeacher(id, &banteacher)
+	err = findBanTeacher(db, id, &banteacher)
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("banteacher not found")

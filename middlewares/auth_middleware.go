@@ -1,4 +1,4 @@
-package middleware
+package middlewares
 
 import (
 	"fmt"
@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/a2n2k3p4/tutorium-backend/config/dbserver"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -51,8 +50,13 @@ func ProtectedMiddleware() fiber.Handler {
 			return c.Status(401).JSON(fiber.Map{"error": "invalid token", "details": err.Error()})
 		}
 
+		db, err := GetDB(c)
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "db not available"})
+		}
+
 		var user models.User
-		if err := dbserver.DB.Preload("Learner").Preload("Teacher").Preload("Admin").
+		if err := db.Preload("Learner").Preload("Teacher").Preload("Admin").
 			First(&user, claims.UserID).Error; err != nil {
 			return c.Status(401).JSON(fiber.Map{"error": "invalid credentials"})
 		}

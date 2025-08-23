@@ -1,16 +1,10 @@
 package handlers
 
 import (
-	"github.com/a2n2k3p4/tutorium-backend/config/dbserver"
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
-var db *gorm.DB
-
 func AllRoutes(app *fiber.App) {
-	db = dbserver.DB
-
 	AdminRoutes(app)
 	BanLearnerRoutes(app)
 	BanTeacherRoutes(app)
