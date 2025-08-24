@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
@@ -12,23 +13,41 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var jwtSecret []byte
-
-func init() {
-	if err := godotenv.Load("../.env"); err != nil {
-		log.Println(".env file not found, using system environment variables")
-	}
-	secretStr := os.Getenv("JWT_SECRET")
-	if secretStr == "" {
-		log.Fatal("JWT_SECRET environment variable is not set")
-	}
-	jwtSecret = []byte(secretStr)
-}
-
 type Claims struct {
 	UserID uint `json:"user_id"`
 	jwt.RegisteredClaims
 }
+
+var Secret func() []byte = sync.OnceValue(func() []byte {
+	// load .env for local dev; no-op if missing
+	_ = godotenv.Load("../.env")
+
+	s := os.Getenv("JWT_SECRET")
+	if s == "" {
+		log.Fatal("JWT_SECRET environment variable is not set")
+	}
+	return []byte(s)
+})
+
+// SetSecret lets tests (or a custom main) override how the secret is provided.
+// Call this once, *before* the middleware is used. Passing nil restores default.
+func SetSecret(f func() []byte) {
+	if f == nil {
+		Secret = sync.OnceValue(func() []byte {
+			_ = godotenv.Load("../.env")
+			s := os.Getenv("JWT_SECRET")
+			if s == "" {
+				log.Fatal("JWT_SECRET environment variable is not set")
+			}
+			return []byte(s)
+		})
+		return
+	}
+
+	Secret = f
+}
+
+/* ------------------------------- middleware ------------------------------ */
 
 func ProtectedMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -44,8 +63,9 @@ func ProtectedMiddleware() fiber.Handler {
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 			}
-			return jwtSecret, nil
+			return Secret(), nil
 		})
+
 		if err != nil || !token.Valid {
 			return c.Status(401).JSON(fiber.Map{"error": "invalid token", "details": err.Error()})
 		}
