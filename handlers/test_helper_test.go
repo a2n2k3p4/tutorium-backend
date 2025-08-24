@@ -16,7 +16,7 @@ import (
 const secretString = "secret"
 
 func init() {
-	middlewares.SetSecretProvider(func() []byte { return []byte(secretString) })
+	middlewares.SetSecret(func() []byte { return []byte(secretString) })
 }
 
 func setupMockGorm(t *testing.T) (sqlmock.Sqlmock, *gorm.DB, func()) {

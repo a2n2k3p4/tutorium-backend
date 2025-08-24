@@ -18,39 +18,33 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-/* ---------- secret provider (prod uses env, tests can override) ---------- */
+var Secret func() []byte = sync.OnceValue(func() []byte {
+	// load .env for local dev; no-op if missing
+	_ = godotenv.Load("../.env")
 
-var (
-	secretOnce     sync.Once
-	cachedSecret   []byte
-	secretProvider = defaultSecretProvider
-)
+	s := os.Getenv("JWT_SECRET")
+	if s == "" {
+		log.Fatal("JWT_SECRET environment variable is not set")
+	}
+	return []byte(s)
+})
 
-// default: load from env (.env for local dev)
-func defaultSecretProvider() []byte {
-	secretOnce.Do(func() {
-		// Try to load ../.env once (no-op if file missing)
-		_ = godotenv.Load("../.env")
-		s := os.Getenv("JWT_SECRET")
-		if s == "" {
-			log.Fatal("JWT_SECRET environment variable is not set")
-		}
-		cachedSecret = []byte(s)
-	})
-	return cachedSecret
-}
-
-// SetSecretProvider allows tests (or main) to inject a secret getter.
-// Pass nil to restore default env-based provider.
-func SetSecretProvider(p func() []byte) {
-	if p == nil {
-		secretProvider = defaultSecretProvider
+// SetSecret lets tests (or a custom main) override how the secret is provided.
+// Call this once, *before* the middleware is used. Passing nil restores default.
+func SetSecret(f func() []byte) {
+	if f == nil {
+		Secret = sync.OnceValue(func() []byte {
+			_ = godotenv.Load("../.env")
+			s := os.Getenv("JWT_SECRET")
+			if s == "" {
+				log.Fatal("JWT_SECRET environment variable is not set")
+			}
+			return []byte(s)
+		})
 		return
 	}
-	// reset any previously cached secret
-	secretOnce = sync.Once{}
-	cachedSecret = nil
-	secretProvider = p
+
+	Secret = f
 }
 
 /* ------------------------------- middleware ------------------------------ */
@@ -65,14 +59,13 @@ func ProtectedMiddleware() fiber.Handler {
 		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 		claims := &Claims{}
 
-		secret := secretProvider()
-
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (interface{}, error) {
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 			}
-			return secret, nil
+			return Secret(), nil
 		})
+
 		if err != nil || !token.Valid {
 			return c.Status(401).JSON(fiber.Map{"error": "invalid token", "details": err.Error()})
 		}

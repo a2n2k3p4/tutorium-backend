@@ -28,7 +28,7 @@ func setupMockGorm(t *testing.T) (sqlmock.Sqlmock, *gorm.DB, func()) {
 }
 
 func init() {
-	SetSecretProvider(func() []byte { return []byte("secret") })
+	SetSecret(func() []byte { return []byte("secret") })
 }
 
 func makeJWT(t *testing.T, userID uint) string {
