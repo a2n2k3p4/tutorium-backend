@@ -10,11 +10,11 @@ import (
 )
 
 func ClassCategoryRoutes(app *fiber.App) {
-	classCategory := app.Group("/class_categories")
+	classCategory := app.Group("/class_categories", middlewares.ProtectedMiddleware())
 	classCategory.Get("/", GetClassCategories)
 	classCategory.Get("/:id", GetClassCategory)
 
-	classCategoryProtected := classCategory.Group("/", middlewares.ProtectedMiddleware(), middlewares.AdminRequired())
+	classCategoryProtected := classCategory.Group("/", middlewares.AdminRequired())
 	classCategoryProtected.Post("/", CreateClassCategory)
 	classCategoryProtected.Put("/:id", UpdateClassCategory)
 	classCategoryProtected.Delete("/:id", DeleteClassCategory)

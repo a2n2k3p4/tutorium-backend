@@ -10,11 +10,11 @@ import (
 )
 
 func ClassRoutes(app *fiber.App) {
-	class := app.Group("/classes")
+	class := app.Group("/classes", middlewares.ProtectedMiddleware())
 	class.Get("/", GetClasses)
 	class.Get("/:id", GetClass)
 
-	classProtected := class.Group("/", middlewares.ProtectedMiddleware(), middlewares.TeacherRequired())
+	classProtected := class.Group("/", middlewares.TeacherRequired())
 	classProtected.Post("/", CreateClass)
 	classProtected.Put("/:id", UpdateClass)
 	classProtected.Delete("/:id", DeleteClass)
