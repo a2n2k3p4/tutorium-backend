@@ -18,6 +18,16 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+// if Status = development you can bypass all routes
+var Status string = func() string {
+	_ = godotenv.Load("../.env")
+	s := os.Getenv("STATUS")
+	if s == "" {
+		s = "production"
+	}
+	return s
+}()
+
 var Secret func() []byte = sync.OnceValue(func() []byte {
 	// load .env for local dev; no-op if missing
 	_ = godotenv.Load("../.env")
@@ -51,6 +61,9 @@ func SetSecret(f func() []byte) {
 
 func ProtectedMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		if Status == "development" {
+			return c.Next()
+		}
 		authHeader := c.Get("Authorization")
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 			return c.Status(401).JSON(fiber.Map{"error": "missing or invalid token"})
@@ -88,6 +101,9 @@ func ProtectedMiddleware() fiber.Handler {
 
 func AdminRequired() fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		if Status == "development" {
+			return c.Next()
+		}
 		user, ok := c.Locals("currentUser").(*models.User)
 		if !ok {
 			return c.Status(401).JSON(fiber.Map{"error": "authentication required"})
@@ -101,6 +117,9 @@ func AdminRequired() fiber.Handler {
 
 func TeacherRequired() fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		if Status == "development" {
+			return c.Next()
+		}
 		user, ok := c.Locals("currentUser").(*models.User)
 		if !ok {
 			return c.Status(401).JSON(fiber.Map{"error": "authentication required"})
@@ -114,6 +133,9 @@ func TeacherRequired() fiber.Handler {
 
 func LearnerRequired() fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		if Status == "development" {
+			return c.Next()
+		}
 		user, ok := c.Locals("currentUser").(*models.User)
 		if !ok {
 			return c.Status(401).JSON(fiber.Map{"error": "authentication required"})
