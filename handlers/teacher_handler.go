@@ -10,14 +10,12 @@ import (
 )
 
 func TeacherRoutes(app *fiber.App) {
-	teacher := app.Group("/teachers")
+	teacher := app.Group("/teachers", middlewares.ProtectedMiddleware())
 	teacher.Get("/", GetTeachers)
 	teacher.Get("/:id", GetTeacher)
-
-	teacherProtected := teacher.Group("/", middlewares.ProtectedMiddleware())
-	teacherProtected.Post("/", CreateTeacher)
-	teacherProtected.Put("/:id", UpdateTeacher)
-	teacherProtected.Delete("/:id", DeleteTeacher)
+	teacher.Post("/", CreateTeacher)
+	teacher.Put("/:id", UpdateTeacher)
+	teacher.Delete("/:id", DeleteTeacher)
 }
 
 // CreateTeacher godoc

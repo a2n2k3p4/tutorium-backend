@@ -37,7 +37,11 @@ func LoginHandler(c *fiber.Ctx) error {
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
-	const NisitKUBaseURL = "https://kuappstore.ku.ac.th/nisitku/nisit/Controller.php"
+
+	if err := godotenv.Load("../.env"); err != nil {
+		log.Println(".env file not found, using system environment variables")
+	}
+	NisitKUBaseURL := os.Getenv("KU_API")
 	nisitClient := NewNisitKUClient(NisitKUBaseURL)
 
 	loginResp, err := nisitClient.Login(req.Username, req.Password)
@@ -97,7 +101,7 @@ func LoginHandler(c *fiber.Ctx) error {
 }
 
 func generateJWT(user models.User) (string, error) {
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load("../.env"); err != nil {
 		log.Println(".env file not found, using system environment variables")
 	}
 	secretStr := os.Getenv("JWT_SECRET")

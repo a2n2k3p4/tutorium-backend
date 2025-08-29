@@ -10,11 +10,11 @@ import (
 )
 
 func ReviewRoutes(app *fiber.App) {
-	review := app.Group("/reviews")
+	review := app.Group("/reviews", middlewares.ProtectedMiddleware())
 	review.Get("/", GetReviews)
 	review.Get("/:id", GetReview)
 
-	reviewLearner := review.Group("/", middlewares.ProtectedMiddleware(), middlewares.LearnerRequired())
+	reviewLearner := review.Group("/", middlewares.LearnerRequired())
 	reviewLearner.Post("/", CreateReview)
 	reviewLearner.Put("/:id", UpdateReview)
 	reviewLearner.Delete("/:id", DeleteReview)
