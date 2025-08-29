@@ -7,13 +7,13 @@ import (
 // Define a struct matching the columns (use pointers for nullable FKs)
 type User struct {
 	gorm.Model
-	StudentID      string `gorm:"size:10;uniqueIndex;not null"`
-	ProfilePicture []byte
-	FirstName      string  `gorm:"size:30;not null"`
-	LastName       string  `gorm:"size:30;not null"`
-	Gender         string  `gorm:"size:6"`
-	PhoneNumber    string  `gorm:"size:20"`
-	Balance        float64 `gorm:"type:numeric(12,2);default:0;check:balance >= 0"`
+	StudentID      string  `json:"student_id" gorm:"size:10;uniqueIndex;not null"`
+	ProfilePicture []byte  `json:"profile_picture,omitempty"`
+	FirstName      string  `json:"first_name" gorm:"size:30;not null"`
+	LastName       string  `json:"last_name" gorm:"size:30;not null"`
+	Gender         string  `json:"gender" gorm:"size:6"`
+	PhoneNumber    string  `json:"phone_number" gorm:"size:20"`
+	Balance        float64 `json:"balance" gorm:"type:numeric(12,2);default:0;check:balance >= 0"`
 
 	Learner *Learner
 	Teacher *Teacher

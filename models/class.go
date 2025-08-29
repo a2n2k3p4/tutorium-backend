@@ -8,10 +8,10 @@ import (
 
 type Class struct {
 	gorm.Model
-	TeacherID          uint      `gorm:"not null"`
-	LearnerLimit       int       `gorm:"not null;default:50"`
-	ClassDescription   string    `gorm:"size:1000"`
-	EnrollmentDeadline time.Time `gorm:"not null"`
+	TeacherID          uint      `json:"teacher_id" gorm:"not null"`
+	LearnerLimit       int       `json:"learner_limit" gorm:"not null;default:50"`
+	ClassDescription   string    `json:"class_description" gorm:"size:1000"`
+	EnrollmentDeadline time.Time `json:"enrollment_deadline" gorm:"not null"`
 
 	Teacher    Teacher         `gorm:"foreignKey:TeacherID;references:ID;constraint:OnDelete:CASCADE"`
 	Categories []ClassCategory `gorm:"many2many:class_class_categories;constraint:OnDelete:CASCADE"`

@@ -4,8 +4,8 @@ import "gorm.io/gorm"
 
 type Teacher struct {
 	gorm.Model
-	UserID      uint   `gorm:"unique;not null"`
-	Description string `gorm:"size:255"`
+	UserID      uint   `json:"user_id" gorm:"unique;not null"`
+	Description string `json:"description" gorm:"size:255"`
 }
 
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----

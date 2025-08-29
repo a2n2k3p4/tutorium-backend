@@ -8,12 +8,12 @@ import (
 
 type Report struct {
 	gorm.Model
-	ReportUserID      uint
-	ReportedUserID    uint   `gorm:"not null"`
-	ReportType        string `gorm:"size:20;not null"`
-	ReportDescription string `gorm:"size:255"`
-	ReportPicture     []byte
-	ReportDate        time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+	ReportUserID      uint      `json:"report_user_id"`
+	ReportedUserID    uint      `json:"reported_user_id" gorm:"not null"`
+	ReportType        string    `json:"report_type" gorm:"size:20;not null"`
+	ReportDescription string    `json:"report_description" gorm:"size:255"`
+	ReportPicture     []byte    `json:"report_picture"`
+	ReportDate        time.Time `json:"report_date" gorm:"default:CURRENT_TIMESTAMP"`
 
 	Reporter User `gorm:"foreignKey:ReportUserID;constraint:OnDelete:SET NULL"`
 	Reported User `gorm:"foreignKey:ReportedUserID;constraint:OnDelete:CASCADE"`
