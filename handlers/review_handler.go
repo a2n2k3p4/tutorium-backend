@@ -25,6 +25,7 @@ func ReviewRoutes(app *fiber.App) {
 //	@Summary		Create a new review
 //	@Description	CreateReview creates a new Review record with rating validation
 //	@Tags			Reviews
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			review	body		models.ReviewDoc	true	"Review payload"
@@ -59,6 +60,7 @@ func CreateReview(c *fiber.Ctx) error {
 //	@Summary		List all reviews
 //	@Description	GetReviews retrieves all Review records with related Learner and Class
 //	@Tags			Reviews
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.ReviewDoc
 //	@Failure		500	{object}	map[string]string	"Server error"
@@ -85,6 +87,7 @@ func findReview(db *gorm.DB, id int, review *models.Review) error {
 //	@Summary		Get review by ID
 //	@Description	GetReview retrieves a single Review by its ID, including related Learner and Class
 //	@Tags			Reviews
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int	true	"Review ID"
 //	@Success		200	{object}	models.ReviewDoc
@@ -121,6 +124,7 @@ func GetReview(c *fiber.Ctx) error {
 //	@Summary		Update an existing review
 //	@Description	UpdateReview updates a Review record by its ID; only Rating and Comment fields
 //	@Tags			Reviews
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			id		path		int					true	"Review ID"
@@ -178,6 +182,7 @@ func UpdateReview(c *fiber.Ctx) error {
 //	@Summary		Delete a review by ID
 //	@Description	DeleteReview removes a Review record by its ID
 //	@Tags			Reviews
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int					true	"Review ID"
 //	@Success		200	{string}	string				"Successfully deleted review"

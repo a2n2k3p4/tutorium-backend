@@ -17,7 +17,7 @@ const docTemplate = `{
         },
         "license": {
             "name": "AGPL-3.0",
-            "url": "https://www.gnu.org/licenses/agpl-3.0.en.html"
+            "url": "https://www.gnu.org/licenses/agpl-3.0.en."
         },
         "version": "{{.Version}}"
     },
@@ -26,6 +26,11 @@ const docTemplate = `{
     "paths": {
         "/admins": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve a list of all admins",
                 "consumes": [
                     "application/json"
@@ -57,6 +62,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new admin with the provided data",
                 "consumes": [
                     "application/json"
@@ -98,6 +108,11 @@ const docTemplate = `{
         },
         "/admins/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve a specific admin by their ID",
                 "consumes": [
                     "application/json"
@@ -135,6 +150,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a specific admin by their ID",
                 "consumes": [
                     "application/json"
@@ -182,6 +202,11 @@ const docTemplate = `{
         },
         "/banlearners": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetBanLearners returns a list of all ban records",
                 "produces": [
                     "application/json"
@@ -212,6 +237,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "CreateBanLearner creates a new ban record for a learner",
                 "consumes": [
                     "application/json"
@@ -264,6 +294,11 @@ const docTemplate = `{
         },
         "/banlearners/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetBanLearner returns a single ban record by ID",
                 "produces": [
                     "application/json"
@@ -318,6 +353,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "UpdateBanLearner modifies an existing ban record",
                 "consumes": [
                     "application/json"
@@ -384,6 +424,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "DeleteBanLearner deletes a ban record by ID",
                 "produces": [
                     "application/json"
@@ -440,6 +485,11 @@ const docTemplate = `{
         },
         "/banteachers": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetBanTeachers retrieves all BanDetailsTeacher entries with associated Teacher",
                 "produces": [
                     "application/json"
@@ -470,6 +520,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "CreateBanTeacher creates a new BanDetailsTeacher entry",
                 "consumes": [
                     "application/json"
@@ -522,6 +577,11 @@ const docTemplate = `{
         },
         "/banteachers/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetBanTeacher retrieves a single BanDetailsTeacher by its ID",
                 "produces": [
                     "application/json"
@@ -576,6 +636,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "UpdateBanTeacher updates an existing BanDetailsTeacher",
                 "consumes": [
                     "application/json"
@@ -642,6 +707,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "DeleteBanTeacher removes a BanDetailsTeacher record by its ID",
                 "produces": [
                     "application/json"
@@ -698,6 +768,11 @@ const docTemplate = `{
         },
         "/class_categories": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetClassCategories retrieves all ClassCategory records with Classes relation",
                 "produces": [
                     "application/json"
@@ -728,6 +803,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "CreateClassCategory creates a new ClassCategory record",
                 "consumes": [
                     "application/json"
@@ -780,6 +860,11 @@ const docTemplate = `{
         },
         "/class_categories/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetClassCategory retrieves a single ClassCategory by its ID, including Classes",
                 "produces": [
                     "application/json"
@@ -834,6 +919,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "UpdateClassCategory updates a ClassCategory record by its ID",
                 "consumes": [
                     "application/json"
@@ -900,6 +990,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "DeleteClassCategory removes a ClassCategory record by its ID",
                 "produces": [
                     "application/json"
@@ -956,6 +1051,11 @@ const docTemplate = `{
         },
         "/class_sessions": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetClassSessions retrieves all ClassSession records with Class relation",
                 "produces": [
                     "application/json"
@@ -986,6 +1086,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "CreateClassSession creates a new ClassSession record",
                 "consumes": [
                     "application/json"
@@ -1038,6 +1143,11 @@ const docTemplate = `{
         },
         "/class_sessions/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetClassSession retrieves a single ClassSession by its ID, including Class",
                 "produces": [
                     "application/json"
@@ -1092,6 +1202,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "UpdateClassSession updates a ClassSession record by its ID",
                 "consumes": [
                     "application/json"
@@ -1158,6 +1273,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "DeleteClassSession removes a ClassSession record by its ID",
                 "produces": [
                     "application/json"
@@ -1214,6 +1334,11 @@ const docTemplate = `{
         },
         "/classes": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetClasses retrieves all Class records with Teacher and Categories relations",
                 "produces": [
                     "application/json"
@@ -1244,6 +1369,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "CreateClass creates a new Class record",
                 "consumes": [
                     "application/json"
@@ -1296,6 +1426,11 @@ const docTemplate = `{
         },
         "/classes/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetClass retrieves a single Class by its ID, including Teacher and Categories",
                 "produces": [
                     "application/json"
@@ -1350,6 +1485,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "UpdateClass updates a Class record by its ID",
                 "consumes": [
                     "application/json"
@@ -1416,6 +1556,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "DeleteClass removes a Class record by its ID",
                 "produces": [
                     "application/json"
@@ -1472,6 +1617,11 @@ const docTemplate = `{
         },
         "/enrollments": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetEnrollments retrieves all Enrollment records with associated Learner and Class",
                 "produces": [
                     "application/json"
@@ -1502,6 +1652,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "CreateEnrollment creates a new Enrollment record",
                 "consumes": [
                     "application/json"
@@ -1554,6 +1709,11 @@ const docTemplate = `{
         },
         "/enrollments/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetEnrollment retrieves a single Enrollment by its ID, including related Learner and Class",
                 "produces": [
                     "application/json"
@@ -1608,6 +1768,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "UpdateEnrollment updates an Enrollment record by its ID",
                 "consumes": [
                     "application/json"
@@ -1674,6 +1839,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "DeleteEnrollment removes an Enrollment record by its ID",
                 "produces": [
                     "application/json"
@@ -1730,6 +1900,11 @@ const docTemplate = `{
         },
         "/learners": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetLearners retrieves all Learner records",
                 "produces": [
                     "application/json"
@@ -1760,6 +1935,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "CreateLearner creates a new Learner record",
                 "consumes": [
                     "application/json"
@@ -1812,6 +1992,11 @@ const docTemplate = `{
         },
         "/learners/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetLearner retrieves a single Learner by its ID",
                 "produces": [
                     "application/json"
@@ -1866,6 +2051,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "DeleteLearner removes a Learner record by its ID",
                 "produces": [
                     "application/json"
@@ -1983,6 +2173,11 @@ const docTemplate = `{
         },
         "/notifications": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetNotifications retrieves all Notification records with associated User",
                 "produces": [
                     "application/json"
@@ -2013,6 +2208,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "CreateNotification creates a new Notification record",
                 "consumes": [
                     "application/json"
@@ -2065,6 +2265,11 @@ const docTemplate = `{
         },
         "/notifications/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetNotification retrieves a single Notification by its ID, including the User",
                 "produces": [
                     "application/json"
@@ -2119,6 +2324,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "UpdateNotification updates a Notification record by its ID",
                 "consumes": [
                     "application/json"
@@ -2185,6 +2395,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "DeleteNotification removes a Notification record by its ID",
                 "produces": [
                     "application/json"
@@ -2241,6 +2456,11 @@ const docTemplate = `{
         },
         "/reports": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetReports retrieves all Report records with Reporter and Reported relations",
                 "produces": [
                     "application/json"
@@ -2271,6 +2491,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "CreateReport creates a new Report record",
                 "consumes": [
                     "application/json"
@@ -2323,6 +2548,11 @@ const docTemplate = `{
         },
         "/reports/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetReport retrieves a single Report by its ID, including Reporter and Reported",
                 "produces": [
                     "application/json"
@@ -2377,6 +2607,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "UpdateReport updates a Report record by its ID",
                 "consumes": [
                     "application/json"
@@ -2443,6 +2678,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "DeleteReport removes a Report record by its ID",
                 "produces": [
                     "application/json"
@@ -2499,6 +2739,11 @@ const docTemplate = `{
         },
         "/reviews": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetReviews retrieves all Review records with related Learner and Class",
                 "produces": [
                     "application/json"
@@ -2529,6 +2774,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "CreateReview creates a new Review record with rating validation",
                 "consumes": [
                     "application/json"
@@ -2581,6 +2831,11 @@ const docTemplate = `{
         },
         "/reviews/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetReview retrieves a single Review by its ID, including related Learner and Class",
                 "produces": [
                     "application/json"
@@ -2635,6 +2890,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "UpdateReview updates a Review record by its ID; only Rating and Comment fields",
                 "consumes": [
                     "application/json"
@@ -2701,6 +2961,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "DeleteReview removes a Review record by its ID",
                 "produces": [
                     "application/json"
@@ -2757,6 +3022,11 @@ const docTemplate = `{
         },
         "/teachers": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetTeachers retrieves all Teacher records",
                 "produces": [
                     "application/json"
@@ -2787,6 +3057,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "CreateTeacher creates a new Teacher record",
                 "consumes": [
                     "application/json"
@@ -2839,6 +3114,11 @@ const docTemplate = `{
         },
         "/teachers/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetTeacher retrieves a single Teacher by its ID",
                 "produces": [
                     "application/json"
@@ -2893,6 +3173,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "UpdateTeacher updates a Teacher record by its ID",
                 "consumes": [
                     "application/json"
@@ -2959,6 +3244,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "DeleteTeacher removes a Teacher record by its ID",
                 "produces": [
                     "application/json"
@@ -3015,6 +3305,11 @@ const docTemplate = `{
         },
         "/users": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetUsers retrieves all user records",
                 "produces": [
                     "application/json"
@@ -3045,6 +3340,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "CreateUser creates a new user record",
                 "consumes": [
                     "application/json"
@@ -3097,6 +3397,11 @@ const docTemplate = `{
         },
         "/users/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "GetUser retrieves a single user by its ID",
                 "produces": [
                     "application/json"
@@ -3151,6 +3456,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "UpdateUser updates a user record by its ID",
                 "consumes": [
                     "application/json"
@@ -3217,6 +3527,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "DeleteUser removes a user record by its ID along with associated Learner, Teacher, and Admin",
                 "produces": [
                     "application/json"
@@ -3632,6 +3947,14 @@ const docTemplate = `{
                     "example": "6610505511"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type \"Bearer \" followed by your JWT token.` + "`" + `",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

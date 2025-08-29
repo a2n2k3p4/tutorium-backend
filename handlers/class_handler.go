@@ -25,6 +25,7 @@ func ClassRoutes(app *fiber.App) {
 //	@Summary		Create a new class
 //	@Description	CreateClass creates a new Class record
 //	@Tags			Classes
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			class	body		models.ClassDoc	true	"Class payload"
@@ -54,6 +55,7 @@ func CreateClass(c *fiber.Ctx) error {
 //	@Summary		List all classes
 //	@Description	GetClasses retrieves all Class records with Teacher and Categories relations
 //	@Tags			Classes
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.ClassDoc
 //	@Failure		500	{object}	map[string]string	"Server error"
@@ -81,6 +83,7 @@ func findClass(db *gorm.DB, id int, class *models.Class) error {
 //	@Summary		Get class by ID
 //	@Description	GetClass retrieves a single Class by its ID, including Teacher and Categories
 //	@Tags			Classes
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int	true	"Class ID"
 //	@Success		200	{object}	models.ClassDoc
@@ -117,6 +120,7 @@ func GetClass(c *fiber.Ctx) error {
 //	@Summary		Update an existing class
 //	@Description	UpdateClass updates a Class record by its ID
 //	@Tags			Classes
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			id		path		int				true	"Class ID"
@@ -165,6 +169,7 @@ func UpdateClass(c *fiber.Ctx) error {
 //	@Summary		Delete a class by ID
 //	@Description	DeleteClass removes a Class record by its ID
 //	@Tags			Classes
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int					true	"Class ID"
 //	@Success		200	{string}	string				"Successfully deleted class"

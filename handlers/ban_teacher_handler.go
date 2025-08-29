@@ -24,6 +24,7 @@ func BanTeacherRoutes(app *fiber.App) {
 //	@Summary		Create a new ban record for a teacher
 //	@Description	CreateBanTeacher creates a new BanDetailsTeacher entry
 //	@Tags			BanTeachers
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			banteacher	body		models.BanDetailsTeacherDoc	true	"BanTeacher payload"
@@ -53,6 +54,7 @@ func CreateBanTeacher(c *fiber.Ctx) error {
 //	@Summary		List all ban records for teachers
 //	@Description	GetBanTeachers retrieves all BanDetailsTeacher entries with associated Teacher
 //	@Tags			BanTeachers
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.BanDetailsTeacherDoc
 //	@Failure		500	{object}	map[string]string	"Server error"
@@ -80,6 +82,7 @@ func findBanTeacher(db *gorm.DB, id int, banteacher *models.BanDetailsTeacher) e
 //	@Summary		Get ban record by ID
 //	@Description	GetBanTeacher retrieves a single BanDetailsTeacher by its ID
 //	@Tags			BanTeachers
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int	true	"BanTeacher ID"
 //	@Success		200	{object}	models.BanDetailsTeacherDoc
@@ -116,6 +119,7 @@ func GetBanTeacher(c *fiber.Ctx) error {
 //	@Summary		Update a ban record by ID
 //	@Description	UpdateBanTeacher updates an existing BanDetailsTeacher
 //	@Tags			BanTeachers
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			id			path		int							true	"BanTeacher ID"
@@ -163,6 +167,7 @@ func UpdateBanTeacher(c *fiber.Ctx) error {
 //	@Summary		Delete a ban record by ID
 //	@Description	DeleteBanTeacher removes a BanDetailsTeacher record by its ID
 //	@Tags			BanTeachers
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int					true	"BanTeacher ID"
 //	@Success		200	{string}	string				"Successfully deleted ban teacher"
