@@ -22,15 +22,28 @@ func LoginRoutes(app *fiber.App) {
 	app.Post("/login", LoginHandler)
 }
 
+// LoginHandler godoc
+//
+//	@Summary		Login with KU/Nisit credentials
+//	@Description	Authenticate a nisit user via KU API, create the user if not exists, and return a JWT token along with user info
+//	@Tags			Login
+//	@Accept			json
+//	@Produce		json
+//	@Param			login	body		models.LoginRequestDoc	true	"Login payload"
+//	@Success		200		{object}	models.LoginResponseDoc
+//	@Failure		400		{object}	map[string]string	"Invalid input"
+//	@Failure		401		{object}	map[string]string	"Unauthorized"
+//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Router			/login [post]
 func LoginHandler(c *fiber.Ctx) error {
 	type LoginRequest struct {
-		Username       string
-		Password       string
-		ProfilePicture string
-		FirstName      string
-		LastName       string
-		Gender         string
-		PhoneNumber    string
+		Username       string `json:"username"`
+		Password       string `json:"password"`
+		ProfilePicture string `json:"profile_picture,omitempty"`
+		FirstName      string `json:"first_name"`
+		LastName       string `json:"last_name"`
+		Gender         string `json:"gender"`
+		PhoneNumber    string `json:"phone_number"`
 	}
 
 	var req LoginRequest

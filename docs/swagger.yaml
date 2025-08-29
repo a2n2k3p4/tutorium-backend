@@ -123,6 +123,38 @@ definitions:
         example: 5
         type: integer
     type: object
+  models.LoginRequestDoc:
+    properties:
+      first_name:
+        example: Alice
+        type: string
+      gender:
+        example: Female
+        type: string
+      last_name:
+        example: Smith
+        type: string
+      password:
+        example: mySecretPassword
+        type: string
+      phone_number:
+        example: "+66912345678"
+        type: string
+      profile_picture:
+        example: <base64-encoded-image>
+        type: string
+      username:
+        example: b6610505511
+        type: string
+    type: object
+  models.LoginResponseDoc:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      user:
+        $ref: '#/definitions/models.UserDoc'
+    type: object
   models.NotificationDoc:
     properties:
       id:
@@ -1506,6 +1538,47 @@ paths:
       summary: Get learner by ID
       tags:
       - Learners
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a nisit user via KU API, create the user if not exists,
+        and return a JWT token along with user info
+      parameters:
+      - description: Login payload
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequestDoc'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LoginResponseDoc'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login with KU/Nisit credentials
+      tags:
+      - Login
   /notifications:
     get:
       description: GetNotifications retrieves all Notification records with associated

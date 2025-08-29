@@ -1920,6 +1920,67 @@ const docTemplate = `{
                 }
             }
         },
+        "/login": {
+            "post": {
+                "description": "Authenticate a nisit user via KU API, create the user if not exists, and return a JWT token along with user info",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "summary": "Login with KU/Nisit credentials",
+                "parameters": [
+                    {
+                        "description": "Login payload",
+                        "name": "login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginRequestDoc"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginResponseDoc"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/notifications": {
             "get": {
                 "description": "GetNotifications retrieves all Notification records with associated User",
@@ -3383,6 +3444,51 @@ const docTemplate = `{
                 "user_id": {
                     "type": "integer",
                     "example": 5
+                }
+            }
+        },
+        "models.LoginRequestDoc": {
+            "type": "object",
+            "properties": {
+                "first_name": {
+                    "type": "string",
+                    "example": "Alice"
+                },
+                "gender": {
+                    "type": "string",
+                    "example": "Female"
+                },
+                "last_name": {
+                    "type": "string",
+                    "example": "Smith"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "mySecretPassword"
+                },
+                "phone_number": {
+                    "type": "string",
+                    "example": "+66912345678"
+                },
+                "profile_picture": {
+                    "type": "string",
+                    "example": "\u003cbase64-encoded-image\u003e"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "b6610505511"
+                }
+            }
+        },
+        "models.LoginResponseDoc": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                },
+                "user": {
+                    "$ref": "#/definitions/models.UserDoc"
                 }
             }
         },
