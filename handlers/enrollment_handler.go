@@ -24,6 +24,7 @@ func EnrollmentRoutes(app *fiber.App) {
 //	@Summary		Create a new enrollment
 //	@Description	CreateEnrollment creates a new Enrollment record
 //	@Tags			Enrollments
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			enrollment	body		models.EnrollmentDoc	true	"Enrollment payload"
@@ -54,6 +55,7 @@ func CreateEnrollment(c *fiber.Ctx) error {
 //	@Summary		List all enrollments
 //	@Description	GetEnrollments retrieves all Enrollment records with associated Learner and Class
 //	@Tags			Enrollments
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.EnrollmentDoc
 //	@Failure		500	{object}	map[string]string	"Server error"
@@ -80,6 +82,7 @@ func findEnrollment(db *gorm.DB, id int, enrollment *models.Enrollment) error {
 //	@Summary		Get enrollment by ID
 //	@Description	GetEnrollment retrieves a single Enrollment by its ID, including related Learner and Class
 //	@Tags			Enrollments
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int	true	"Enrollment ID"
 //	@Success		200	{object}	models.EnrollmentDoc
@@ -116,6 +119,7 @@ func GetEnrollment(c *fiber.Ctx) error {
 //	@Summary		Update an existing enrollment
 //	@Description	UpdateEnrollment updates an Enrollment record by its ID
 //	@Tags			Enrollments
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			id			path		int						true	"Enrollment ID"
@@ -164,6 +168,7 @@ func UpdateEnrollment(c *fiber.Ctx) error {
 //	@Summary		Delete an enrollment by ID
 //	@Description	DeleteEnrollment removes an Enrollment record by its ID
 //	@Tags			Enrollments
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int					true	"Enrollment ID"
 //	@Success		200	{string}	string				"Successfully deleted enrollment"

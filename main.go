@@ -28,7 +28,13 @@ import (
 //	@contact.email	support@swagger.io
 
 //	@license.name	AGPL-3.0
-//	@license.url	https://www.gnu.org/licenses/agpl-3.0.en.html
+//	@license.url	https://www.gnu.org/licenses/agpl-3.0.en.
+
+// ------------------ JWT Auth Definition ------------------
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer " followed by your JWT token.`
 
 func main() {
 	cfg := dbserver.NewConfig()

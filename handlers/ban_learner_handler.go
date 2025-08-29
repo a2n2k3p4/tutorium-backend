@@ -24,6 +24,7 @@ func BanLearnerRoutes(app *fiber.App) {
 //	@Summary		Create a new banned learner record
 //	@Description	CreateBanLearner creates a new ban record for a learner
 //	@Tags			BanLearners
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			banlearner	body		models.BanDetailsLearnerDoc	true	"Ban Learner Payload"
@@ -53,6 +54,7 @@ func CreateBanLearner(c *fiber.Ctx) error {
 //	@Summary		Get all banned learners
 //	@Description	GetBanLearners returns a list of all ban records
 //	@Tags			BanLearners
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.BanDetailsLearnerDoc
 //	@Failure		500	{object}	map[string]string
@@ -80,6 +82,7 @@ func findBanLearner(db *gorm.DB, id int, banlearner *models.BanDetailsLearner) e
 //	@Summary		Get a banned learner by ID
 //	@Description	GetBanLearner returns a single ban record by ID
 //	@Tags			BanLearners
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int	true	"Ban Learner ID"
 //	@Success		200	{object}	models.BanDetailsLearnerDoc
@@ -116,6 +119,7 @@ func GetBanLearner(c *fiber.Ctx) error {
 //	@Summary		Update a banned learner record
 //	@Description	UpdateBanLearner modifies an existing ban record
 //	@Tags			BanLearners
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			id			path		int							true	"Ban Learner ID"
@@ -164,6 +168,7 @@ func UpdateBanLearner(c *fiber.Ctx) error {
 //	@Summary		Delete a banned learner record
 //	@Description	DeleteBanLearner deletes a ban record by ID
 //	@Tags			BanLearners
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int		true	"Ban Learner ID"
 //	@Success		200	{string}	string	"Successfully deleted ban learner"

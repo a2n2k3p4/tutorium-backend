@@ -22,22 +22,39 @@ func LoginRoutes(app *fiber.App) {
 	app.Post("/login", LoginHandler)
 }
 
+// LoginHandler godoc
+//
+//	@Summary		Login with KU/Nisit credentials
+//	@Description	Authenticate a nisit user via KU API, create the user if not exists, and return a JWT token along with user info
+//	@Tags			Login
+//	@Accept			json
+//	@Produce		json
+//	@Param			login	body		models.LoginRequestDoc	true	"Login payload"
+//	@Success		200		{object}	models.LoginResponseDoc
+//	@Failure		400		{object}	map[string]string	"Invalid input"
+//	@Failure		401		{object}	map[string]string	"Unauthorized"
+//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Router			/login [post]
 func LoginHandler(c *fiber.Ctx) error {
 	type LoginRequest struct {
-		Username       string
-		Password       string
-		ProfilePicture string
-		FirstName      string
-		LastName       string
-		Gender         string
-		PhoneNumber    string
+		Username       string `json:"username"`
+		Password       string `json:"password"`
+		ProfilePicture string `json:"profile_picture,omitempty"`
+		FirstName      string `json:"first_name"`
+		LastName       string `json:"last_name"`
+		Gender         string `json:"gender"`
+		PhoneNumber    string `json:"phone_number"`
 	}
 
 	var req LoginRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
-	const NisitKUBaseURL = "https://kuappstore.ku.ac.th/nisitku/nisit/Controller.php"
+
+	if err := godotenv.Load("../.env"); err != nil {
+		log.Println(".env file not found, using system environment variables")
+	}
+	NisitKUBaseURL := os.Getenv("KU_API")
 	nisitClient := NewNisitKUClient(NisitKUBaseURL)
 
 	loginResp, err := nisitClient.Login(req.Username, req.Password)
@@ -97,7 +114,7 @@ func LoginHandler(c *fiber.Ctx) error {
 }
 
 func generateJWT(user models.User) (string, error) {
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load("../.env"); err != nil {
 		log.Println(".env file not found, using system environment variables")
 	}
 	secretStr := os.Getenv("JWT_SECRET")

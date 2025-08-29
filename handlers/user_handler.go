@@ -26,6 +26,7 @@ func UserRoutes(app *fiber.App) {
 //	@Summary		Create a new user
 //	@Description	CreateUser creates a new user record
 //	@Tags			Users
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			user	body		models.UserDoc	true	"User payload"
@@ -56,6 +57,7 @@ func CreateUser(c *fiber.Ctx) error {
 //	@Summary		List all users
 //	@Description	GetUsers retrieves all user records
 //	@Tags			Users
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.UserDoc
 //	@Failure		500	{object}	map[string]string	"Server error"
@@ -89,6 +91,7 @@ func findUser(db *gorm.DB, id int, user *models.User) error {
 //	@Summary		Get user by ID
 //	@Description	GetUser retrieves a single user by its ID
 //	@Tags			Users
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int	true	"User ID"
 //	@Success		200	{object}	models.UserDoc
@@ -125,6 +128,7 @@ func GetUser(c *fiber.Ctx) error {
 //	@Summary		Update an existing user
 //	@Description	UpdateUser updates a user record by its ID
 //	@Tags			Users
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			id		path		int				true	"User ID"
@@ -172,6 +176,7 @@ func UpdateUser(c *fiber.Ctx) error {
 //	@Summary		Delete a user by ID
 //	@Description	DeleteUser removes a user record by its ID along with associated Learner, Teacher, and Admin
 //	@Tags			Users
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int					true	"User ID"
 //	@Success		200	{string}	string				"Successfully deleted User and associated roles"

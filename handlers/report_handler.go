@@ -25,6 +25,7 @@ func ReportRoutes(app *fiber.App) {
 //	@Summary		Create a new report
 //	@Description	CreateReport creates a new Report record
 //	@Tags			Reports
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			report	body		models.ReportDoc	true	"Report payload"
@@ -55,6 +56,7 @@ func CreateReport(c *fiber.Ctx) error {
 //	@Summary		List all reports
 //	@Description	GetReports retrieves all Report records with Reporter and Reported relations
 //	@Tags			Reports
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.ReportDoc
 //	@Failure		500	{object}	map[string]string	"Server error"
@@ -81,6 +83,7 @@ func findReport(db *gorm.DB, id int, report *models.Report) error {
 //	@Summary		Get report by ID
 //	@Description	GetReport retrieves a single Report by its ID, including Reporter and Reported
 //	@Tags			Reports
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int	true	"Report ID"
 //	@Success		200	{object}	models.ReportDoc
@@ -117,6 +120,7 @@ func GetReport(c *fiber.Ctx) error {
 //	@Summary		Update an existing report
 //	@Description	UpdateReport updates a Report record by its ID
 //	@Tags			Reports
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			id		path		int					true	"Report ID"
@@ -164,6 +168,7 @@ func UpdateReport(c *fiber.Ctx) error {
 //	@Summary		Delete a report by ID
 //	@Description	DeleteReport removes a Report record by its ID
 //	@Tags			Reports
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int					true	"Report ID"
 //	@Success		200	{string}	string				"Successfully deleted Report"

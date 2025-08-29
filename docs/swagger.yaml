@@ -123,6 +123,38 @@ definitions:
         example: 5
         type: integer
     type: object
+  models.LoginRequestDoc:
+    properties:
+      first_name:
+        example: Alice
+        type: string
+      gender:
+        example: Female
+        type: string
+      last_name:
+        example: Smith
+        type: string
+      password:
+        example: mySecretPassword
+        type: string
+      phone_number:
+        example: "+66912345678"
+        type: string
+      profile_picture:
+        example: <base64-encoded-image>
+        type: string
+      username:
+        example: b6610505511
+        type: string
+    type: object
+  models.LoginResponseDoc:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      user:
+        $ref: '#/definitions/models.UserDoc'
+    type: object
   models.NotificationDoc:
     properties:
       id:
@@ -234,7 +266,7 @@ info:
   description: This is the API for Tutorium Backend system.
   license:
     name: AGPL-3.0
-    url: https://www.gnu.org/licenses/agpl-3.0.en.html
+    url: https://www.gnu.org/licenses/agpl-3.0.en.
   termsOfService: http://swagger.io/terms/
   title: Tutorium Backend API
   version: "1.0"
@@ -258,6 +290,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - BearerAuth: []
       summary: Get all admins
       tags:
       - admins
@@ -284,6 +318,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new admin
       tags:
       - admins
@@ -316,6 +352,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete admin by ID
       tags:
       - admins
@@ -341,6 +379,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - BearerAuth: []
       summary: Get admin by ID
       tags:
       - admins
@@ -362,6 +402,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get all banned learners
       tags:
       - BanLearners
@@ -395,6 +437,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new banned learner record
       tags:
       - BanLearners
@@ -432,6 +476,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a banned learner record
       tags:
       - BanLearners
@@ -468,6 +514,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get a banned learner by ID
       tags:
       - BanLearners
@@ -512,6 +560,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update a banned learner record
       tags:
       - BanLearners
@@ -534,6 +584,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: List all ban records for teachers
       tags:
       - BanTeachers
@@ -567,6 +619,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new ban record for a teacher
       tags:
       - BanTeachers
@@ -604,6 +658,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a ban record by ID
       tags:
       - BanTeachers
@@ -640,6 +696,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get ban record by ID
       tags:
       - BanTeachers
@@ -684,6 +742,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update a ban record by ID
       tags:
       - BanTeachers
@@ -706,6 +766,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: List all class categories
       tags:
       - ClassCategories
@@ -739,6 +801,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new class category
       tags:
       - ClassCategories
@@ -776,6 +840,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a class category by ID
       tags:
       - ClassCategories
@@ -813,6 +879,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get class category by ID
       tags:
       - ClassCategories
@@ -857,6 +925,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update an existing class category
       tags:
       - ClassCategories
@@ -879,6 +949,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: List all class sessions
       tags:
       - ClassSessions
@@ -912,6 +984,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new class session
       tags:
       - ClassSessions
@@ -949,6 +1023,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a class session by ID
       tags:
       - ClassSessions
@@ -986,6 +1062,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get class session by ID
       tags:
       - ClassSessions
@@ -1030,6 +1108,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update an existing class session
       tags:
       - ClassSessions
@@ -1052,6 +1132,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: List all classes
       tags:
       - Classes
@@ -1085,6 +1167,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new class
       tags:
       - Classes
@@ -1122,6 +1206,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a class by ID
       tags:
       - Classes
@@ -1159,6 +1245,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get class by ID
       tags:
       - Classes
@@ -1203,6 +1291,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update an existing class
       tags:
       - Classes
@@ -1225,6 +1315,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: List all enrollments
       tags:
       - Enrollments
@@ -1258,6 +1350,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new enrollment
       tags:
       - Enrollments
@@ -1295,6 +1389,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete an enrollment by ID
       tags:
       - Enrollments
@@ -1332,6 +1428,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get enrollment by ID
       tags:
       - Enrollments
@@ -1376,6 +1474,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update an existing enrollment
       tags:
       - Enrollments
@@ -1397,6 +1497,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: List all learners
       tags:
       - Learners
@@ -1430,6 +1532,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new learner
       tags:
       - Learners
@@ -1467,6 +1571,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a learner by ID
       tags:
       - Learners
@@ -1503,9 +1609,52 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get learner by ID
       tags:
       - Learners
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a nisit user via KU API, create the user if not exists,
+        and return a JWT token along with user info
+      parameters:
+      - description: Login payload
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequestDoc'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LoginResponseDoc'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login with KU/Nisit credentials
+      tags:
+      - Login
   /notifications:
     get:
       description: GetNotifications retrieves all Notification records with associated
@@ -1525,6 +1674,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: List all notifications
       tags:
       - Notifications
@@ -1558,6 +1709,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new notification
       tags:
       - Notifications
@@ -1595,6 +1748,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a notification by ID
       tags:
       - Notifications
@@ -1632,6 +1787,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get notification by ID
       tags:
       - Notifications
@@ -1676,6 +1833,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update an existing notification
       tags:
       - Notifications
@@ -1698,6 +1857,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: List all reports
       tags:
       - Reports
@@ -1731,6 +1892,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new report
       tags:
       - Reports
@@ -1768,6 +1931,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a report by ID
       tags:
       - Reports
@@ -1805,6 +1970,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get report by ID
       tags:
       - Reports
@@ -1849,6 +2016,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update an existing report
       tags:
       - Reports
@@ -1871,6 +2040,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: List all reviews
       tags:
       - Reviews
@@ -1904,6 +2075,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new review
       tags:
       - Reviews
@@ -1941,6 +2114,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a review by ID
       tags:
       - Reviews
@@ -1978,6 +2153,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get review by ID
       tags:
       - Reviews
@@ -2023,6 +2200,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update an existing review
       tags:
       - Reviews
@@ -2044,6 +2223,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: List all teachers
       tags:
       - Teachers
@@ -2077,6 +2258,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new teacher
       tags:
       - Teachers
@@ -2114,6 +2297,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a teacher by ID
       tags:
       - Teachers
@@ -2150,6 +2335,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get teacher by ID
       tags:
       - Teachers
@@ -2194,6 +2381,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update an existing teacher
       tags:
       - Teachers
@@ -2215,6 +2404,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: List all users
       tags:
       - Users
@@ -2248,6 +2439,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new user
       tags:
       - Users
@@ -2286,6 +2479,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a user by ID
       tags:
       - Users
@@ -2322,6 +2517,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get user by ID
       tags:
       - Users
@@ -2366,7 +2563,15 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update an existing user
       tags:
       - Users
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer " followed by your JWT token.`
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

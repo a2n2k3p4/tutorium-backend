@@ -10,11 +10,11 @@ import (
 )
 
 func ClassSessionRoutes(app *fiber.App) {
-	classSession := app.Group("/class_sessions")
+	classSession := app.Group("/class_sessions", middlewares.ProtectedMiddleware())
 	classSession.Get("/", GetClassSessions)
 	classSession.Get("/:id", GetClassSession)
 
-	classSessionProtected := classSession.Group("/", middlewares.ProtectedMiddleware(), middlewares.TeacherRequired())
+	classSessionProtected := classSession.Group("/", middlewares.TeacherRequired())
 	classSessionProtected.Post("/", CreateClassSession)
 	classSessionProtected.Put("/:id", UpdateClassSession)
 	classSessionProtected.Delete("/:id", DeleteClassSession)
@@ -25,6 +25,7 @@ func ClassSessionRoutes(app *fiber.App) {
 //	@Summary		Create a new class session
 //	@Description	CreateClassSession creates a new ClassSession record
 //	@Tags			ClassSessions
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			class_session	body		models.ClassSessionDoc	true	"ClassSession payload"
@@ -55,6 +56,7 @@ func CreateClassSession(c *fiber.Ctx) error {
 //	@Summary		List all class sessions
 //	@Description	GetClassSessions retrieves all ClassSession records with Class relation
 //	@Tags			ClassSessions
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.ClassSessionDoc
 //	@Failure		500	{object}	map[string]string	"Server error"
@@ -82,6 +84,7 @@ func findClassSession(db *gorm.DB, id int, class_session *models.ClassSession) e
 //	@Summary		Get class session by ID
 //	@Description	GetClassSession retrieves a single ClassSession by its ID, including Class
 //	@Tags			ClassSessions
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int	true	"ClassSession ID"
 //	@Success		200	{object}	models.ClassSessionDoc
@@ -118,6 +121,7 @@ func GetClassSession(c *fiber.Ctx) error {
 //	@Summary		Update an existing class session
 //	@Description	UpdateClassSession updates a ClassSession record by its ID
 //	@Tags			ClassSessions
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			id				path		int						true	"ClassSession ID"
@@ -166,6 +170,7 @@ func UpdateClassSession(c *fiber.Ctx) error {
 //	@Summary		Delete a class session by ID
 //	@Description	DeleteClassSession removes a ClassSession record by its ID
 //	@Tags			ClassSessions
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int					true	"ClassSession ID"
 //	@Success		200	{string}	string				"Successfully deleted class session"
