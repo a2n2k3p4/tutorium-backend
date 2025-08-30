@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
@@ -81,6 +82,21 @@ func GetClasses(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
+	// Generate presigned URL if BannerPictureURL exists
+	mc, ok := c.Locals("minio").(*storage.Client)
+	if ok {
+		for i := range classes {
+			if classes[i].BannerPictureURL != "" {
+				presignedURL, err := mc.PresignedGetObject(c.Context(), classes[i].BannerPictureURL, 15*time.Minute)
+				if err == nil {
+					classes[i].BannerPictureURL = presignedURL
+				} else {
+					classes[i].BannerPictureURL = ""
+				}
+			}
+		}
+	}
+
 	return c.Status(200).JSON(classes)
 }
 
@@ -120,6 +136,17 @@ func GetClass(c *fiber.Ctx) error {
 		return c.Status(404).JSON("class not found")
 	case err != nil:
 		return c.Status(500).JSON(err.Error())
+	}
+
+	// Generate presigned URL if BannerPictureURL exists
+	mc, ok := c.Locals("minio").(*storage.Client)
+	if ok && class.BannerPictureURL != "" {
+		presignedURL, err := mc.PresignedGetObject(c.Context(), class.BannerPictureURL, 15*time.Minute)
+		if err == nil {
+			class.BannerPictureURL = presignedURL
+		} else {
+			class.BannerPictureURL = ""
+		}
 	}
 
 	return c.Status(200).JSON(class)

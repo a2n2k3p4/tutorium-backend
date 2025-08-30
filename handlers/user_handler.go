@@ -1,11 +1,11 @@
 package handlers
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
@@ -86,6 +86,21 @@ func GetUsers(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
+	// Generate presigned URL if ProfilePictureURL exists for each user
+	mc, ok := c.Locals("minio").(*storage.Client)
+	if ok {
+		for i := range users {
+			if users[i].ProfilePictureURL != "" {
+				presignedURL, err := mc.PresignedGetObject(c.Context(), users[i].ProfilePictureURL, 15*time.Minute)
+				if err == nil {
+					users[i].ProfilePictureURL = presignedURL
+				} else {
+					users[i].ProfilePictureURL = ""
+				}
+			}
+		}
+	}
+
 	return c.Status(200).JSON(users)
 }
 
@@ -128,6 +143,18 @@ func GetUser(c *fiber.Ctx) error {
 		return c.Status(404).JSON("user not found")
 	case err != nil:
 		return c.Status(500).JSON(err.Error())
+	}
+	
+	// Generate presigned URL if ProfilePictureURL exists
+	mc, ok := c.Locals("minio").(*storage.Client)
+	if ok && user.ProfilePictureURL != "" {
+		presignedURL, err := mc.PresignedGetObject(c.Context(), user.ProfilePictureURL, 15*time.Minute)
+		if err == nil {
+			user.ProfilePictureURL = presignedURL
+		} else {
+			// optional: log the error
+			user.ProfilePictureURL = ""
+		}
 	}
 
 	return c.Status(200).JSON(user)
@@ -236,11 +263,11 @@ func processProfilePicture(c *fiber.Ctx, user *models.User) error {
         }
  		mc := c.Locals("minio").(*storage.Client)
         filename := storage.GenerateFilename(http.DetectContentType(b[:min(512, len(b))]))
-        uploaded, err := mc.UploadBytes(context.Background(), "users", filename, b)
+		objectKey, err := mc.UploadBytes(c.Context(), "users", filename, b)
         if err != nil {
             return err
         }
-        user.ProfilePictureURL = uploaded
+        user.ProfilePictureURL = objectKey
     }
     return nil
 }

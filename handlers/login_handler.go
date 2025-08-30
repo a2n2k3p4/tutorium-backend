@@ -82,19 +82,17 @@ func LoginHandler(c *fiber.Ctx) error {
 				return c.Status(400).JSON(fiber.Map{"error": "invalid profile_picture", "detail": err.Error()})
 			}
 
-			minioClient, err := storage.NewClientFromEnv()
-			if err != nil {
-				return c.Status(500).JSON(fiber.Map{"error": "minio init failed", "detail": err.Error()})
-			}
+			mc := c.Locals("minio").(*storage.Client)
 
-			// detect type & generate filename
 			ct := http.DetectContentType(profileBytes[:min(512, len(profileBytes))])
 			filename := storage.GenerateFilename(ct)
 
-			uploadedURL, err = minioClient.UploadBytes(c.Context(), "users", filename, profileBytes)
+			objectKey, err := mc.UploadBytes(c.Context(), "users", filename, profileBytes)
 			if err != nil {
 				return c.Status(500).JSON(fiber.Map{"error": "upload failed", "detail": err.Error()})
 			}
+
+			uploadedURL = objectKey
 		}
 	}
 	db, err := middlewares.GetDB(c)

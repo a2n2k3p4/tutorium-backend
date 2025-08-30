@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
@@ -81,6 +82,22 @@ func GetReports(c *fiber.Ctx) error {
 	if err := db.Preload("Reporter").Preload("Reported").Find(&reports).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
+
+	// Generate presigned URL if ReportPictureURL exists
+	mc, ok := c.Locals("minio").(*storage.Client)
+	if ok {
+		for i := range reports {
+			if reports[i].ReportPictureURL != "" {
+				presignedURL, err := mc.PresignedGetObject(c.Context(), reports[i].ReportPictureURL, 15*time.Minute)
+				if err == nil {
+					reports[i].ReportPictureURL = presignedURL
+				} else {
+					reports[i].ReportPictureURL = ""
+				}
+			}
+		}
+	}
+
 	return c.Status(200).JSON(reports)
 }
 
@@ -120,6 +137,17 @@ func GetReport(c *fiber.Ctx) error {
 		return c.Status(404).JSON("report not found")
 	case err != nil:
 		return c.Status(500).JSON(err.Error())
+	}
+
+	// Generate presigned URL if ReportPictureURL exists
+	mc, ok := c.Locals("minio").(*storage.Client)
+	if ok && report.ReportPictureURL != "" {
+		presignedURL, err := mc.PresignedGetObject(c.Context(), report.ReportPictureURL, 15*time.Minute)
+		if err == nil {
+			report.ReportPictureURL = presignedURL
+		} else {
+			report.ReportPictureURL = ""
+		}
 	}
 
 	return c.Status(200).JSON(report)

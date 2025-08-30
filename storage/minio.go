@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -72,6 +73,16 @@ func NewClientFromEnv() (*Client, error) {
 	return c, nil
 }
 
+// PresignedGetObject returns a temporary (presigned) GET URL for an objectName (objectName = "folder/filename")
+func (c *Client) PresignedGetObject(ctx context.Context, objectName string, expiry time.Duration) (string, error) {
+    reqParams := make(url.Values)
+    u, err := c.Client.PresignedGetObject(ctx, c.Bucket, objectName, expiry, reqParams)
+    if err != nil {
+        return "", err
+    }
+    return u.String(), nil
+}
+
 // UploadBytes uploads bytes to bucket with objectName and returns public URL.
 // folder: "users", "classes", "reports"
 // filename: "user_42_123456.png"
@@ -95,13 +106,7 @@ func (c *Client) UploadBytes(ctx context.Context, folder, filename string, b []b
 		return "", err
 	}
 
-	scheme := "http"
-	if c.UseSSL {
-		scheme = "https"
-	}
-
-	url := fmt.Sprintf("%s://%s/%s/%s", scheme, c.Endpoint, c.Bucket, objectName)
-	return url, nil
+	return objectName, nil
 }
 
 // DecodeBase64Image handles data: URI or plain base64
