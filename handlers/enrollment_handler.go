@@ -53,7 +53,7 @@ func CreateEnrollment(c *fiber.Ctx) error {
 // GetEnrollments godoc
 //
 //	@Summary		List all enrollments
-//	@Description	GetEnrollments retrieves all Enrollment records with associated Learner and Class
+//	@Description	GetEnrollments retrieves all Enrollment records with associated Learner and ClassSession
 //	@Tags			Enrollments
 //  @Security 		BearerAuth
 //	@Produce		json
@@ -67,20 +67,20 @@ func GetEnrollments(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	if err := db.Preload("Learner").Preload("Class").Find(&enrollments).Error; err != nil {
+	if err := db.Preload("Learner").Preload("ClassSession").Find(&enrollments).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON(enrollments)
 }
 
 func findEnrollment(db *gorm.DB, id int, enrollment *models.Enrollment) error {
-	return db.Preload("Learner").Preload("Class").First(enrollment, "id = ?", id).Error
+	return db.Preload("Learner").Preload("ClassSession").First(enrollment, "id = ?", id).Error
 }
 
 // GetEnrollment godoc
 //
 //	@Summary		Get enrollment by ID
-//	@Description	GetEnrollment retrieves a single Enrollment by its ID, including related Learner and Class
+//	@Description	GetEnrollment retrieves a single Enrollment by its ID, including related Learner and ClassSession
 //	@Tags			Enrollments
 //  @Security 		BearerAuth
 //	@Produce		json
