@@ -12,7 +12,7 @@ type Report struct {
 	ReportedUserID    uint      `json:"reported_user_id" gorm:"not null"`
 	ReportType        string    `json:"report_type" gorm:"size:20;not null"`
 	ReportDescription string    `json:"report_description" gorm:"size:255"`
-	ReportPictureURL  string    `json:"report_picture_url"`
+	ReportPictureURL  string    `json:"report_picture,omitempty"`
 	ReportDate        time.Time `json:"report_date" gorm:"default:CURRENT_TIMESTAMP"`
 
 	Reporter User `gorm:"foreignKey:ReportUserID;constraint:OnDelete:SET NULL"`
@@ -27,6 +27,6 @@ type ReportDoc struct {
 	ReportedUserID    uint      `json:"reported_user_id" example:"8"`
 	ReportType        string    `json:"report_type" example:"Abuse"`
 	ReportDescription string    `json:"report_description" example:"User sent inappropriate messages"`
-	ReportPictureURL  string    `json:"report_picture_url" example:"https://minio.example.com/tutorium/reports/12/report.png"`
+	ReportPicture	  string    `json:"report_picture,omitempty" example:"<base64-encoded-image>"`
 	ReportDate        time.Time `json:"report_date" example:"2025-08-20T14:30:00Z"`
 }

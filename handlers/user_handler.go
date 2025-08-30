@@ -1,10 +1,15 @@
 package handlers
 
 import (
+	"context"
 	"errors"
+	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
+	"github.com/a2n2k3p4/tutorium-backend/storage"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -40,6 +45,11 @@ func CreateUser(c *fiber.Ctx) error {
 	if err := c.BodyParser(&user); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+
+	if err := processProfilePicture(c, &user); err != nil {
+    	return c.Status(400).JSON(err.Error())
+	}
+
 	db, err := middlewares.GetDB(c)
 	if err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -164,6 +174,10 @@ func UpdateUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
+	if err := processProfilePicture(c, &user_update); err != nil {
+    	return c.Status(400).JSON(err.Error())
+	}
+
 	if err := db.Model(&user).Updates(user_update).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
@@ -209,4 +223,24 @@ func DeleteUser(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted User")
+}
+
+func processProfilePicture(c *fiber.Ctx, user *models.User) error {
+    if user.ProfilePictureURL != "" && !strings.HasPrefix(user.ProfilePictureURL, "http") {
+        b, err := storage.DecodeBase64Image(user.ProfilePictureURL)
+        if err != nil {
+            return fmt.Errorf("invalid base64 image: %w", err)
+        }
+        if err := validateImageBytes(b); err != nil {
+            return fmt.Errorf("invalid image: %w", err)
+        }
+ 		mc := c.Locals("minio").(*storage.Client)
+        filename := storage.GenerateFilename(http.DetectContentType(b[:min(512, len(b))]))
+        uploaded, err := mc.UploadBytes(context.Background(), "users", filename, b)
+        if err != nil {
+            return err
+        }
+        user.ProfilePictureURL = uploaded
+    }
+    return nil
 }

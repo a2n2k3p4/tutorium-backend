@@ -59,8 +59,14 @@ definitions:
     type: object
   models.ClassDoc:
     properties:
+      banner_picture:
+        example: <base64-encoded-image>
+        type: string
       class_description:
         example: Advanced Python programming course
+        type: string
+      class_name:
+        example: Advanced Python Programming
         type: string
       enrollment_deadline:
         example: "2025-09-10T23:59:59Z"
@@ -71,6 +77,12 @@ definitions:
       learner_limit:
         example: 50
         type: integer
+      price:
+        example: 1999.99
+        type: number
+      rating:
+        example: 4.7
+        type: number
       teacher_id:
         example: 7
         type: integer
@@ -101,7 +113,7 @@ definitions:
     type: object
   models.EnrollmentDoc:
     properties:
-      class_id:
+      class_session_id:
         example: 21
         type: integer
       enrollment_status:
@@ -116,6 +128,12 @@ definitions:
     type: object
   models.LearnerDoc:
     properties:
+      ban_count:
+        example: 1
+        type: integer
+      flag_count:
+        example: 3
+        type: integer
       id:
         example: 42
         type: integer
@@ -188,7 +206,7 @@ definitions:
         example: User sent inappropriate messages
         type: string
       report_picture:
-        example: base64-encoded-image-string
+        example: <base64-encoded-image>
         type: string
       report_type:
         example: Abuse
@@ -220,10 +238,19 @@ definitions:
     type: object
   models.TeacherDoc:
     properties:
+      ban_count:
+        example: 1
+        type: integer
       description:
         example: Experienced Mathematics teacher specializing in calculus and linear
           algebra.
         type: string
+      email:
+        example: teacher@example.com
+        type: string
+      flag_count:
+        example: 3
+        type: integer
       id:
         example: 12
         type: integer

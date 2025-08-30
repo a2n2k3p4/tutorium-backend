@@ -1,10 +1,15 @@
 package handlers
 
 import (
+	"context"
 	"errors"
+	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
+	"github.com/a2n2k3p4/tutorium-backend/storage"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -39,6 +44,11 @@ func CreateClass(c *fiber.Ctx) error {
 	if err := c.BodyParser(&class); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+
+	if err := processBannerPicture(c, &class); err != nil {
+    	return c.Status(400).JSON(err.Error())
+	}
+
 	db, err := middlewares.GetDB(c)
 	if err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -156,6 +166,10 @@ func UpdateClass(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
+	if err := processBannerPicture(c, &class_update); err != nil {
+    	return c.Status(400).JSON(err.Error())
+	}
+
 	if err := db.Model(&class).Updates(class_update).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
@@ -202,4 +216,25 @@ func DeleteClass(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted class")
+}
+
+func processBannerPicture(c *fiber.Ctx, class *models.Class) error {
+    if class.BannerPictureURL != "" && !strings.HasPrefix(class.BannerPictureURL, "http") {
+        b, err := storage.DecodeBase64Image(class.BannerPictureURL)
+        if err != nil {
+            return fmt.Errorf("invalid base64 image: %w", err)
+        }
+        if err := validateImageBytes(b); err != nil {
+            return fmt.Errorf("invalid image: %w", err)
+        }
+		
+		mc := c.Locals("minio").(*storage.Client)
+        filename := storage.GenerateFilename(http.DetectContentType(b[:min(512, len(b))]))
+        uploaded, err := mc.UploadBytes(context.Background(), "classes", filename, b)
+        if err != nil {
+            return err
+        }
+        class.BannerPictureURL = uploaded
+    }
+    return nil
 }

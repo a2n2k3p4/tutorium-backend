@@ -8,6 +8,7 @@ import (
 	"github.com/a2n2k3p4/tutorium-backend/handlers"
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
+	"github.com/a2n2k3p4/tutorium-backend/storage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 
@@ -52,6 +53,13 @@ func main() {
 	app.Use(middlewares.DBMiddleware(db))
 
 	app.Use(cors.New())
+
+	// --- MinIO ---
+    minioClient, err := storage.NewClientFromEnv()
+    if err != nil {
+        log.Fatalf("Unable to initialize MinIO: %v", err)
+    }
+    app.Use(middlewares.MinioMiddleware(minioClient))
 
 	// debug route
 	app.Get("/", func(c *fiber.Ctx) error {

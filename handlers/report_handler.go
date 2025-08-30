@@ -1,10 +1,15 @@
 package handlers
 
 import (
+	"context"
 	"errors"
+	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
+	"github.com/a2n2k3p4/tutorium-backend/storage"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -39,6 +44,11 @@ func CreateReport(c *fiber.Ctx) error {
 	if err := c.BodyParser(&report); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+
+	if err := processReportPicture(c, &report); err != nil {
+    	return c.Status(400).JSON(err.Error())
+	}
+
 	db, err := middlewares.GetDB(c)
 	if err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -156,6 +166,10 @@ func UpdateReport(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
+	if err := processReportPicture(c, &report_updated); err != nil {
+    	return c.Status(400).JSON(err.Error())
+	}
+
 	if err := db.Model(&report).Updates(report_updated).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
@@ -201,4 +215,24 @@ func DeleteReport(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted Report")
+}
+
+func processReportPicture(c *fiber.Ctx, report *models.Report) error {
+    if report.ReportPictureURL != "" && !strings.HasPrefix(report.ReportPictureURL, "http") {
+        b, err := storage.DecodeBase64Image(report.ReportPictureURL)
+        if err != nil {
+            return fmt.Errorf("invalid base64 image: %w", err)
+        }
+        if err := validateImageBytes(b); err != nil {
+            return fmt.Errorf("invalid image: %w", err)
+        }
+		mc := c.Locals("minio").(*storage.Client)
+        filename := storage.GenerateFilename(http.DetectContentType(b[:min(512, len(b))]))
+        uploaded, err := mc.UploadBytes(context.Background(), "reports", filename, b)
+        if err != nil {
+            return err
+        }
+        report.ReportPictureURL = uploaded
+    }
+    return nil
 }
