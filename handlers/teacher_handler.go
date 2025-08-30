@@ -10,14 +10,12 @@ import (
 )
 
 func TeacherRoutes(app *fiber.App) {
-	teacher := app.Group("/teachers")
+	teacher := app.Group("/teachers", middlewares.ProtectedMiddleware())
 	teacher.Get("/", GetTeachers)
 	teacher.Get("/:id", GetTeacher)
-
-	teacherProtected := teacher.Group("/", middlewares.ProtectedMiddleware())
-	teacherProtected.Post("/", CreateTeacher)
-	teacherProtected.Put("/:id", UpdateTeacher)
-	teacherProtected.Delete("/:id", DeleteTeacher)
+	teacher.Post("/", CreateTeacher)
+	teacher.Put("/:id", UpdateTeacher)
+	teacher.Delete("/:id", DeleteTeacher)
 }
 
 // CreateTeacher godoc
@@ -25,6 +23,7 @@ func TeacherRoutes(app *fiber.App) {
 //	@Summary		Create a new teacher
 //	@Description	CreateTeacher creates a new Teacher record
 //	@Tags			Teachers
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			teacher	body		models.TeacherDoc	true	"Teacher payload"
@@ -55,6 +54,7 @@ func CreateTeacher(c *fiber.Ctx) error {
 //	@Summary		List all teachers
 //	@Description	GetTeachers retrieves all Teacher records
 //	@Tags			Teachers
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.TeacherDoc
 //	@Failure		500	{object}	map[string]string	"Server error"
@@ -82,6 +82,7 @@ func findTeacher(db *gorm.DB, id int, teacher *models.Teacher) error {
 //	@Summary		Get teacher by ID
 //	@Description	GetTeacher retrieves a single Teacher by its ID
 //	@Tags			Teachers
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int	true	"Teacher ID"
 //	@Success		200	{object}	models.TeacherDoc
@@ -118,6 +119,7 @@ func GetTeacher(c *fiber.Ctx) error {
 //	@Summary		Update an existing teacher
 //	@Description	UpdateTeacher updates a Teacher record by its ID
 //	@Tags			Teachers
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			id		path		int					true	"Teacher ID"
@@ -165,6 +167,7 @@ func UpdateTeacher(c *fiber.Ctx) error {
 //	@Summary		Delete a teacher by ID
 //	@Description	DeleteTeacher removes a Teacher record by its ID
 //	@Tags			Teachers
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int					true	"Teacher ID"
 //	@Success		200	{string}	string				"Successfully deleted Teacher"

@@ -24,6 +24,7 @@ func LearnerRoutes(app *fiber.App) {
 //	@Summary		Create a new learner
 //	@Description	CreateLearner creates a new Learner record
 //	@Tags			Learners
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			learner	body		models.LearnerDoc	true	"Learner payload"
@@ -54,6 +55,7 @@ func CreateLearner(c *fiber.Ctx) error {
 //	@Summary		List all learners
 //	@Description	GetLearners retrieves all Learner records
 //	@Tags			Learners
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.LearnerDoc
 //	@Failure		500	{object}	map[string]string	"Server error"
@@ -81,6 +83,7 @@ func findLearner(db *gorm.DB, id int, learner *models.Learner) error {
 //	@Summary		Get learner by ID
 //	@Description	GetLearner retrieves a single Learner by its ID
 //	@Tags			Learners
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int	true	"Learner ID"
 //	@Success		200	{object}	models.LearnerDoc
@@ -117,6 +120,7 @@ func GetLearner(c *fiber.Ctx) error {
 //	@Summary		Delete a learner by ID
 //	@Description	DeleteLearner removes a Learner record by its ID
 //	@Tags			Learners
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int					true	"Learner ID"
 //	@Success		200	{string}	string				"Successfully deleted Learner"

@@ -8,10 +8,10 @@ import (
 
 type BanDetailsLearner struct {
 	gorm.Model
-	LearnerID      uint      `gorm:"not null"`
-	BanStart       time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-	BanEnd         time.Time `gorm:"not null"`
-	BanDescription string    `gorm:"size:255"`
+	LearnerID      uint      `json:"learner_id" gorm:"not null"`
+	BanStart       time.Time `json:"ban_start" gorm:"default:CURRENT_TIMESTAMP"`
+	BanEnd         time.Time `json:"ban_end" gorm:"not null"`
+	BanDescription string    `json:"ban_description" gorm:"size:255"`
 
 	Learner Learner `gorm:"foreignKey:LearnerID;references:ID;constraint:OnDelete:CASCADE"`
 }

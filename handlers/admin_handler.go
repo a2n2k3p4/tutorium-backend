@@ -24,6 +24,7 @@ func AdminRoutes(app *fiber.App) {
 //	@Summary		Create a new admin
 //	@Description	Create a new admin with the provided data
 //	@Tags			admins
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			admin	body		models.AdminDoc	true	"Admin data"
@@ -53,6 +54,7 @@ func CreateAdmin(c *fiber.Ctx) error {
 //	@Summary		Get all admins
 //	@Description	Retrieve a list of all admins
 //	@Tags			admins
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{array}		models.AdminDoc
@@ -81,6 +83,7 @@ func findAdmin(db *gorm.DB, id int, admin *models.Admin) error {
 //	@Summary		Get admin by ID
 //	@Description	Retrieve a specific admin by their ID
 //	@Tags			admins
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	path		int	true	"Admin ID"
@@ -117,6 +120,7 @@ func GetAdmin(c *fiber.Ctx) error {
 //	@Summary		Delete admin by ID
 //	@Description	Delete a specific admin by their ID
 //	@Tags			admins
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	path		int						true	"Admin ID"

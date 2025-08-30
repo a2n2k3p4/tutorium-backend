@@ -8,11 +8,11 @@ import (
 
 type Notification struct {
 	gorm.Model
-	UserID                  uint      `gorm:"not null"`
-	NotificationType        string    `gorm:"size:30;not null"`
-	NotificationDescription string    `gorm:"size:255"`
-	NotificationDate        time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-	ReadFlag                bool      `gorm:"default:false"`
+	UserID                  uint      `json:"user_id" gorm:"not null"`
+	NotificationType        string    `json:"notification_type" gorm:"size:30;not null"`
+	NotificationDescription string    `json:"notification_description" gorm:"size:255"`
+	NotificationDate        time.Time `json:"notification_date" gorm:"default:CURRENT_TIMESTAMP"`
+	ReadFlag                bool      `json:"read_flag" gorm:"default:false"`
 
 	User User `gorm:"foreignKey:UserID;references:ID;constraint:OnDelete:CASCADE"`
 }

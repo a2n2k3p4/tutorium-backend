@@ -8,12 +8,12 @@ import (
 
 type Report struct {
 	gorm.Model
-	ReportUserID      uint
-	ReportedUserID    uint   `gorm:"not null"`
-	ReportType        string `gorm:"size:20;not null"`
-	ReportDescription string `gorm:"size:255"`
-	ReportPicture     []byte
-	ReportDate        time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+	ReportUserID      uint      `json:"report_user_id"`
+	ReportedUserID    uint      `json:"reported_user_id" gorm:"not null"`
+	ReportType        string    `json:"report_type" gorm:"size:20;not null"`
+	ReportDescription string    `json:"report_description" gorm:"size:255"`
+	ReportPictureURL  string    `json:"report_picture,omitempty"`
+	ReportDate        time.Time `json:"report_date" gorm:"default:CURRENT_TIMESTAMP"`
 
 	Reporter User `gorm:"foreignKey:ReportUserID;constraint:OnDelete:SET NULL"`
 	Reported User `gorm:"foreignKey:ReportedUserID;constraint:OnDelete:CASCADE"`
@@ -27,6 +27,6 @@ type ReportDoc struct {
 	ReportedUserID    uint      `json:"reported_user_id" example:"8"`
 	ReportType        string    `json:"report_type" example:"Abuse"`
 	ReportDescription string    `json:"report_description" example:"User sent inappropriate messages"`
-	ReportPicture     string    `json:"report_picture" example:"base64-encoded-image-string"`
+	ReportPicture	  string    `json:"report_picture,omitempty" example:"<base64-encoded-image>"`
 	ReportDate        time.Time `json:"report_date" example:"2025-08-20T14:30:00Z"`
 }
