@@ -2,9 +2,14 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
+	"net/http"
+	"strings"
+	"time"
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
+	"github.com/a2n2k3p4/tutorium-backend/storage"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -40,6 +45,11 @@ func CreateUser(c *fiber.Ctx) error {
 	if err := c.BodyParser(&user); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+
+	if err := processProfilePicture(c, &user); err != nil {
+    	return c.Status(400).JSON(err.Error())
+	}
+
 	db, err := middlewares.GetDB(c)
 	if err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -74,6 +84,21 @@ func GetUsers(c *fiber.Ctx) error {
 		Preload("Admin").
 		Find(&users).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
+	}
+
+	// Generate presigned URL if ProfilePictureURL exists for each user
+	mc, ok := c.Locals("minio").(*storage.Client)
+	if ok {
+		for i := range users {
+			if users[i].ProfilePictureURL != "" {
+				presignedURL, err := mc.PresignedGetObject(c.Context(), users[i].ProfilePictureURL, 15*time.Minute)
+				if err == nil {
+					users[i].ProfilePictureURL = presignedURL
+				} else {
+					users[i].ProfilePictureURL = ""
+				}
+			}
+		}
 	}
 
 	return c.Status(200).JSON(users)
@@ -119,6 +144,18 @@ func GetUser(c *fiber.Ctx) error {
 	case err != nil:
 		return c.Status(500).JSON(err.Error())
 	}
+	
+	// Generate presigned URL if ProfilePictureURL exists
+	mc, ok := c.Locals("minio").(*storage.Client)
+	if ok && user.ProfilePictureURL != "" {
+		presignedURL, err := mc.PresignedGetObject(c.Context(), user.ProfilePictureURL, 15*time.Minute)
+		if err == nil {
+			user.ProfilePictureURL = presignedURL
+		} else {
+			// optional: log the error
+			user.ProfilePictureURL = ""
+		}
+	}
 
 	return c.Status(200).JSON(user)
 }
@@ -162,6 +199,10 @@ func UpdateUser(c *fiber.Ctx) error {
 	var user_update models.User
 	if err := c.BodyParser(&user_update); err != nil {
 		return c.Status(400).JSON(err.Error())
+	}
+
+	if err := processProfilePicture(c, &user_update); err != nil {
+    	return c.Status(400).JSON(err.Error())
 	}
 
 	if err := db.Model(&user).Updates(user_update).Error; err != nil {
@@ -209,4 +250,24 @@ func DeleteUser(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted User")
+}
+
+func processProfilePicture(c *fiber.Ctx, user *models.User) error {
+    if user.ProfilePictureURL != "" && !strings.HasPrefix(user.ProfilePictureURL, "http") {
+        b, err := storage.DecodeBase64Image(user.ProfilePictureURL)
+        if err != nil {
+            return fmt.Errorf("invalid base64 image: %w", err)
+        }
+        if err := validateImageBytes(b); err != nil {
+            return fmt.Errorf("invalid image: %w", err)
+        }
+ 		mc := c.Locals("minio").(*storage.Client)
+        filename := storage.GenerateFilename(http.DetectContentType(b[:min(512, len(b))]))
+		objectKey, err := mc.UploadBytes(c.Context(), "users", filename, b)
+        if err != nil {
+            return err
+        }
+        user.ProfilePictureURL = objectKey
+    }
+    return nil
 }

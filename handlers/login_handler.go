@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"log"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
+	"github.com/a2n2k3p4/tutorium-backend/storage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/joho/godotenv"
@@ -66,16 +66,33 @@ func LoginHandler(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{"error": "invalid credentials"})
 	}
 
-	// Decode ProfilePicture from string to []byte and validate it
-	var profileBytes []byte
+	// ProfilePictureURL
+	var uploadedURL string
 	if req.ProfilePicture != "" {
-		profileBytes, err = decodeBase64Image(req.ProfilePicture)
-		if err != nil {
-			return c.Status(400).JSON(fiber.Map{"error": "invalid profile_picture", "detail": err.Error()})
-		}
-		// validate size and mime type
-		if err := validateImageBytes(profileBytes); err != nil {
-			return c.Status(400).JSON(fiber.Map{"error": "invalid profile_picture", "detail": err.Error()})
+		// if client already sent a URL, just use it
+		if strings.HasPrefix(req.ProfilePicture, "http://") || strings.HasPrefix(req.ProfilePicture, "https://") {
+			uploadedURL = req.ProfilePicture
+		} else {
+			// decode base64 -> validate -> upload to minio
+			profileBytes, err := storage.DecodeBase64Image(req.ProfilePicture)
+			if err != nil {
+				return c.Status(400).JSON(fiber.Map{"error": "invalid profile_picture", "detail": err.Error()})
+			}
+			if err := validateImageBytes(profileBytes); err != nil {
+				return c.Status(400).JSON(fiber.Map{"error": "invalid profile_picture", "detail": err.Error()})
+			}
+
+			mc := c.Locals("minio").(*storage.Client)
+
+			ct := http.DetectContentType(profileBytes[:min(512, len(profileBytes))])
+			filename := storage.GenerateFilename(ct)
+
+			objectKey, err := mc.UploadBytes(c.Context(), "users", filename, profileBytes)
+			if err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": "upload failed", "detail": err.Error()})
+			}
+
+			uploadedURL = objectKey
 		}
 	}
 	db, err := middlewares.GetDB(c)
@@ -92,7 +109,7 @@ func LoginHandler(c *fiber.Ctx) error {
 			LastName:       req.LastName,
 			Gender:         req.Gender,
 			PhoneNumber:    req.PhoneNumber,
-			ProfilePicture: profileBytes,
+			ProfilePictureURL: uploadedURL,
 			Balance:        0,
 		}
 		if err := db.Create(&user).Error; err != nil {
@@ -128,25 +145,6 @@ func generateJWT(user models.User) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(secret)
-}
-
-// decodeBase64Image decodes data: URI or plain base64 payload.
-func decodeBase64Image(s string) ([]byte, error) {
-	if s == "" {
-		return nil, nil
-	}
-	if strings.HasPrefix(s, "data:") {
-		comma := strings.IndexByte(s, ',')
-		if comma < 0 {
-			return nil, errors.New("invalid data URI")
-		}
-		s = s[comma+1:]
-	}
-	b, err := base64.StdEncoding.DecodeString(s)
-	if err != nil {
-		return nil, fmt.Errorf("base64 decode: %w", err)
-	}
-	return b, nil
 }
 
 // validateImageBytes checks size and MIME type of the image bytes.

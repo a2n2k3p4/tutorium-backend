@@ -3673,9 +3673,17 @@ const docTemplate = `{
         "models.ClassDoc": {
             "type": "object",
             "properties": {
+                "banner_picture": {
+                    "type": "string",
+                    "example": "\u003cbase64-encoded-image\u003e"
+                },
                 "class_description": {
                     "type": "string",
                     "example": "Advanced Python programming course"
+                },
+                "class_name": {
+                    "type": "string",
+                    "example": "Advanced Python Programming"
                 },
                 "enrollment_deadline": {
                     "type": "string",
@@ -3688,6 +3696,14 @@ const docTemplate = `{
                 "learner_limit": {
                     "type": "integer",
                     "example": 50
+                },
+                "price": {
+                    "type": "number",
+                    "example": 1999.99
+                },
+                "rating": {
+                    "type": "number",
+                    "example": 4.7
                 },
                 "teacher_id": {
                     "type": "integer",
@@ -3731,7 +3747,7 @@ const docTemplate = `{
         "models.EnrollmentDoc": {
             "type": "object",
             "properties": {
-                "class_id": {
+                "class_session_id": {
                     "type": "integer",
                     "example": 21
                 },
@@ -3752,6 +3768,14 @@ const docTemplate = `{
         "models.LearnerDoc": {
             "type": "object",
             "properties": {
+                "ban_count": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "flag_count": {
+                    "type": "integer",
+                    "example": 3
+                },
                 "id": {
                     "type": "integer",
                     "example": 42
@@ -3853,7 +3877,7 @@ const docTemplate = `{
                 },
                 "report_picture": {
                     "type": "string",
-                    "example": "base64-encoded-image-string"
+                    "example": "\u003cbase64-encoded-image\u003e"
                 },
                 "report_type": {
                     "type": "string",
@@ -3897,9 +3921,21 @@ const docTemplate = `{
         "models.TeacherDoc": {
             "type": "object",
             "properties": {
+                "ban_count": {
+                    "type": "integer",
+                    "example": 1
+                },
                 "description": {
                     "type": "string",
                     "example": "Experienced Mathematics teacher specializing in calculus and linear algebra."
+                },
+                "email": {
+                    "type": "string",
+                    "example": "teacher@example.com"
+                },
+                "flag_count": {
+                    "type": "integer",
+                    "example": 3
                 },
                 "id": {
                     "type": "integer",

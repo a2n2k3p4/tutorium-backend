@@ -67,14 +67,14 @@ func GetEnrollments(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	if err := db.Preload("Learner").Preload("Class").Find(&enrollments).Error; err != nil {
+	if err := db.Preload("Learner").Preload("ClassSession").Find(&enrollments).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON(enrollments)
 }
 
 func findEnrollment(db *gorm.DB, id int, enrollment *models.Enrollment) error {
-	return db.Preload("Learner").Preload("Class").First(enrollment, "id = ?", id).Error
+	return db.Preload("Learner").Preload("ClassSession").First(enrollment, "id = ?", id).Error
 }
 
 // GetEnrollment godoc

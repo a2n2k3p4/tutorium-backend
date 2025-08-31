@@ -155,7 +155,7 @@ func UpdateBanTeacher(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err := db.Model(&banteacher).Updates(banteacher_update).Error; err != nil {
+	if err := db.Model(&banteacher).Omit("Teacher").Updates(banteacher_update).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
