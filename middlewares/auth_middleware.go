@@ -19,14 +19,14 @@ type Claims struct {
 }
 
 // if Status = development you can bypass all routes
-var Status string = func() string {
+var Status = sync.OnceValue(func() string {
 	_ = godotenv.Load("../.env")
 	s := os.Getenv("STATUS")
 	if s == "" {
 		s = "production"
 	}
 	return s
-}()
+})
 
 var Secret func() []byte = sync.OnceValue(func() []byte {
 	// load .env for local dev; no-op if missing
