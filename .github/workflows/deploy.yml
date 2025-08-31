@@ -56,11 +56,14 @@ jobs:
 
               # Create .env file on the server (needed for docker-compose)
               echo "=== Creating .env file for docker-compose ==="
-              if [ -f .env.example ]; then
-                  cp .env.example .env
-                  echo "✅ .env file created from .env.example"
+              # Use a persistent server-side env file for production secrets
+              ENV_FILE=~/secrets/tutorium-backend.env
+              mkdir -p "$(dirname "$ENV_FILE")"
+              if [ -f "$ENV_FILE" ]; then
+                  cp $ENV_FILE .env
+                  echo "ℹ️ Using env file: $ENV_FILE"
               else
-                  echo "❌ .env.example not found!"
+                  echo "❌ $ENV_FILE not found!"
                   ls -la
                   exit 1
               fi
