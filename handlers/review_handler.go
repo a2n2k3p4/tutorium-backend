@@ -22,17 +22,17 @@ func ReviewRoutes(app *fiber.App) {
 
 // CreateReview godoc
 //
-//	@Summary		Create a new review
-//	@Description	CreateReview creates a new Review record with rating validation
-//	@Tags			Reviews
-//  @Security 		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			review	body		models.ReviewDoc	true	"Review payload"
-//	@Success		201		{object}	models.ReviewDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input or rating out of range"
-//	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/reviews [post]
+//		@Summary		Create a new review
+//		@Description	CreateReview creates a new Review record with rating validation
+//		@Tags			Reviews
+//	 @Security 		BearerAuth
+//		@Accept			json
+//		@Produce		json
+//		@Param			review	body		models.ReviewDoc	true	"Review payload"
+//		@Success		201		{object}	models.ReviewDoc
+//		@Failure		400		{object}	map[string]string	"Invalid input or rating out of range"
+//		@Failure		500		{object}	map[string]string	"Server error"
+//		@Router			/reviews [post]
 func CreateReview(c *fiber.Ctx) error {
 	var review models.Review
 
@@ -57,14 +57,14 @@ func CreateReview(c *fiber.Ctx) error {
 
 // GetReviews godoc
 //
-//	@Summary		List all reviews
-//	@Description	GetReviews retrieves all Review records with related Learner and Class
-//	@Tags			Reviews
-//  @Security 		BearerAuth
-//	@Produce		json
-//	@Success		200	{array}		models.ReviewDoc
-//	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/reviews [get]
+//		@Summary		List all reviews
+//		@Description	GetReviews retrieves all Review records with related Learner and Class
+//		@Tags			Reviews
+//	 @Security 		BearerAuth
+//		@Produce		json
+//		@Success		200	{array}		models.ReviewDoc
+//		@Failure		500	{object}	map[string]string	"Server error"
+//		@Router			/reviews [get]
 func GetReviews(c *fiber.Ctx) error {
 	var reviews []models.Review
 	db, err := middlewares.GetDB(c)
@@ -84,17 +84,17 @@ func findReview(db *gorm.DB, id int, review *models.Review) error {
 
 // GetReview godoc
 //
-//	@Summary		Get review by ID
-//	@Description	GetReview retrieves a single Review by its ID, including related Learner and Class
-//	@Tags			Reviews
-//  @Security 		BearerAuth
-//	@Produce		json
-//	@Param			id	path		int	true	"Review ID"
-//	@Success		200	{object}	models.ReviewDoc
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Review not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/reviews/{id} [get]
+//		@Summary		Get review by ID
+//		@Description	GetReview retrieves a single Review by its ID, including related Learner and Class
+//		@Tags			Reviews
+//	 @Security 		BearerAuth
+//		@Produce		json
+//		@Param			id	path		int	true	"Review ID"
+//		@Success		200	{object}	models.ReviewDoc
+//		@Failure		400	{object}	map[string]string	"Invalid ID"
+//		@Failure		404	{object}	map[string]string	"Review not found"
+//		@Failure		500	{object}	map[string]string	"Server error"
+//		@Router			/reviews/{id} [get]
 func GetReview(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -121,19 +121,19 @@ func GetReview(c *fiber.Ctx) error {
 
 // UpdateReview godoc
 //
-//	@Summary		Update an existing review
-//	@Description	UpdateReview updates a Review record by its ID; only Rating and Comment fields
-//	@Tags			Reviews
-//  @Security 		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			id		path		int					true	"Review ID"
-//	@Param			review	body		models.ReviewDoc	true	"Updated review payload"
-//	@Success		200		{object}	models.ReviewDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input or rating out of range"
-//	@Failure		404		{object}	map[string]string	"Review not found"
-//	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/reviews/{id} [put]
+//		@Summary		Update an existing review
+//		@Description	UpdateReview updates a Review record by its ID; only Rating and Comment fields
+//		@Tags			Reviews
+//	 @Security 		BearerAuth
+//		@Accept			json
+//		@Produce		json
+//		@Param			id		path		int					true	"Review ID"
+//		@Param			review	body		models.ReviewDoc	true	"Updated review payload"
+//		@Success		200		{object}	models.ReviewDoc
+//		@Failure		400		{object}	map[string]string	"Invalid input or rating out of range"
+//		@Failure		404		{object}	map[string]string	"Review not found"
+//		@Failure		500		{object}	map[string]string	"Server error"
+//		@Router			/reviews/{id} [put]
 func UpdateReview(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -179,17 +179,17 @@ func UpdateReview(c *fiber.Ctx) error {
 
 // DeleteReview godoc
 //
-//	@Summary		Delete a review by ID
-//	@Description	DeleteReview removes a Review record by its ID
-//	@Tags			Reviews
-//  @Security 		BearerAuth
-//	@Produce		json
-//	@Param			id	path		int					true	"Review ID"
-//	@Success		200	{string}	string				"Successfully deleted review"
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Review not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/reviews/{id} [delete]
+//		@Summary		Delete a review by ID
+//		@Description	DeleteReview removes a Review record by its ID
+//		@Tags			Reviews
+//	 @Security 		BearerAuth
+//		@Produce		json
+//		@Param			id	path		int					true	"Review ID"
+//		@Success		200	{string}	string				"Successfully deleted review"
+//		@Failure		400	{object}	map[string]string	"Invalid ID"
+//		@Failure		404	{object}	map[string]string	"Review not found"
+//		@Failure		500	{object}	map[string]string	"Server error"
+//		@Router			/reviews/{id} [delete]
 func DeleteReview(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
