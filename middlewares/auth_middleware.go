@@ -61,7 +61,7 @@ func SetSecret(f func() []byte) {
 
 func ProtectedMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		if Status == "development" {
+		if Status() == "development" {
 			return c.Next()
 		}
 		authHeader := c.Get("Authorization")
