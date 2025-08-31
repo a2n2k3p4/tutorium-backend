@@ -22,17 +22,17 @@ func ClassSessionRoutes(app *fiber.App) {
 
 // CreateClassSession godoc
 //
-//	@Summary		Create a new class session
-//	@Description	CreateClassSession creates a new ClassSession record
-//	@Tags			ClassSessions
-//  @Security 		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			class_session	body		models.ClassSessionDoc	true	"ClassSession payload"
-//	@Success		201				{object}	models.ClassSessionDoc
-//	@Failure		400				{object}	map[string]string	"Invalid input"
-//	@Failure		500				{object}	map[string]string	"Server error"
-//	@Router			/class_sessions [post]
+//		@Summary		Create a new class session
+//		@Description	CreateClassSession creates a new ClassSession record
+//		@Tags			ClassSessions
+//	 @Security 		BearerAuth
+//		@Accept			json
+//		@Produce		json
+//		@Param			class_session	body		models.ClassSessionDoc	true	"ClassSession payload"
+//		@Success		201				{object}	models.ClassSessionDoc
+//		@Failure		400				{object}	map[string]string	"Invalid input"
+//		@Failure		500				{object}	map[string]string	"Server error"
+//		@Router			/class_sessions [post]
 func CreateClassSession(c *fiber.Ctx) error {
 	var class_session models.ClassSession
 
@@ -53,14 +53,14 @@ func CreateClassSession(c *fiber.Ctx) error {
 
 // GetClassSessions godoc
 //
-//	@Summary		List all class sessions
-//	@Description	GetClassSessions retrieves all ClassSession records with Class relation
-//	@Tags			ClassSessions
-//  @Security 		BearerAuth
-//	@Produce		json
-//	@Success		200	{array}		models.ClassSessionDoc
-//	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/class_sessions [get]
+//		@Summary		List all class sessions
+//		@Description	GetClassSessions retrieves all ClassSession records with Class relation
+//		@Tags			ClassSessions
+//	 @Security 		BearerAuth
+//		@Produce		json
+//		@Success		200	{array}		models.ClassSessionDoc
+//		@Failure		500	{object}	map[string]string	"Server error"
+//		@Router			/class_sessions [get]
 func GetClassSessions(c *fiber.Ctx) error {
 	class_sessions := []models.ClassSession{}
 	db, err := middlewares.GetDB(c)
@@ -81,17 +81,17 @@ func findClassSession(db *gorm.DB, id int, class_session *models.ClassSession) e
 
 // GetClassSession godoc
 //
-//	@Summary		Get class session by ID
-//	@Description	GetClassSession retrieves a single ClassSession by its ID, including Class
-//	@Tags			ClassSessions
-//  @Security 		BearerAuth
-//	@Produce		json
-//	@Param			id	path		int	true	"ClassSession ID"
-//	@Success		200	{object}	models.ClassSessionDoc
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"ClassSession not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/class_sessions/{id} [get]
+//		@Summary		Get class session by ID
+//		@Description	GetClassSession retrieves a single ClassSession by its ID, including Class
+//		@Tags			ClassSessions
+//	 @Security 		BearerAuth
+//		@Produce		json
+//		@Param			id	path		int	true	"ClassSession ID"
+//		@Success		200	{object}	models.ClassSessionDoc
+//		@Failure		400	{object}	map[string]string	"Invalid ID"
+//		@Failure		404	{object}	map[string]string	"ClassSession not found"
+//		@Failure		500	{object}	map[string]string	"Server error"
+//		@Router			/class_sessions/{id} [get]
 func GetClassSession(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -118,19 +118,19 @@ func GetClassSession(c *fiber.Ctx) error {
 
 // UpdateClassSession godoc
 //
-//	@Summary		Update an existing class session
-//	@Description	UpdateClassSession updates a ClassSession record by its ID
-//	@Tags			ClassSessions
-//  @Security 		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			id				path		int						true	"ClassSession ID"
-//	@Param			class_session	body		models.ClassSessionDoc	true	"Updated ClassSession payload"
-//	@Success		200				{object}	models.ClassSessionDoc
-//	@Failure		400				{object}	map[string]string	"Invalid input"
-//	@Failure		404				{object}	map[string]string	"ClassSession not found"
-//	@Failure		500				{object}	map[string]string	"Server error"
-//	@Router			/class_sessions/{id} [put]
+//		@Summary		Update an existing class session
+//		@Description	UpdateClassSession updates a ClassSession record by its ID
+//		@Tags			ClassSessions
+//	 @Security 		BearerAuth
+//		@Accept			json
+//		@Produce		json
+//		@Param			id				path		int						true	"ClassSession ID"
+//		@Param			class_session	body		models.ClassSessionDoc	true	"Updated ClassSession payload"
+//		@Success		200				{object}	models.ClassSessionDoc
+//		@Failure		400				{object}	map[string]string	"Invalid input"
+//		@Failure		404				{object}	map[string]string	"ClassSession not found"
+//		@Failure		500				{object}	map[string]string	"Server error"
+//		@Router			/class_sessions/{id} [put]
 func UpdateClassSession(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -167,17 +167,17 @@ func UpdateClassSession(c *fiber.Ctx) error {
 
 // DeleteClassSession godoc
 //
-//	@Summary		Delete a class session by ID
-//	@Description	DeleteClassSession removes a ClassSession record by its ID
-//	@Tags			ClassSessions
-//  @Security 		BearerAuth
-//	@Produce		json
-//	@Param			id	path		int					true	"ClassSession ID"
-//	@Success		200	{string}	string				"Successfully deleted class session"
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"ClassSession not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/class_sessions/{id} [delete]
+//		@Summary		Delete a class session by ID
+//		@Description	DeleteClassSession removes a ClassSession record by its ID
+//		@Tags			ClassSessions
+//	 @Security 		BearerAuth
+//		@Produce		json
+//		@Param			id	path		int					true	"ClassSession ID"
+//		@Success		200	{string}	string				"Successfully deleted class session"
+//		@Failure		400	{object}	map[string]string	"Invalid ID"
+//		@Failure		404	{object}	map[string]string	"ClassSession not found"
+//		@Failure		500	{object}	map[string]string	"Server error"
+//		@Router			/class_sessions/{id} [delete]
 func DeleteClassSession(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
