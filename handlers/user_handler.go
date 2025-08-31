@@ -47,7 +47,7 @@ func CreateUser(c *fiber.Ctx) error {
 	}
 
 	if err := processProfilePicture(c, &user); err != nil {
-    	return c.Status(400).JSON(err.Error())
+		return c.Status(400).JSON(err.Error())
 	}
 
 	db, err := middlewares.GetDB(c)
@@ -144,7 +144,7 @@ func GetUser(c *fiber.Ctx) error {
 	case err != nil:
 		return c.Status(500).JSON(err.Error())
 	}
-	
+
 	// Generate presigned URL if ProfilePictureURL exists
 	mc, ok := c.Locals("minio").(*storage.Client)
 	if ok && user.ProfilePictureURL != "" {
@@ -202,7 +202,7 @@ func UpdateUser(c *fiber.Ctx) error {
 	}
 
 	if err := processProfilePicture(c, &user_update); err != nil {
-    	return c.Status(400).JSON(err.Error())
+		return c.Status(400).JSON(err.Error())
 	}
 
 	if err := db.Model(&user).Updates(user_update).Error; err != nil {
@@ -253,21 +253,21 @@ func DeleteUser(c *fiber.Ctx) error {
 }
 
 func processProfilePicture(c *fiber.Ctx, user *models.User) error {
-    if user.ProfilePictureURL != "" && !strings.HasPrefix(user.ProfilePictureURL, "http") {
-        b, err := storage.DecodeBase64Image(user.ProfilePictureURL)
-        if err != nil {
-            return fmt.Errorf("invalid base64 image: %w", err)
-        }
-        if err := validateImageBytes(b); err != nil {
-            return fmt.Errorf("invalid image: %w", err)
-        }
- 		mc := c.Locals("minio").(*storage.Client)
-        filename := storage.GenerateFilename(http.DetectContentType(b[:min(512, len(b))]))
+	if user.ProfilePictureURL != "" && !strings.HasPrefix(user.ProfilePictureURL, "http") {
+		b, err := storage.DecodeBase64Image(user.ProfilePictureURL)
+		if err != nil {
+			return fmt.Errorf("invalid base64 image: %w", err)
+		}
+		if err := validateImageBytes(b); err != nil {
+			return fmt.Errorf("invalid image: %w", err)
+		}
+		mc := c.Locals("minio").(*storage.Client)
+		filename := storage.GenerateFilename(http.DetectContentType(b[:min(512, len(b))]))
 		objectKey, err := mc.UploadBytes(c.Context(), "users", filename, b)
-        if err != nil {
-            return err
-        }
-        user.ProfilePictureURL = objectKey
-    }
-    return nil
+		if err != nil {
+			return err
+		}
+		user.ProfilePictureURL = objectKey
+	}
+	return nil
 }

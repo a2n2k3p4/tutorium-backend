@@ -27,6 +27,6 @@ type ReportDoc struct {
 	ReportedUserID    uint      `json:"reported_user_id" example:"8"`
 	ReportType        string    `json:"report_type" example:"Abuse"`
 	ReportDescription string    `json:"report_description" example:"User sent inappropriate messages"`
-	ReportPicture	  string    `json:"report_picture,omitempty" example:"<base64-encoded-image>"`
+	ReportPicture     string    `json:"report_picture,omitempty" example:"<base64-encoded-image>"`
 	ReportDate        time.Time `json:"report_date" example:"2025-08-20T14:30:00Z"`
 }

@@ -23,15 +23,12 @@ type User struct {
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
 
 type UserDoc struct {
-	ID                uint    `json:"id" example:"101"`
-	StudentID         string  `json:"student_id" example:"6610505511"`
-	ProfilePicture	  string  `json:"profile_picture,omitempty" example:"<base64-encoded-image>"`
-	FirstName         string  `json:"first_name" example:"Alice"`
-	LastName          string  `json:"last_name" example:"Smith"`
-	Gender            string  `json:"gender" example:"Female"`
-	PhoneNumber       string  `json:"phone_number" example:"+66912345678"`
-	Balance           float64 `json:"balance" example:"250.75"`
+	ID             uint    `json:"id" example:"101"`
+	StudentID      string  `json:"student_id" example:"6610505511"`
+	ProfilePicture string  `json:"profile_picture,omitempty" example:"<base64-encoded-image>"`
+	FirstName      string  `json:"first_name" example:"Alice"`
+	LastName       string  `json:"last_name" example:"Smith"`
+	Gender         string  `json:"gender" example:"Female"`
+	PhoneNumber    string  `json:"phone_number" example:"+66912345678"`
+	Balance        float64 `json:"balance" example:"250.75"`
 }
-
-
-

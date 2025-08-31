@@ -29,7 +29,7 @@ type ClassDoc struct {
 	ClassName          string    `json:"class_name" example:"Advanced Python Programming"`
 	LearnerLimit       int       `json:"learner_limit" example:"50"`
 	ClassDescription   string    `json:"class_description" example:"Advanced Python programming course"`
-	BannerPicture	   string    `json:"banner_picture,omitempty" example:"<base64-encoded-image>"`
+	BannerPicture      string    `json:"banner_picture,omitempty" example:"<base64-encoded-image>"`
 	Price              float64   `json:"price" example:"1999.99"`
 	Rating             float64   `json:"rating" example:"4.7"`
 	EnrollmentDeadline time.Time `json:"enrollment_deadline" example:"2025-09-10T23:59:59Z"`

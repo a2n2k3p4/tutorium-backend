@@ -47,7 +47,7 @@ func CreateReport(c *fiber.Ctx) error {
 	}
 
 	if err := processReportPicture(c, &report); err != nil {
-    	return c.Status(400).JSON(err.Error())
+		return c.Status(400).JSON(err.Error())
 	}
 
 	db, err := middlewares.GetDB(c)
@@ -195,7 +195,7 @@ func UpdateReport(c *fiber.Ctx) error {
 	}
 
 	if err := processReportPicture(c, &report_updated); err != nil {
-    	return c.Status(400).JSON(err.Error())
+		return c.Status(400).JSON(err.Error())
 	}
 
 	if err := db.Model(&report).Updates(report_updated).Error; err != nil {
@@ -246,21 +246,21 @@ func DeleteReport(c *fiber.Ctx) error {
 }
 
 func processReportPicture(c *fiber.Ctx, report *models.Report) error {
-    if report.ReportPictureURL != "" && !strings.HasPrefix(report.ReportPictureURL, "http") {
-        b, err := storage.DecodeBase64Image(report.ReportPictureURL)
-        if err != nil {
-            return fmt.Errorf("invalid base64 image: %w", err)
-        }
-        if err := validateImageBytes(b); err != nil {
-            return fmt.Errorf("invalid image: %w", err)
-        }
+	if report.ReportPictureURL != "" && !strings.HasPrefix(report.ReportPictureURL, "http") {
+		b, err := storage.DecodeBase64Image(report.ReportPictureURL)
+		if err != nil {
+			return fmt.Errorf("invalid base64 image: %w", err)
+		}
+		if err := validateImageBytes(b); err != nil {
+			return fmt.Errorf("invalid image: %w", err)
+		}
 		mc := c.Locals("minio").(*storage.Client)
-        filename := storage.GenerateFilename(http.DetectContentType(b[:min(512, len(b))]))
-        uploaded, err := mc.UploadBytes(context.Background(), "reports", filename, b)
-        if err != nil {
-            return err
-        }
-        report.ReportPictureURL = uploaded
-    }
-    return nil
+		filename := storage.GenerateFilename(http.DetectContentType(b[:min(512, len(b))]))
+		uploaded, err := mc.UploadBytes(context.Background(), "reports", filename, b)
+		if err != nil {
+			return err
+		}
+		report.ReportPictureURL = uploaded
+	}
+	return nil
 }

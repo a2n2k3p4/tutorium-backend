@@ -104,13 +104,13 @@ func LoginHandler(c *fiber.Ctx) error {
 	err = db.Where("student_id = ?", loginResp.ID).First(&user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		user = models.User{
-			StudentID:      loginResp.ID,
-			FirstName:      req.FirstName,
-			LastName:       req.LastName,
-			Gender:         req.Gender,
-			PhoneNumber:    req.PhoneNumber,
+			StudentID:         loginResp.ID,
+			FirstName:         req.FirstName,
+			LastName:          req.LastName,
+			Gender:            req.Gender,
+			PhoneNumber:       req.PhoneNumber,
 			ProfilePictureURL: uploadedURL,
-			Balance:        0,
+			Balance:           0,
 		}
 		if err := db.Create(&user).Error; err != nil {
 			return c.Status(500).JSON(err.Error())

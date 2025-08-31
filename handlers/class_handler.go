@@ -47,7 +47,7 @@ func CreateClass(c *fiber.Ctx) error {
 	}
 
 	if err := processBannerPicture(c, &class); err != nil {
-    	return c.Status(400).JSON(err.Error())
+		return c.Status(400).JSON(err.Error())
 	}
 
 	db, err := middlewares.GetDB(c)
@@ -194,7 +194,7 @@ func UpdateClass(c *fiber.Ctx) error {
 	}
 
 	if err := processBannerPicture(c, &class_update); err != nil {
-    	return c.Status(400).JSON(err.Error())
+		return c.Status(400).JSON(err.Error())
 	}
 
 	if err := db.Model(&class).Updates(class_update).Error; err != nil {
@@ -246,22 +246,22 @@ func DeleteClass(c *fiber.Ctx) error {
 }
 
 func processBannerPicture(c *fiber.Ctx, class *models.Class) error {
-    if class.BannerPictureURL != "" && !strings.HasPrefix(class.BannerPictureURL, "http") {
-        b, err := storage.DecodeBase64Image(class.BannerPictureURL)
-        if err != nil {
-            return fmt.Errorf("invalid base64 image: %w", err)
-        }
-        if err := validateImageBytes(b); err != nil {
-            return fmt.Errorf("invalid image: %w", err)
-        }
-		
+	if class.BannerPictureURL != "" && !strings.HasPrefix(class.BannerPictureURL, "http") {
+		b, err := storage.DecodeBase64Image(class.BannerPictureURL)
+		if err != nil {
+			return fmt.Errorf("invalid base64 image: %w", err)
+		}
+		if err := validateImageBytes(b); err != nil {
+			return fmt.Errorf("invalid image: %w", err)
+		}
+
 		mc := c.Locals("minio").(*storage.Client)
-        filename := storage.GenerateFilename(http.DetectContentType(b[:min(512, len(b))]))
-        uploaded, err := mc.UploadBytes(context.Background(), "classes", filename, b)
-        if err != nil {
-            return err
-        }
-        class.BannerPictureURL = uploaded
-    }
-    return nil
+		filename := storage.GenerateFilename(http.DetectContentType(b[:min(512, len(b))]))
+		uploaded, err := mc.UploadBytes(context.Background(), "classes", filename, b)
+		if err != nil {
+			return err
+		}
+		class.BannerPictureURL = uploaded
+	}
+	return nil
 }

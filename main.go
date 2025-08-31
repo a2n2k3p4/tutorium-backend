@@ -55,11 +55,11 @@ func main() {
 	app.Use(cors.New())
 
 	// --- MinIO ---
-    minioClient, err := storage.NewClientFromEnv()
-    if err != nil {
-        log.Fatalf("Unable to initialize MinIO: %v", err)
-    }
-    app.Use(middlewares.MinioMiddleware(minioClient))
+	minioClient, err := storage.NewClientFromEnv()
+	if err != nil {
+		log.Fatalf("Unable to initialize MinIO: %v", err)
+	}
+	app.Use(middlewares.MinioMiddleware(minioClient))
 
 	// debug route
 	app.Get("/", func(c *fiber.Ctx) error {
