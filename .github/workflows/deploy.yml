@@ -33,8 +33,7 @@ jobs:
           port: ${{ secrets.PORT }}
           source: ".,!.git"
           target: "~/tutorium-backend"
-          overwrite: true
-          strip_components: 0
+          rm: true
 
       - name: Deploy with docker compose
         uses: appleboy/ssh-action@v1
