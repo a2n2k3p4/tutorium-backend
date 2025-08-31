@@ -25,6 +25,7 @@ func ClassCategoryRoutes(app *fiber.App) {
 //	@Summary		Create a new class category
 //	@Description	CreateClassCategory creates a new ClassCategory record
 //	@Tags			ClassCategories
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			class_category	body		models.ClassCategoryDoc	true	"ClassCategory payload"
@@ -55,6 +56,7 @@ func CreateClassCategory(c *fiber.Ctx) error {
 //	@Summary		List all class categories
 //	@Description	GetClassCategories retrieves all ClassCategory records with Classes relation
 //	@Tags			ClassCategories
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.ClassCategoryDoc
 //	@Failure		500	{object}	map[string]string	"Server error"
@@ -82,6 +84,7 @@ func findClassCategory(db *gorm.DB, id int, class_category *models.ClassCategory
 //	@Summary		Get class category by ID
 //	@Description	GetClassCategory retrieves a single ClassCategory by its ID, including Classes
 //	@Tags			ClassCategories
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int	true	"ClassCategory ID"
 //	@Success		200	{object}	models.ClassCategoryDoc
@@ -118,6 +121,7 @@ func GetClassCategory(c *fiber.Ctx) error {
 //	@Summary		Update an existing class category
 //	@Description	UpdateClassCategory updates a ClassCategory record by its ID
 //	@Tags			ClassCategories
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			id				path		int						true	"ClassCategory ID"
@@ -166,6 +170,7 @@ func UpdateClassCategory(c *fiber.Ctx) error {
 //	@Summary		Delete a class category by ID
 //	@Description	DeleteClassCategory removes a ClassCategory record by its ID
 //	@Tags			ClassCategories
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int					true	"ClassCategory ID"
 //	@Success		200	{string}	string				"Successfully deleted class category"

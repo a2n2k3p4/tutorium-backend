@@ -25,6 +25,7 @@ func NotificationRoutes(app *fiber.App) {
 //	@Summary		Create a new notification
 //	@Description	CreateNotification creates a new Notification record
 //	@Tags			Notifications
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			notification	body		models.NotificationDoc	true	"Notification payload"
@@ -55,6 +56,7 @@ func CreateNotification(c *fiber.Ctx) error {
 //	@Summary		List all notifications
 //	@Description	GetNotifications retrieves all Notification records with associated User
 //	@Tags			Notifications
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.NotificationDoc
 //	@Failure		500	{object}	map[string]string	"Server error"
@@ -81,6 +83,7 @@ func findNotification(db *gorm.DB, id int, notification *models.Notification) er
 //	@Summary		Get notification by ID
 //	@Description	GetNotification retrieves a single Notification by its ID, including the User
 //	@Tags			Notifications
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int	true	"Notification ID"
 //	@Success		200	{object}	models.NotificationDoc
@@ -117,6 +120,7 @@ func GetNotification(c *fiber.Ctx) error {
 //	@Summary		Update an existing notification
 //	@Description	UpdateNotification updates a Notification record by its ID
 //	@Tags			Notifications
+//  @Security 		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			id				path		int						true	"Notification ID"
@@ -164,6 +168,7 @@ func UpdateNotification(c *fiber.Ctx) error {
 //	@Summary		Delete a notification by ID
 //	@Description	DeleteNotification removes a Notification record by its ID
 //	@Tags			Notifications
+//  @Security 		BearerAuth
 //	@Produce		json
 //	@Param			id	path		int					true	"Notification ID"
 //	@Success		200	{string}	string				"Successfully deleted notification"
