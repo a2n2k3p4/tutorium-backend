@@ -1,38 +1,36 @@
-name: autoGenDocs
+name: Swagger Autogen
 
 on:
   push:
-    branches:
-      - "main"
+    branches: ["main"]
   pull_request:
-    branches:
-      - "main"
+    branches: ["main"]
+
+# Needs write to push the auto-commit on push events
+permissions:
+  contents: write
 
 jobs:
   docs:
+    name: Generate Swagger Docs
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           persist-credentials: true
           fetch-depth: 0
-
       - name: Setup Go environment
         uses: actions/setup-go@v4
         with:
           go-version: 1.24
-
       - name: Install swag CLI
         run: |
           go install github.com/swaggo/swag/cmd/swag@latest
           echo "$HOME/go/bin" >> $GITHUB_PATH
-
       - name: Generate Swagger docs
         run: |
           swag init
-
       - name: Commit and push docs if changed
         if: github.event_name == 'push'
         uses: stefanzweifel/git-auto-commit-action@v5
