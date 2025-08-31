@@ -101,7 +101,7 @@ func ProtectedMiddleware() fiber.Handler {
 
 func AdminRequired() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		if Status == "development" {
+		if Status() == "development" {
 			return c.Next()
 		}
 		user, ok := c.Locals("currentUser").(*models.User)
