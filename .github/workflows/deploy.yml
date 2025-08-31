@@ -50,6 +50,9 @@ jobs:
               # Change to project directory
               cd ~/tutorium-backend
 
+              # fetch and merge lastest code
+              git pull
+
               echo "=== Starting deployment ==="
               echo "Current directory: $(pwd)"
 
