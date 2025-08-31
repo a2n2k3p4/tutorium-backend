@@ -126,13 +126,19 @@ func TestGetTeachers_OK(t *testing.T) {
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 
+	userID := 42
+
+	preloadUserForAuth(mock, uint(userID), false, false, false)
+
 	// Handler: list teachers
 	mock.ExpectQuery(`SELECT .* FROM "teachers".*`).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1).AddRow(2))
 
 	app := setupApp(gdb)
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, "/teachers/", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := app.Test(req, -1)
@@ -159,12 +165,18 @@ func TestGetTeachers_DBError(t *testing.T) {
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 
+	userID := 42
+
+	preloadUserForAuth(mock, uint(userID), false, false, false)
+
 	mock.ExpectQuery(`SELECT .* FROM "teachers".*`).
 		WillReturnError(fmt.Errorf("select failed"))
 
 	app := setupApp(gdb)
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, "/teachers/", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := app.Test(req, -1)
@@ -186,16 +198,20 @@ func TestGetTeacher_OK(t *testing.T) {
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 
+	userID := 42
 	teacherID := 7
 
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 	// Handler: find by id
 	mock.ExpectQuery(`SELECT \* FROM "teachers" WHERE id = \$1 AND "teachers"\."deleted_at" IS NULL ORDER BY "teachers"\."id" LIMIT .*`).
 		WithArgs(teacherID, 1).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(teacherID))
 
 	app := setupApp(gdb)
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/teachers/%d", teacherID), nil)
+	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := app.Test(req, -1)
@@ -223,7 +239,10 @@ func TestGetTeacher_NotFound(t *testing.T) {
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 
+	userID := 42
 	teacherID := 999
+
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	// Handler: not found (empty rowset)
 	mock.ExpectQuery(`SELECT \* FROM "teachers" WHERE id = \$1 AND "teachers"\."deleted_at" IS NULL ORDER BY "teachers"\."id" LIMIT .*`).
@@ -231,8 +250,10 @@ func TestGetTeacher_NotFound(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{"id"}))
 
 	app := setupApp(gdb)
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/teachers/%d", teacherID), nil)
+	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := app.Test(req, -1)
@@ -252,15 +273,20 @@ func TestGetTeacher_NotFound(t *testing.T) {
 func TestGetTeacher_DBError(t *testing.T) {
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
+	userID := 42
 	teacherID := 7
+	// Auth: user + preloads
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 
 	mock.ExpectQuery(`SELECT \* FROM "teachers" WHERE id = \$1 AND "teachers"\."deleted_at" IS NULL ORDER BY "teachers"\."id" LIMIT .*`).
 		WithArgs(teacherID, 1).
 		WillReturnError(fmt.Errorf("select failed"))
 
 	app := setupApp(gdb)
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/teachers/%d", teacherID), nil)
+	req.Header.Set("Authorization", "Bearer "+token)
 
 	resp, err := app.Test(req, -1)
 	if err != nil {
@@ -279,10 +305,16 @@ func TestGetTeacher_DBError(t *testing.T) {
 func TestGetTeacher_BadRequest(t *testing.T) {
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
+	mock.MatchExpectationsInOrder(false)
+	userID := 42
 
+	// Auth: user + preloads
+	preloadUserForAuth(mock, uint(userID), false, false, false)
 	app := setupApp(gdb)
+	token := makeJWT(t, []byte(secretString), uint(userID))
 
 	req := httptest.NewRequest(http.MethodGet, "/teachers/not-an-int", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := app.Test(req, -1)
