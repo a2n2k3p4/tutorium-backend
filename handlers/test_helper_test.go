@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"io"
+	"log"
+	"os"
 	"testing"
 	"time"
 
@@ -11,6 +13,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 const secretString = "secret"
@@ -22,7 +25,15 @@ func init() {
 func setupMockGorm(t *testing.T) (sqlmock.Sqlmock, *gorm.DB, func()) {
 	t.Helper()
 	sqlDB, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherRegexp))
-	gdb, _ := gorm.Open(postgres.New(postgres.Config{Conn: sqlDB, PreferSimpleProtocol: true}), &gorm.Config{})
+	gdb, _ := gorm.Open(
+		postgres.New(postgres.Config{Conn: sqlDB, PreferSimpleProtocol: true}),
+		&gorm.Config{
+			Logger: logger.New(
+				log.New(os.Stdout, "[gorm] ", log.LstdFlags),
+				logger.Config{LogLevel: logger.Info}, // show SQL
+			),
+		},
+	)
 	cleanup := func() { _ = sqlDB.Close() }
 	return mock, gdb, cleanup
 }
