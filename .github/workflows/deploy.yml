@@ -33,8 +33,7 @@ jobs:
           port: ${{ secrets.PORT }}
           source: ".,!.git"
           target: "~/tutorium-backend"
-          overwrite: true
-          strip_components: 0
+          rm: true
 
       - name: Deploy with docker compose
         uses: appleboy/ssh-action@v1
@@ -49,9 +48,6 @@ jobs:
 
               # Change to project directory
               cd ~/tutorium-backend
-
-              # fetch and merge lastest code
-              git pull
 
               echo "=== Starting deployment ==="
               echo "Current directory: $(pwd)"
