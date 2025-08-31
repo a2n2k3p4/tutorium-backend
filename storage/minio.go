@@ -75,12 +75,12 @@ func NewClientFromEnv() (*Client, error) {
 
 // PresignedGetObject returns a temporary (presigned) GET URL for an objectName (objectName = "folder/filename")
 func (c *Client) PresignedGetObject(ctx context.Context, objectName string, expiry time.Duration) (string, error) {
-    reqParams := make(url.Values)
-    u, err := c.Client.PresignedGetObject(ctx, c.Bucket, objectName, expiry, reqParams)
-    if err != nil {
-        return "", err
-    }
-    return u.String(), nil
+	reqParams := make(url.Values)
+	u, err := c.Client.PresignedGetObject(ctx, c.Bucket, objectName, expiry, reqParams)
+	if err != nil {
+		return "", err
+	}
+	return u.String(), nil
 }
 
 // UploadBytes uploads bytes to bucket with objectName and returns public URL.
