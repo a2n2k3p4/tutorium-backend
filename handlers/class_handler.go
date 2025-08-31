@@ -28,17 +28,17 @@ func ClassRoutes(app *fiber.App) {
 
 // CreateClass godoc
 //
-//	@Summary		Create a new class
-//	@Description	CreateClass creates a new Class record
-//	@Tags			Classes
-//  @Security 		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			class	body		models.ClassDoc	true	"Class payload"
-//	@Success		201		{object}	models.ClassDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
-//	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/classes [post]
+//		@Summary		Create a new class
+//		@Description	CreateClass creates a new Class record
+//		@Tags			Classes
+//	 @Security 		BearerAuth
+//		@Accept			json
+//		@Produce		json
+//		@Param			class	body		models.ClassDoc	true	"Class payload"
+//		@Success		201		{object}	models.ClassDoc
+//		@Failure		400		{object}	map[string]string	"Invalid input"
+//		@Failure		500		{object}	map[string]string	"Server error"
+//		@Router			/classes [post]
 func CreateClass(c *fiber.Ctx) error {
 	var class models.Class
 
@@ -63,14 +63,14 @@ func CreateClass(c *fiber.Ctx) error {
 
 // GetClasses godoc
 //
-//	@Summary		List all classes
-//	@Description	GetClasses retrieves all Class records with Teacher and Categories relations
-//	@Tags			Classes
-//  @Security 		BearerAuth
-//	@Produce		json
-//	@Success		200	{array}		models.ClassDoc
-//	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/classes [get]
+//		@Summary		List all classes
+//		@Description	GetClasses retrieves all Class records with Teacher and Categories relations
+//		@Tags			Classes
+//	 @Security 		BearerAuth
+//		@Produce		json
+//		@Success		200	{array}		models.ClassDoc
+//		@Failure		500	{object}	map[string]string	"Server error"
+//		@Router			/classes [get]
 func GetClasses(c *fiber.Ctx) error {
 	classes := []models.Class{}
 	db, err := middlewares.GetDB(c)
@@ -106,17 +106,17 @@ func findClass(db *gorm.DB, id int, class *models.Class) error {
 
 // GetClass godoc
 //
-//	@Summary		Get class by ID
-//	@Description	GetClass retrieves a single Class by its ID, including Teacher and Categories
-//	@Tags			Classes
-//  @Security 		BearerAuth
-//	@Produce		json
-//	@Param			id	path		int	true	"Class ID"
-//	@Success		200	{object}	models.ClassDoc
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Class not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/classes/{id} [get]
+//		@Summary		Get class by ID
+//		@Description	GetClass retrieves a single Class by its ID, including Teacher and Categories
+//		@Tags			Classes
+//	 @Security 		BearerAuth
+//		@Produce		json
+//		@Param			id	path		int	true	"Class ID"
+//		@Success		200	{object}	models.ClassDoc
+//		@Failure		400	{object}	map[string]string	"Invalid ID"
+//		@Failure		404	{object}	map[string]string	"Class not found"
+//		@Failure		500	{object}	map[string]string	"Server error"
+//		@Router			/classes/{id} [get]
 func GetClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -154,19 +154,19 @@ func GetClass(c *fiber.Ctx) error {
 
 // UpdateClass godoc
 //
-//	@Summary		Update an existing class
-//	@Description	UpdateClass updates a Class record by its ID
-//	@Tags			Classes
-//  @Security 		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			id		path		int				true	"Class ID"
-//	@Param			class	body		models.ClassDoc	true	"Updated class payload"
-//	@Success		200		{object}	models.ClassDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
-//	@Failure		404		{object}	map[string]string	"Class not found"
-//	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/classes/{id} [put]
+//		@Summary		Update an existing class
+//		@Description	UpdateClass updates a Class record by its ID
+//		@Tags			Classes
+//	 @Security 		BearerAuth
+//		@Accept			json
+//		@Produce		json
+//		@Param			id		path		int				true	"Class ID"
+//		@Param			class	body		models.ClassDoc	true	"Updated class payload"
+//		@Success		200		{object}	models.ClassDoc
+//		@Failure		400		{object}	map[string]string	"Invalid input"
+//		@Failure		404		{object}	map[string]string	"Class not found"
+//		@Failure		500		{object}	map[string]string	"Server error"
+//		@Router			/classes/{id} [put]
 func UpdateClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -207,17 +207,17 @@ func UpdateClass(c *fiber.Ctx) error {
 
 // DeleteClass godoc
 //
-//	@Summary		Delete a class by ID
-//	@Description	DeleteClass removes a Class record by its ID
-//	@Tags			Classes
-//  @Security 		BearerAuth
-//	@Produce		json
-//	@Param			id	path		int					true	"Class ID"
-//	@Success		200	{string}	string				"Successfully deleted class"
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Class not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/classes/{id} [delete]
+//		@Summary		Delete a class by ID
+//		@Description	DeleteClass removes a Class record by its ID
+//		@Tags			Classes
+//	 @Security 		BearerAuth
+//		@Produce		json
+//		@Param			id	path		int					true	"Class ID"
+//		@Success		200	{string}	string				"Successfully deleted class"
+//		@Failure		400	{object}	map[string]string	"Invalid ID"
+//		@Failure		404	{object}	map[string]string	"Class not found"
+//		@Failure		500	{object}	map[string]string	"Server error"
+//		@Router			/classes/{id} [delete]
 func DeleteClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
