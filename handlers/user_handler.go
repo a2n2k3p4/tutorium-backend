@@ -2,9 +2,14 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
+	"net/http"
+	"strings"
+	"time"
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
+	"github.com/a2n2k3p4/tutorium-backend/storage"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -23,22 +28,28 @@ func UserRoutes(app *fiber.App) {
 
 // CreateUser godoc
 //
-//	@Summary		Create a new user
-//	@Description	CreateUser creates a new user record
-//	@Tags			Users
-//	@Accept			json
-//	@Produce		json
-//	@Param			user	body		models.UserDoc	true	"User payload"
-//	@Success		201		{object}	models.UserDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
-//	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/users [post]
+//		@Summary		Create a new user
+//		@Description	CreateUser creates a new user record
+//		@Tags			Users
+//	 @Security 		BearerAuth
+//		@Accept			json
+//		@Produce		json
+//		@Param			user	body		models.UserDoc	true	"User payload"
+//		@Success		201		{object}	models.UserDoc
+//		@Failure		400		{object}	map[string]string	"Invalid input"
+//		@Failure		500		{object}	map[string]string	"Server error"
+//		@Router			/users [post]
 func CreateUser(c *fiber.Ctx) error {
 	var user models.User
 
 	if err := c.BodyParser(&user); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+
+	if err := processProfilePicture(c, &user); err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
 	db, err := middlewares.GetDB(c)
 	if err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -53,13 +64,14 @@ func CreateUser(c *fiber.Ctx) error {
 
 // GetUsers godoc
 //
-//	@Summary		List all users
-//	@Description	GetUsers retrieves all user records
-//	@Tags			Users
-//	@Produce		json
-//	@Success		200	{array}		models.UserDoc
-//	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/users [get]
+//		@Summary		List all users
+//		@Description	GetUsers retrieves all user records
+//		@Tags			Users
+//	 @Security 		BearerAuth
+//		@Produce		json
+//		@Success		200	{array}		models.UserDoc
+//		@Failure		500	{object}	map[string]string	"Server error"
+//		@Router			/users [get]
 func GetUsers(c *fiber.Ctx) error {
 	users := []models.User{}
 	db, err := middlewares.GetDB(c)
@@ -74,6 +86,21 @@ func GetUsers(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
+	// Generate presigned URL if ProfilePictureURL exists for each user
+	mc, ok := c.Locals("minio").(*storage.Client)
+	if ok {
+		for i := range users {
+			if users[i].ProfilePictureURL != "" {
+				presignedURL, err := mc.PresignedGetObject(c.Context(), users[i].ProfilePictureURL, 15*time.Minute)
+				if err == nil {
+					users[i].ProfilePictureURL = presignedURL
+				} else {
+					users[i].ProfilePictureURL = ""
+				}
+			}
+		}
+	}
+
 	return c.Status(200).JSON(users)
 }
 
@@ -86,16 +113,17 @@ func findUser(db *gorm.DB, id int, user *models.User) error {
 
 // GetUser godoc
 //
-//	@Summary		Get user by ID
-//	@Description	GetUser retrieves a single user by its ID
-//	@Tags			Users
-//	@Produce		json
-//	@Param			id	path		int	true	"User ID"
-//	@Success		200	{object}	models.UserDoc
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"User not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/users/{id} [get]
+//		@Summary		Get user by ID
+//		@Description	GetUser retrieves a single user by its ID
+//		@Tags			Users
+//	 @Security 		BearerAuth
+//		@Produce		json
+//		@Param			id	path		int	true	"User ID"
+//		@Success		200	{object}	models.UserDoc
+//		@Failure		400	{object}	map[string]string	"Invalid ID"
+//		@Failure		404	{object}	map[string]string	"User not found"
+//		@Failure		500	{object}	map[string]string	"Server error"
+//		@Router			/users/{id} [get]
 func GetUser(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -117,23 +145,36 @@ func GetUser(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
+	// Generate presigned URL if ProfilePictureURL exists
+	mc, ok := c.Locals("minio").(*storage.Client)
+	if ok && user.ProfilePictureURL != "" {
+		presignedURL, err := mc.PresignedGetObject(c.Context(), user.ProfilePictureURL, 15*time.Minute)
+		if err == nil {
+			user.ProfilePictureURL = presignedURL
+		} else {
+			// optional: log the error
+			user.ProfilePictureURL = ""
+		}
+	}
+
 	return c.Status(200).JSON(user)
 }
 
 // UpdateUser godoc
 //
-//	@Summary		Update an existing user
-//	@Description	UpdateUser updates a user record by its ID
-//	@Tags			Users
-//	@Accept			json
-//	@Produce		json
-//	@Param			id		path		int				true	"User ID"
-//	@Param			user	body		models.UserDoc	true	"Updated user payload"
-//	@Success		200		{object}	models.UserDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
-//	@Failure		404		{object}	map[string]string	"User not found"
-//	@Failure		500		{object}	map[string]string	"Server error"
-//	@Router			/users/{id} [put]
+//		@Summary		Update an existing user
+//		@Description	UpdateUser updates a user record by its ID
+//		@Tags			Users
+//	 @Security 		BearerAuth
+//		@Accept			json
+//		@Produce		json
+//		@Param			id		path		int				true	"User ID"
+//		@Param			user	body		models.UserDoc	true	"Updated user payload"
+//		@Success		200		{object}	models.UserDoc
+//		@Failure		400		{object}	map[string]string	"Invalid input"
+//		@Failure		404		{object}	map[string]string	"User not found"
+//		@Failure		500		{object}	map[string]string	"Server error"
+//		@Router			/users/{id} [put]
 func UpdateUser(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -160,6 +201,10 @@ func UpdateUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
+	if err := processProfilePicture(c, &user_update); err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
 	if err := db.Model(&user).Updates(user_update).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
@@ -169,16 +214,17 @@ func UpdateUser(c *fiber.Ctx) error {
 
 // DeleteUser godoc
 //
-//	@Summary		Delete a user by ID
-//	@Description	DeleteUser removes a user record by its ID along with associated Learner, Teacher, and Admin
-//	@Tags			Users
-//	@Produce		json
-//	@Param			id	path		int					true	"User ID"
-//	@Success		200	{string}	string				"Successfully deleted User and associated roles"
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"User not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
-//	@Router			/users/{id} [delete]
+//		@Summary		Delete a user by ID
+//		@Description	DeleteUser removes a user record by its ID along with associated Learner, Teacher, and Admin
+//		@Tags			Users
+//	 @Security 		BearerAuth
+//		@Produce		json
+//		@Param			id	path		int					true	"User ID"
+//		@Success		200	{string}	string				"Successfully deleted User and associated roles"
+//		@Failure		400	{object}	map[string]string	"Invalid ID"
+//		@Failure		404	{object}	map[string]string	"User not found"
+//		@Failure		500	{object}	map[string]string	"Server error"
+//		@Router			/users/{id} [delete]
 func DeleteUser(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -204,4 +250,24 @@ func DeleteUser(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted User")
+}
+
+func processProfilePicture(c *fiber.Ctx, user *models.User) error {
+	if user.ProfilePictureURL != "" && !strings.HasPrefix(user.ProfilePictureURL, "http") {
+		b, err := storage.DecodeBase64Image(user.ProfilePictureURL)
+		if err != nil {
+			return fmt.Errorf("invalid base64 image: %w", err)
+		}
+		if err := validateImageBytes(b); err != nil {
+			return fmt.Errorf("invalid image: %w", err)
+		}
+		mc := c.Locals("minio").(*storage.Client)
+		filename := storage.GenerateFilename(http.DetectContentType(b[:min(512, len(b))]))
+		objectKey, err := mc.UploadBytes(c.Context(), "users", filename, b)
+		if err != nil {
+			return err
+		}
+		user.ProfilePictureURL = objectKey
+	}
+	return nil
 }

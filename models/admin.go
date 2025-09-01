@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Admin struct {
 	gorm.Model
-	UserID uint `gorm:"unique;not null"`
+	UserID uint `json:"user_id" gorm:"unique;not null"`
 }
 
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----

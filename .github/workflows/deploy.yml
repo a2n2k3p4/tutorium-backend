@@ -1,23 +1,25 @@
-name: Deploy
+name: Docker Compose (Server)
 
 on:
   push:
-    branches:
-      - "main"
+    branches: ["main"]
   pull_request:
-    branches:
-      - "main"
+    branches: ["main"]
 
 concurrency:
   group: deploy-${{ github.ref }}
   cancel-in-progress: true
 
+# Default token only needs read
+permissions:
+  contents: read
+
 jobs:
   deploy:
+    name: Deploy to Server
     # Skip fork PRs to avoid secret access issues
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,8 +35,7 @@ jobs:
           port: ${{ secrets.PORT }}
           source: ".,!.git"
           target: "~/tutorium-backend"
-          overwrite: true
-          strip_components: 0
+          rm: true
 
       - name: Deploy with docker compose
         uses: appleboy/ssh-action@v1
@@ -55,11 +56,14 @@ jobs:
 
               # Create .env file on the server (needed for docker-compose)
               echo "=== Creating .env file for docker-compose ==="
-              if [ -f .env.example ]; then
-                  cp .env.example .env
-                  echo "✅ .env file created from .env.example"
+              # Use a persistent server-side env file for production secrets
+              ENV_FILE=~/secrets/tutorium-backend.env
+              mkdir -p "$(dirname "$ENV_FILE")"
+              if [ -f "$ENV_FILE" ]; then
+                  cp $ENV_FILE .env
+                  echo "ℹ️ Using env file: $ENV_FILE"
               else
-                  echo "❌ .env.example not found!"
+                  echo "❌ $ENV_FILE not found!"
                   ls -la
                   exit 1
               fi
@@ -70,7 +74,7 @@ jobs:
                   exit 1
               fi
 
-              # Check docker compose command (newer versions use \'docker compose\', older use \'docker-compose\')
+              # Check docker compose command (newer versions use '"'"'docker compose'"'"', older use '"'"'docker-compose'"'"')
               if docker compose version &> /dev/null; then
                   DOCKER_COMPOSE="docker compose"
               elif command -v docker-compose &> /dev/null; then
@@ -92,7 +96,7 @@ jobs:
 
               # Pull latest base images
               echo "=== Pulling latest base images ==="
-              $DOCKER_COMPOSE pull || echo "Some images couldn\'t be pulled, will build anyway"
+              $DOCKER_COMPOSE pull || echo "Some images couldn'"'"'t be pulled, will build anyway"
 
               # Build new images
               echo "=== Building application ==="
