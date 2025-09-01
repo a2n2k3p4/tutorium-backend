@@ -369,12 +369,9 @@ func TestUpdateBanTeacher_OK(t *testing.T) {
 	mock.ExpectQuery(`SELECT .* FROM "teachers".*WHERE .*id.`).
 		WillReturnRows(teacherRows)
 	mock.ExpectBegin()
-	mock.ExpectQuery(`INSERT INTO "teachers".*RETURNING "id"`).
-		WillReturnRows(teacherRows)
-	mock.ExpectCommit()
-	// Mock the update transaction
 	mock.ExpectExec(`UPDATE "ban_details_teachers" SET .*updated_at.*WHERE .*deleted_at.*IS NULL.*`).
 		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
 
 	app := setupApp(gdb)
 	token := makeJWT(t, []byte(secretString), userID)
