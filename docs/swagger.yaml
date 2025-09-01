@@ -68,14 +68,8 @@ definitions:
       class_name:
         example: Advanced Python Programming
         type: string
-      enrollment_deadline:
-        example: "2025-09-10T23:59:59Z"
-        type: string
       id:
         example: 21
-        type: integer
-      learner_limit:
-        example: 50
         type: integer
       price:
         example: 1999.99
@@ -110,6 +104,9 @@ definitions:
       id:
         example: 15
         type: integer
+      learner_limit:
+        example: 50
+        type: integer
     type: object
   models.EnrollmentDoc:
     properties:
@@ -128,9 +125,6 @@ definitions:
     type: object
   models.LearnerDoc:
     properties:
-      ban_count:
-        example: 1
-        type: integer
       flag_count:
         example: 3
         type: integer
@@ -238,9 +232,6 @@ definitions:
     type: object
   models.TeacherDoc:
     properties:
-      ban_count:
-        example: 1
-        type: integer
       description:
         example: Experienced Mathematics teacher specializing in calculus and linear
           algebra.
@@ -263,6 +254,9 @@ definitions:
       balance:
         example: 250.75
         type: number
+      ban_count:
+        example: 1
+        type: integer
       first_name:
         example: Alice
         type: string

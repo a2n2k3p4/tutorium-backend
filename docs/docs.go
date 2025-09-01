@@ -3685,17 +3685,9 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Advanced Python Programming"
                 },
-                "enrollment_deadline": {
-                    "type": "string",
-                    "example": "2025-09-10T23:59:59Z"
-                },
                 "id": {
                     "type": "integer",
                     "example": 21
-                },
-                "learner_limit": {
-                    "type": "integer",
-                    "example": 50
                 },
                 "price": {
                     "type": "number",
@@ -3741,6 +3733,10 @@ const docTemplate = `{
                 "id": {
                     "type": "integer",
                     "example": 15
+                },
+                "learner_limit": {
+                    "type": "integer",
+                    "example": 50
                 }
             }
         },
@@ -3768,10 +3764,6 @@ const docTemplate = `{
         "models.LearnerDoc": {
             "type": "object",
             "properties": {
-                "ban_count": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "flag_count": {
                     "type": "integer",
                     "example": 3
@@ -3921,10 +3913,6 @@ const docTemplate = `{
         "models.TeacherDoc": {
             "type": "object",
             "properties": {
-                "ban_count": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "description": {
                     "type": "string",
                     "example": "Experienced Mathematics teacher specializing in calculus and linear algebra."
@@ -3953,6 +3941,10 @@ const docTemplate = `{
                 "balance": {
                     "type": "number",
                     "example": 250.75
+                },
+                "ban_count": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "first_name": {
                     "type": "string",
