@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"io"
-	"log"
-	"os"
 	"testing"
 	"time"
 
@@ -28,10 +26,7 @@ func setupMockGorm(t *testing.T) (sqlmock.Sqlmock, *gorm.DB, func()) {
 	gdb, _ := gorm.Open(
 		postgres.New(postgres.Config{Conn: sqlDB, PreferSimpleProtocol: true}),
 		&gorm.Config{
-			Logger: logger.New(
-				log.New(os.Stdout, "[gorm] ", log.LstdFlags),
-				logger.Config{LogLevel: logger.Info}, // show SQL
-			),
+			Logger: logger.Default.LogMode(logger.Silent),
 		},
 	)
 	cleanup := func() { _ = sqlDB.Close() }
