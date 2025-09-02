@@ -1,7 +1,13 @@
 package handlers
 
 import (
+	"bytes"
+	"database/sql/driver"
+	"encoding/json"
+	"fmt"
 	"io"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -102,4 +108,183 @@ func preloadUserForAuth(mock sqlmock.Sqlmock, userID uint, hasAdmin bool, hasTea
 			WillReturnRows(sqlmock.NewRows([]string{"id"}))
 	}
 
+}
+
+type Exp func(sqlmock.Sqlmock)
+
+func ExpAuthUser(userID uint, asAdmin, asTeacher, asSomethingElse bool) Exp {
+	return func(m sqlmock.Sqlmock) {
+		preloadUserForAuth(m, userID, asAdmin, asTeacher, asSomethingElse)
+	}
+}
+
+func ExpInsertReturningID(table string, id uint64) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
+		m.ExpectQuery(fmt.Sprintf(`INSERT INTO "%s".*RETURNING "id"`, table)).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(id))
+		m.ExpectCommit()
+	}
+}
+
+func ExpInsertError(table string, err error) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
+		m.ExpectQuery(fmt.Sprintf(`INSERT INTO "%s".*RETURNING "id"`, table)).
+			WillReturnError(err)
+		m.ExpectRollback()
+	}
+}
+
+func ExpListRows(table string, columns []string, rows ...[]any) Exp {
+	return func(m sqlmock.Sqlmock) {
+		r := sqlmock.NewRows(columns)
+		for _, row := range rows {
+			values := make([]driver.Value, len(row))
+			for i, v := range row {
+				values[i] = v
+			}
+			r.AddRow(values...)
+		}
+		m.ExpectQuery(fmt.Sprintf(`SELECT .* FROM "%s".*`, table)).WillReturnRows(r)
+	}
+}
+
+func ExpListError(table string, err error) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectQuery(fmt.Sprintf(`SELECT .* FROM "%s".*`, table)).WillReturnError(err)
+	}
+}
+
+func ExpSelectByIDFound(table string, id uint, cols []string, vals []any) Exp {
+	return func(m sqlmock.Sqlmock) {
+		values := make([]driver.Value, len(vals))
+		for i, v := range vals {
+			values[i] = v
+		}
+		m.ExpectQuery(fmt.Sprintf(
+			`SELECT \* FROM "%s" WHERE id = \$1 AND "%s"\."deleted_at" IS NULL ORDER BY "%s"\."id" LIMIT .*`,
+			table, table, table,
+		)).
+			WithArgs(id, 1).
+			WillReturnRows(sqlmock.NewRows(cols).AddRow(values...))
+	}
+}
+
+func ExpSelectByIDEmpty(table string, id uint) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectQuery(fmt.Sprintf(
+			`SELECT \* FROM "%s" WHERE id = \$1 AND "%s"\."deleted_at" IS NULL ORDER BY "%s"\."id" LIMIT .*`,
+			table, table, table,
+		)).
+			WithArgs(id, 1).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}))
+	}
+}
+
+func ExpSelectByIDError(table string, id uint, err error) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectQuery(fmt.Sprintf(
+			`SELECT \* FROM "%s" WHERE id = \$1 AND "%s"\."deleted_at" IS NULL ORDER BY "%s"\."id" LIMIT .*`,
+			table, table, table,
+		)).
+			WithArgs(id, 1).
+			WillReturnError(err)
+	}
+}
+
+func ExpUpdateOK(table string) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
+		m.ExpectExec(fmt.Sprintf(`UPDATE "%s" SET .* WHERE "%s"\."deleted_at" IS NULL`, table, table)).
+			WillReturnResult(sqlmock.NewResult(0, 1))
+		m.ExpectCommit()
+	}
+}
+
+func ExpUpdateError(table string, err error) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
+		m.ExpectExec(fmt.Sprintf(`UPDATE "%s" SET .* WHERE "%s"\."deleted_at" IS NULL`, table, table)).
+			WillReturnError(err)
+		m.ExpectRollback()
+	}
+}
+
+func ExpSoftDeleteOK(table string) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
+		m.ExpectExec(fmt.Sprintf(`UPDATE "%s" SET "deleted_at"=`, table)).
+			WillReturnResult(sqlmock.NewResult(0, 1))
+		m.ExpectCommit()
+	}
+}
+
+func ExpSoftDeleteError(table string, err error) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
+		m.ExpectExec(fmt.Sprintf(`UPDATE "%s" SET "deleted_at"=`, table)).
+			WillReturnError(err)
+		m.ExpectRollback()
+	}
+}
+
+func ExpPreloadField(table string, columns []string, vals []any) Exp {
+	return func(m sqlmock.Sqlmock) {
+		values := make([]driver.Value, len(vals))
+		for i, v := range vals {
+			values[i] = v
+		}
+		r := sqlmock.NewRows(columns).AddRow(values...)
+		m.ExpectQuery(fmt.Sprintf(`SELECT .* FROM "%s".*`, table)).
+			WillReturnRows(r)
+	}
+}
+
+// -------- HTTP runner & assertions --------
+
+type httpInput struct {
+	Method      string
+	Path        string
+	Body        []byte
+	ContentType string
+	UserID      *uint // if set, attach JWT
+}
+
+// Accept *fiber.App (your setupApp returns this)
+func runHTTP(t *testing.T, app *fiber.App, in httpInput) *http.Response {
+	t.Helper()
+
+	var body *bytes.Reader
+	if in.Body != nil {
+		body = bytes.NewReader(in.Body)
+	} else {
+		body = bytes.NewReader(nil)
+	}
+	req := httptest.NewRequest(in.Method, in.Path, body)
+	if in.ContentType != "" {
+		req.Header.Set("Content-Type", in.ContentType)
+	}
+	if in.UserID != nil {
+		token := makeJWT(t, []byte(secretString), uint(*in.UserID))
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
+
+	resp, err := app.Test(req, -1)
+	if err != nil {
+		t.Fatalf("app.Test: %v", err)
+	}
+	return resp
+}
+
+func wantStatus(t *testing.T, got *http.Response, want int) {
+	t.Helper()
+	if got.StatusCode != want {
+		t.Fatalf("status = %d, want %d; body=%s", got.StatusCode, want, string(readBody(t, got.Body)))
+	}
+}
+
+func jsonBody(v any) []byte {
+	b, _ := json.Marshal(v)
+	return b
 }
