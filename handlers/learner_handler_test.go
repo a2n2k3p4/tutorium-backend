@@ -1,481 +1,310 @@
 package handlers
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
-	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/a2n2k3p4/tutorium-backend/models"
 )
 
 /* ------------------ CreateLearner ------------------ */
 
-// code 201
+// 201
 func TestCreateLearner_OK(t *testing.T) {
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
-
 	mock.MatchExpectationsInOrder(false)
-	userID := 42
 
-	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID), false, false, false)
+	table := "learners"
+	userID := uint(42)
 
-	// Handler: insert learners
-	mock.ExpectBegin()
-	mock.ExpectQuery(`INSERT INTO "learners".*RETURNING "id"`).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
-	mock.ExpectCommit()
+	ExpAuthUser(userID, false, false, false)(mock)
+	ExpInsertReturningID(table, 1)(mock)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, []byte(secretString), uint(userID))
 
-	req := httptest.NewRequest(http.MethodPost, "/learners/", bytes.NewReader([]byte(`{}`)))
-	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := app.Test(req, -1)
-	if err != nil {
-		t.Fatalf("app.Test: %v", err)
-	}
-	if resp.StatusCode != http.StatusCreated {
-		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusCreated)
+	payload := models.Learner{
+		UserID: userID,
 	}
 
-	var got map[string]any
-	_ = json.Unmarshal(readBody(t, resp.Body), &got)
-
-	if _, ok := got["ID"]; !ok {
-		t.Fatalf("response missing ID; got: %v", got)
-	}
+	resp := runHTTP(t, app, httpInput{
+		Method:      http.MethodPost,
+		Path:        "/learners/",
+		Body:        jsonBody(payload),
+		ContentType: "application/json",
+		UserID:      &userID,
+	})
+	wantStatus(t, resp, http.StatusCreated)
 
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("unmet expectations: %v", err)
 	}
 }
 
-// code 400
+// 400
 func TestCreateLearner_BadRequest(t *testing.T) {
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 	mock.MatchExpectationsInOrder(false)
-	userID := 42
+	userID := uint(42)
 
-	preloadUserForAuth(mock, uint(userID), false, false, false)
+	ExpAuthUser(userID, false, false, false)(mock)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, []byte(secretString), uint(userID))
-
-	req := httptest.NewRequest(http.MethodPost, "/learners/", bytes.NewBufferString(`{invalid-json}`))
-	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := app.Test(req, -1)
-	if err != nil {
-		t.Fatalf("app.Test: %v", err)
-	}
-	if resp.StatusCode != http.StatusBadRequest {
-		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusBadRequest)
-	}
-
+	resp := runHTTP(t, app, httpInput{
+		Method: http.MethodPost, Path: "/learners/",
+		Body: []byte(`{invalid-json}`), ContentType: "application/json", UserID: &userID,
+	})
+	wantStatus(t, resp, http.StatusBadRequest)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("unmet expectations: %v", err)
 	}
 }
 
-// code 500
+// 500
 func TestCreateLearner_DBError(t *testing.T) {
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 	mock.MatchExpectationsInOrder(false)
-	userID := 42
 
-	preloadUserForAuth(mock, uint(userID), false, false, false)
+	table := "learners"
+	userID := uint(42)
 
-	mock.ExpectBegin()
-	mock.ExpectQuery(`INSERT INTO "learners".*RETURNING "id"`).
-		WillReturnError(fmt.Errorf("db insert failed"))
-	mock.ExpectRollback()
+	ExpAuthUser(userID, false, false, false)(mock)
+	ExpInsertError(table, fmt.Errorf("db insert failed"))(mock)
 
+	payload := models.Learner{
+		UserID: userID,
+	}
 	app := setupApp(gdb)
-	token := makeJWT(t, []byte(secretString), uint(userID))
-
-	req := httptest.NewRequest(http.MethodPost, "/learners/", bytes.NewReader([]byte(`{}`)))
-	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := app.Test(req, -1)
-	if err != nil {
-		t.Fatalf("app.Test: %v", err)
-	}
-	if resp.StatusCode != http.StatusInternalServerError {
-		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusInternalServerError)
-	}
-
+	resp := runHTTP(t, app, httpInput{
+		Method: http.MethodPost, Path: "/learners/",
+		Body: jsonBody(payload), ContentType: "application/json", UserID: &userID,
+	})
+	wantStatus(t, resp, http.StatusInternalServerError)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("unmet expectations: %v", err)
 	}
 }
 
 /* ------------------ GetLearners ------------------ */
-//code 200
+// 200
 func TestGetLearners_OK(t *testing.T) {
-
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
-
 	mock.MatchExpectationsInOrder(false)
-	userID := 42
+	userID := uint(42)
 
-	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID), false, false, false)
-
-	// Handler: list learners
-	mock.ExpectQuery(`SELECT .* FROM "learners".*`).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1).AddRow(2))
+	ExpAuthUser(userID, false, false, false)(mock)
+	ExpListRows("learners", []string{"id"}, []any{1}, []any{2})(mock)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, []byte(secretString), uint(userID))
-
-	req := httptest.NewRequest(http.MethodGet, "/learners/", nil)
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	resp, err := app.Test(req, -1)
-	if err != nil {
-		t.Fatalf("app.Test: %v", err)
-	}
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusOK)
-	}
-
-	var arr []map[string]any
-	_ = json.Unmarshal(readBody(t, resp.Body), &arr)
-	if len(arr) != 2 {
-		t.Fatalf("expected 2 learners, got %d (%v)", len(arr), arr)
-	}
-
+	resp := runHTTP(t, app, httpInput{
+		Method: http.MethodGet, Path: "/learners/", UserID: &userID,
+	})
+	wantStatus(t, resp, http.StatusOK)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("unmet expectations: %v", err)
 	}
 }
 
-// code 500
+// 500
 func TestGetLearners_DBError(t *testing.T) {
-
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 	mock.MatchExpectationsInOrder(false)
-	userID := 42
+	userID := uint(42)
 
-	preloadUserForAuth(mock, uint(userID), false, false, false)
-
-	mock.ExpectQuery(`SELECT .* FROM "learners".*`).
-		WillReturnError(fmt.Errorf("select failed"))
+	ExpAuthUser(userID, false, false, false)(mock)
+	ExpListError("learners", fmt.Errorf("select failed"))(mock)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, []byte(secretString), uint(userID))
-
-	req := httptest.NewRequest(http.MethodGet, "/learners/", nil)
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	resp, err := app.Test(req, -1)
-	if err != nil {
-		t.Fatalf("app.Test: %v", err)
-	}
-	if resp.StatusCode != http.StatusInternalServerError {
-		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusInternalServerError)
-	}
-
+	resp := runHTTP(t, app, httpInput{
+		Method: http.MethodGet, Path: "/learners/", UserID: &userID,
+	})
+	wantStatus(t, resp, http.StatusInternalServerError)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("unmet expectations: %v", err)
 	}
 }
 
 /* ------------------ GetLearner ------------------ */
-//code 200
+// 200
 func TestGetLearner_OK(t *testing.T) {
-
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
-
 	mock.MatchExpectationsInOrder(false)
-	userID := 42
-	learnerID := 7
 
-	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID), false, false, false)
+	table := "learners"
+	userID := uint(42)
+	learnerID := uint(7)
 
-	// Handler: find by id
-	mock.ExpectQuery(`SELECT \* FROM "learners" WHERE id = \$1 AND "learners"\."deleted_at" IS NULL ORDER BY "learners"\."id" LIMIT .*`).
-		WithArgs(learnerID, 1).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(learnerID))
+	ExpAuthUser(userID, false, false, false)(mock)
+	ExpSelectByIDFound(table, learnerID, []string{"id"}, []any{learnerID})(mock)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, []byte(secretString), uint(userID))
-
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/learners/%d", learnerID), nil)
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	resp, err := app.Test(req, -1)
-	if err != nil {
-		t.Fatalf("app.Test: %v", err)
-	}
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusOK)
-	}
-
-	var got map[string]any
-	_ = json.Unmarshal(readBody(t, resp.Body), &got)
-	if _, ok := got["ID"]; !ok {
-		t.Fatalf("response missing ID; got: %v", got)
-	}
-
+	resp := runHTTP(t, app, httpInput{
+		Method: http.MethodGet, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
+	})
+	wantStatus(t, resp, http.StatusOK)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("unmet expectations: %v", err)
 	}
 }
 
-// code 404
+// 404
 func TestGetLearner_NotFound(t *testing.T) {
-
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
-
 	mock.MatchExpectationsInOrder(false)
-	userID := 42
-	learnerID := 999
 
-	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID), false, false, false)
+	table := "learners"
+	userID := uint(42)
+	learnerID := uint(999)
 
-	// Handler: not found (empty rowset)
-	mock.ExpectQuery(`SELECT \* FROM "learners" WHERE id = \$1 AND "learners"\."deleted_at" IS NULL ORDER BY "learners"\."id" LIMIT .*`).
-		WithArgs(learnerID, 1).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}))
+	ExpAuthUser(userID, false, false, false)(mock)
+	ExpSelectByIDEmpty(table, learnerID)(mock)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, []byte(secretString), uint(userID))
-
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/learners/%d", learnerID), nil)
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	resp, err := app.Test(req, -1)
-	if err != nil {
-		t.Fatalf("app.Test: %v", err)
-	}
-	if resp.StatusCode != http.StatusNotFound {
-		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusNotFound)
-	}
-
+	resp := runHTTP(t, app, httpInput{
+		Method: http.MethodGet, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
+	})
+	wantStatus(t, resp, http.StatusNotFound)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("unmet expectations: %v", err)
 	}
 }
 
-// code 500
+// 500
 func TestGetLearner_DBError(t *testing.T) {
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 	mock.MatchExpectationsInOrder(false)
-	userID := 42
-	learnerID := 7
 
-	preloadUserForAuth(mock, uint(userID), false, false, false)
+	table := "learners"
+	userID := uint(42)
+	learnerID := uint(7)
 
-	mock.ExpectQuery(`SELECT \* FROM "learners" WHERE id = \$1 AND "learners"\."deleted_at" IS NULL ORDER BY "learners"\."id" LIMIT .*`).
-		WithArgs(learnerID, 1).
-		WillReturnError(fmt.Errorf("select failed"))
+	ExpAuthUser(userID, false, false, false)(mock)
+	ExpSelectByIDError(table, learnerID, fmt.Errorf("select failed"))(mock)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, []byte(secretString), uint(userID))
-
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/learners/%d", learnerID), nil)
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	resp, err := app.Test(req, -1)
-	if err != nil {
-		t.Fatalf("app.Test: %v", err)
-	}
-	if resp.StatusCode != http.StatusInternalServerError {
-		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusInternalServerError)
-	}
-
+	resp := runHTTP(t, app, httpInput{
+		Method: http.MethodGet, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
+	})
+	wantStatus(t, resp, http.StatusInternalServerError)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("unmet expectations: %v", err)
 	}
 }
 
-// code 400
+// 400
 func TestGetLearner_BadRequest(t *testing.T) {
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 	mock.MatchExpectationsInOrder(false)
-	userID := 42
+	userID := uint(42)
 
-	preloadUserForAuth(mock, uint(userID), false, false, false)
+	ExpAuthUser(userID, false, false, false)(mock)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, []byte(secretString), uint(userID))
-
-	req := httptest.NewRequest(http.MethodGet, "/learners/not-an-int", nil)
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	resp, err := app.Test(req, -1)
-	if err != nil {
-		t.Fatalf("app.Test: %v", err)
-	}
-	if resp.StatusCode != http.StatusBadRequest {
-		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusBadRequest)
-	}
-
+	resp := runHTTP(t, app, httpInput{
+		Method: http.MethodGet, Path: "/learners/not-an-int", UserID: &userID,
+	})
+	wantStatus(t, resp, http.StatusBadRequest)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("unmet expectations: %v", err)
 	}
 }
 
-/* ------------------ DeleteLearners ------------------ */
-//code 200
+/* ------------------ DeleteLearner ------------------ */
+
+// 200
 func TestDeleteLearner_OK_SoftDelete(t *testing.T) {
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
-
 	mock.MatchExpectationsInOrder(false)
-	userID := 42
-	learnerID := 5
 
-	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID), false, false, false)
+	table := "learners"
+	userID := uint(42)
+	learnerID := uint(5)
 
-	// Handler: find then soft-delete
-	mock.ExpectQuery(`SELECT \* FROM "learners" WHERE id = \$1 AND "learners"\."deleted_at" IS NULL ORDER BY "learners"\."id" LIMIT .*`).
-		WithArgs(learnerID, 1).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(learnerID))
-
-	mock.ExpectBegin()
-	mock.ExpectExec(`UPDATE "learners" SET "deleted_at"=`).
-		WillReturnResult(sqlmock.NewResult(0, 1))
-	mock.ExpectCommit()
+	ExpAuthUser(userID, false, false, false)(mock)
+	ExpSelectByIDFound(table, learnerID, []string{"id"}, []any{learnerID})(mock)
+	ExpSoftDeleteOK(table)(mock)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, []byte(secretString), uint(userID))
-
-	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/learners/%d", learnerID), nil)
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	resp, err := app.Test(req, -1)
-	if err != nil {
-		t.Fatalf("app.Test: %v", err)
-	}
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusOK)
-	}
-
+	resp := runHTTP(t, app, httpInput{
+		Method: http.MethodDelete, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
+	})
+	wantStatus(t, resp, http.StatusOK)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("unmet expectations: %v", err)
 	}
 }
 
-// code 404
+// 404
 func TestDeleteLearner_NotFound(t *testing.T) {
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
-
 	mock.MatchExpectationsInOrder(false)
-	userID := 42
-	learnerID := 12345
 
-	// Auth: user + preloads
-	preloadUserForAuth(mock, uint(userID), false, false, false)
+	table := "learners"
+	userID := uint(42)
+	learnerID := uint(12345)
 
-	// Handler: not found on SELECT
-	mock.ExpectQuery(`SELECT \* FROM "learners" WHERE id = \$1 AND "learners"\."deleted_at" IS NULL ORDER BY "learners"\."id" LIMIT .*`).
-		WithArgs(learnerID, 1).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}))
+	ExpAuthUser(userID, false, false, false)(mock)
+	ExpSelectByIDEmpty(table, learnerID)(mock)
+
 	app := setupApp(gdb)
-	token := makeJWT(t, []byte(secretString), uint(userID))
-
-	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/learners/%d", learnerID), nil)
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	resp, err := app.Test(req, -1)
-	if err != nil {
-		t.Fatalf("app.Test: %v", err)
-	}
-	if resp.StatusCode != http.StatusNotFound {
-		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusNotFound)
-	}
-
+	resp := runHTTP(t, app, httpInput{
+		Method: http.MethodDelete, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
+	})
+	wantStatus(t, resp, http.StatusNotFound)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("unmet expectations: %v", err)
 	}
 }
 
-// code 500
+// 500
 func TestDeleteLearner_DBError(t *testing.T) {
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 	mock.MatchExpectationsInOrder(false)
-	userID := 42
-	learnerID := 5
 
-	preloadUserForAuth(mock, uint(userID), false, false, false)
+	table := "learners"
+	userID := uint(42)
+	learnerID := uint(5)
 
-	// Found, then UPDATE fails -> rollback
-	mock.ExpectQuery(`SELECT \* FROM "learners" WHERE id = \$1 AND "learners"\."deleted_at" IS NULL ORDER BY "learners"\."id" LIMIT .*`).
-		WithArgs(learnerID, 1).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(5))
-
-	mock.ExpectBegin()
-	mock.ExpectExec(`UPDATE "learners" SET "deleted_at"=`).
-		WillReturnError(fmt.Errorf("update failed"))
-	mock.ExpectRollback()
+	ExpAuthUser(userID, false, false, false)(mock)
+	ExpSelectByIDFound(table, learnerID, []string{"id"}, []any{learnerID})(mock)
+	ExpSoftDeleteError(table, fmt.Errorf("update failed"))(mock)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, []byte(secretString), uint(userID))
-
-	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/learners/%d", learnerID), nil)
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	resp, err := app.Test(req, -1)
-	if err != nil {
-		t.Fatalf("app.Test: %v", err)
-	}
-	if resp.StatusCode != http.StatusInternalServerError {
-		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusInternalServerError)
-	}
-
+	resp := runHTTP(t, app, httpInput{
+		Method: http.MethodDelete, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
+	})
+	wantStatus(t, resp, http.StatusInternalServerError)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("unmet expectations: %v", err)
 	}
 }
 
-// code 400
+// 400
 func TestDeleteLearner_BadRequest(t *testing.T) {
-
 	mock, gdb, cleanup := setupMockGorm(t)
 	defer cleanup()
 	mock.MatchExpectationsInOrder(false)
-	userID := 42
+	userID := uint(42)
 
-	preloadUserForAuth(mock, uint(userID), false, false, false)
+	ExpAuthUser(userID, false, false, false)(mock)
 
 	app := setupApp(gdb)
-	token := makeJWT(t, []byte(secretString), uint(userID))
-
-	req := httptest.NewRequest(http.MethodDelete, "/learners/not-an-int", nil)
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	resp, err := app.Test(req, -1)
-	if err != nil {
-		t.Fatalf("app.Test: %v", err)
-	}
-	if resp.StatusCode != http.StatusBadRequest {
-		t.Fatalf("status = %d, want %d", resp.StatusCode, http.StatusBadRequest)
-	}
-
+	resp := runHTTP(t, app, httpInput{
+		Method: http.MethodDelete, Path: "/learners/not-an-int", UserID: &userID,
+	})
+	wantStatus(t, resp, http.StatusBadRequest)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("unmet expectations: %v", err)
 	}
