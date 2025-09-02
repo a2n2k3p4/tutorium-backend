@@ -10,6 +10,7 @@ type ClassSession struct {
 	gorm.Model
 	ClassID            uint      `json:"class_id"`
 	Description        string    `json:"description" gorm:"size:1000"`
+	LearnerLimit       int       `json:"learner_limit" gorm:"not null;default:50"`
 	EnrollmentDeadline time.Time `json:"enrollment_deadline" gorm:"not null"`
 	ClassStart         time.Time `json:"class_start" gorm:"not null"`
 	ClassFinish        time.Time `json:"class_finish" gorm:"not null"`
@@ -24,6 +25,7 @@ type ClassSessionDoc struct {
 	ID                 uint      `json:"id" example:"15"`
 	ClassID            uint      `json:"class_id" example:"12"`
 	Description        string    `json:"description" example:"Weekly tutoring session for calculus"`
+	LearnerLimit       int       `json:"learner_limit" example:"50"`
 	EnrollmentDeadline time.Time `json:"enrollment_deadline" example:"2025-09-01T23:59:59Z"`
 	ClassStart         time.Time `json:"class_start" example:"2025-09-05T14:00:00Z"`
 	ClassFinish        time.Time `json:"class_finish" example:"2025-09-05T16:00:00Z"`

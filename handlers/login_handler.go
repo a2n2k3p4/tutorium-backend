@@ -131,14 +131,8 @@ func LoginHandler(c *fiber.Ctx) error {
 }
 
 func generateJWT(user models.User) (string, error) {
-	if err := godotenv.Load("../.env"); err != nil {
-		log.Println(".env file not found, using system environment variables")
-	}
-	secretStr := os.Getenv("JWT_SECRET")
-	if secretStr == "" {
-		log.Fatal("JWT_SECRET environment variable is not set")
-	}
-	secret := []byte(secretStr)
+	secret := middlewares.Secret()
+
 	claims := jwt.MapClaims{
 		"user_id": user.ID,
 		"exp":     time.Now().Add(time.Hour * 24).Unix(), // token expires in 24h
