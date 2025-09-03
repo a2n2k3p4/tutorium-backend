@@ -61,7 +61,7 @@ func CreateClass(c *fiber.Ctx) error {
 		return c.Status(500).JSON(tx.Error.Error())
 	}
 
-	if err := tx.Create(&class).Error; err != nil {
+	if err := tx.Omit("Categories").Create(&class).Error; err != nil {
 		tx.Rollback()
 		return c.Status(500).JSON(err.Error())
 	}
