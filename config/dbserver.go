@@ -1,9 +1,8 @@
-package dbserver
+package config
 
 import (
 	"fmt"
 	"log"
-	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -50,10 +49,10 @@ func NewConfig() *Config {
 	}
 
 	return &Config{
-		DBUser:     os.Getenv("DB_USER"),
-		DBPassword: os.Getenv("DB_PASSWORD"),
-		DBHost:     os.Getenv("DB_HOST"),
-		DBPort:     os.Getenv("DB_PORT"),
-		DBName:     os.Getenv("DB_NAME"),
+		DBUser:     DBUser(),
+		DBPassword: DBPassword(),
+		DBHost:     DBHost(),
+		DBPort:     DBPort(),
+		DBName:     DBName(),
 	}
 }

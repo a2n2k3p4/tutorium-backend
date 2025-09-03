@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
+	"github.com/a2n2k3p4/tutorium-backend/config"
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/a2n2k3p4/tutorium-backend/storage"
@@ -51,10 +51,10 @@ func LoginHandler(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err := godotenv.Load("../.env"); err != nil {
+	if err := godotenv.Load(); err != nil {
 		log.Println(".env file not found, using system environment variables")
 	}
-	NisitKUBaseURL := os.Getenv("KU_API")
+	NisitKUBaseURL := config.KUAPI()
 	nisitClient := NewNisitKUClient(NisitKUBaseURL)
 
 	loginResp, err := nisitClient.Login(req.Username, req.Password)
