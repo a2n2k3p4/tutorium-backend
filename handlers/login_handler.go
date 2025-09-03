@@ -3,7 +3,6 @@ package handlers
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -14,7 +13,6 @@ import (
 	"github.com/a2n2k3p4/tutorium-backend/storage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
 
@@ -51,9 +49,6 @@ func LoginHandler(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err := godotenv.Load(); err != nil {
-		log.Println(".env file not found, using system environment variables")
-	}
 	NisitKUBaseURL := config.KUAPI()
 	nisitClient := NewNisitKUClient(NisitKUBaseURL)
 
