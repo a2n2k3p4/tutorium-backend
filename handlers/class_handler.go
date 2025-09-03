@@ -78,7 +78,7 @@ func GetClasses(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	if err := db.Preload("Teacher").Preload("Categories").Find(&classes).Error; err != nil {
+	if err := db.Find(&classes).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
@@ -101,7 +101,7 @@ func GetClasses(c *fiber.Ctx) error {
 }
 
 func findClass(db *gorm.DB, id int, class *models.Class) error {
-	return db.Preload("Teacher").Preload("Categories").First(class, "id = ?", id).Error
+	return db.First(class, "id = ?", id).Error
 }
 
 // GetClass godoc
@@ -130,7 +130,7 @@ func GetClass(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	err = findClass(db, id, &class)
+	err = db.Preload("Teacher").Preload("Categories").First(&class, "id = ?", id).Error
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("class not found")
