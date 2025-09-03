@@ -7,6 +7,7 @@ import (
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func EnrollmentRoutes(app *fiber.App) {
@@ -156,8 +157,7 @@ func UpdateEnrollment(c *fiber.Ctx) error {
 	}
 
 	if err := db.Model(&enrollment).
-		Omit("Learner").
-		Omit("ClassSession").
+		Omit(clause.Associations).
 		Updates(enrollment_update).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}

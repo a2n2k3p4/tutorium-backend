@@ -7,6 +7,7 @@ import (
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func BanTeacherRoutes(app *fiber.App) {
@@ -155,7 +156,7 @@ func UpdateBanTeacher(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err := db.Model(&banteacher).Omit("Teacher").Updates(banteacher_update).Error; err != nil {
+	if err := db.Model(&banteacher).Omit(clause.Associations).Updates(banteacher_update).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 

@@ -14,6 +14,7 @@ import (
 	"github.com/a2n2k3p4/tutorium-backend/storage"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func ClassRoutes(app *fiber.App) {
@@ -94,6 +95,7 @@ func CreateClass(c *fiber.Ctx) error {
 	if err := tx.Commit().Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
+
 	return c.Status(201).JSON(class)
 }
 
@@ -326,8 +328,7 @@ func UpdateClass(c *fiber.Ctx) error {
 	}
 
 	if err := tx.Model(&class).
-		Omit("Teacher").
-		Omit("Categories").
+		Omit(clause.Associations).
 		Updates(class_update).Error; err != nil {
 		tx.Rollback()
 		return c.Status(500).JSON(err.Error())

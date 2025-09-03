@@ -13,6 +13,7 @@ import (
 	"github.com/a2n2k3p4/tutorium-backend/storage"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func ReportRoutes(app *fiber.App) {
@@ -199,8 +200,7 @@ func UpdateReport(c *fiber.Ctx) error {
 	}
 
 	if err := db.Model(&report).
-		Omit("Reporter").
-		Omit("Reported").
+		Omit(clause.Associations).
 		Updates(report_updated).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
