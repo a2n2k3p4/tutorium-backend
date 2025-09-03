@@ -107,9 +107,31 @@ func LoginHandler(c *fiber.Ctx) error {
 			ProfilePictureURL: uploadedURL,
 			Balance:           0,
 		}
-		if err := db.Create(&user).Error; err != nil {
+		// begin transaction for create User and Learner
+		tx := db.Begin()
+		if tx.Error != nil {
+			return c.Status(500).JSON(tx.Error.Error())
+		}
+
+		if err := tx.Create(&user).Error; err != nil {
+			tx.Rollback()
 			return c.Status(500).JSON(err.Error())
 		}
+
+		learner := models.Learner{
+			UserID:    user.ID,
+			FlagCount: 0,
+		}
+		if err := tx.Create(&learner).Error; err != nil {
+			tx.Rollback()
+			return c.Status(500).JSON(err.Error())
+		}
+
+		if err := tx.Commit().Error; err != nil {
+			return c.Status(500).JSON(err.Error())
+		}
+
+		user.Learner = &learner
 	} else if err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
