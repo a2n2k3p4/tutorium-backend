@@ -205,7 +205,11 @@ func UpdateUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err := db.Model(&user).Updates(user_update).Error; err != nil {
+	if err := db.Model(&user).
+		Omit("Learner").
+		Omit("Teacher").
+		Omit("Admin").
+		Updates(user_update).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 

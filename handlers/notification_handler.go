@@ -156,7 +156,7 @@ func UpdateNotification(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err := db.Model(&notification).Updates(notification_updated).Error; err != nil {
+	if err := db.Model(&notification).Omit("User").Updates(notification_updated).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 

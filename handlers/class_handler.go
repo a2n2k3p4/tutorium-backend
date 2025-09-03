@@ -197,7 +197,10 @@ func UpdateClass(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err := db.Model(&class).Updates(class_update).Error; err != nil {
+	if err := db.Model(&class).
+		Omit("Teacher").
+		Omit("Categories").
+		Updates(class_update).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
