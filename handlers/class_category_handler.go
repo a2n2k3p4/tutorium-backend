@@ -105,7 +105,7 @@ func GetClassCategory(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	err = db.Preload("Classes").First(class_category, "id = ?", id).Error
+	err = db.Preload("Classes").First(&class_category, "id = ?", id).Error
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("class_category not found")
