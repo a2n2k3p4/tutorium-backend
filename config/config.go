@@ -9,7 +9,10 @@ import (
 
 func EnvGetter(name, def string) func() string {
 	return sync.OnceValue(func() string {
+		// Try current directory first
 		_ = godotenv.Load()
+		// Fallback to parent directory
+		_ = godotenv.Load("../.env")
 		v := os.Getenv(name)
 		if v == "" {
 			return def
