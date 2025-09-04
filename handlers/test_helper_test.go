@@ -6,8 +6,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"time"
 
@@ -32,9 +34,17 @@ func setupMockGorm(t *testing.T) (sqlmock.Sqlmock, *gorm.DB, func()) {
 	gdb, _ := gorm.Open(
 		postgres.New(postgres.Config{Conn: sqlDB, PreferSimpleProtocol: true}),
 		&gorm.Config{
-			Logger: logger.Default.LogMode(logger.Silent),
+			Logger: logger.New(
+				log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+				logger.Config{
+					SlowThreshold: time.Second, // Slow SQL threshold
+					LogLevel:      logger.Info, // Show all SQL
+					Colorful:      true,        // Enable color
+				},
+			),
 		},
 	)
+
 	cleanup := func() { _ = sqlDB.Close() }
 	return mock, gdb, cleanup
 }
@@ -238,6 +248,28 @@ func ExpPreloadField(table string, columns []string, vals []any) Exp {
 		r := sqlmock.NewRows(columns).AddRow(values...)
 		m.ExpectQuery(fmt.Sprintf(`SELECT .* FROM "%s".*`, table)).
 			WillReturnRows(r)
+	}
+}
+
+func ExpPreloadM2M(joinTable string, childTable string, parentKey string,
+	childKey string, pairs [][2]any) Exp {
+	return func(m sqlmock.Sqlmock) {
+
+		joinRows := sqlmock.NewRows([]string{parentKey, childKey})
+		childIDs := make(map[any]struct{}, len(pairs))
+		for _, p := range pairs {
+			joinRows.AddRow(p[0], p[1])
+			childIDs[p[1]] = struct{}{}
+		}
+		m.ExpectQuery(`SELECT .* FROM "` + joinTable + `".*WHERE .*"` + joinTable + `"\."` + parentKey + `" (=\s*\$1|IN \(.*\)).*`).
+			WillReturnRows(joinRows)
+
+		childRows := sqlmock.NewRows([]string{"id"})
+		for id := range childIDs {
+			childRows.AddRow(id)
+		}
+		m.ExpectQuery(`SELECT .* FROM "` + childTable + `".*WHERE .*"` + childTable + `"\."id" (=\s*\$1|IN \(.*\)).*`).
+			WillReturnRows(childRows)
 	}
 }
 
