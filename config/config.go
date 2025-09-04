@@ -31,7 +31,7 @@ var (
 
 	// JWT & App
 	JWTSecret = EnvGetter("JWT_SECRET", "secret")
-	STATUS    = EnvGetter("STATUS", "development")
+	STATUS    = EnvGetter("STATUS", "production")
 	KUAPI     = EnvGetter("KU_API", "https://kuappstore.ku.ac.th/nisitku/nisit/Controller.php")
 
 	// MinIO
