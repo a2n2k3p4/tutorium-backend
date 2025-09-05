@@ -212,10 +212,6 @@ func GetFilteredClasses(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	var classes []models.Class
-	query := db.Preload("Categories")
-
-	// Multiple categories
 	var filters struct {
 		Categories []string `query:"category"`
 		MinPrice   string   `query:"min_price"`
@@ -228,11 +224,37 @@ func GetFilteredClasses(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
+	type FilteredClassResponse struct {
+		ID               uint    `json:"id"`
+		ClassName        string  `json:"class_name"`
+		BannerPictureURL string  `json:"banner_picture_url"`
+		Rating           float64 `json:"rating"`
+		Price            float64 `json:"price"`
+		TeacherName      string  `json:"teacher_name"`
+	}
+	var results []FilteredClassResponse
+
+	// Get teacher's FirstName and LastName from users table
+	query := db.Table("classes").
+		Select(`
+			classes.id,
+			classes.class_name,
+			classes.banner_picture_url,
+			classes.rating,
+			classes.price,
+			users.first_name || ' ' || users.last_name AS teacher_name
+		`).
+		Joins("JOIN teachers ON teachers.id = classes.teacher_id").
+		Joins("JOIN users ON users.id = teachers.user_id")
+
+	// Categories fitler
 	if len(filters.Categories) > 0 {
-		query = query.
-			Joins("JOIN class_class_categories ccc ON ccc.class_id = classes.id").
-			Joins("JOIN class_categories cc ON cc.id = ccc.class_category_id").
-			Where("cc.class_category IN (?)", filters.Categories)
+		query = query.Where("classes.id IN (?)",
+			db.Table("class_class_categories ccc").
+				Joins("JOIN class_categories cc ON cc.id = ccc.class_category_id").
+				Select("ccc.class_id").
+				Where("cc.class_category IN ?", filters.Categories),
+		)
 	}
 
 	// Price filter
@@ -263,11 +285,27 @@ func GetFilteredClasses(c *fiber.Ctx) error {
 		}
 	}
 
-	if err := query.Find(&classes).Error; err != nil {
+	// Executed query
+	if err := query.Scan(&results).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	return c.JSON(classes)
+	// Presigned URLs for BannerPicture
+	mc, ok := c.Locals("minio").(*storage.Client)
+	if ok {
+		for i := range results {
+			if results[i].BannerPictureURL != "" {
+				presignedURL, err := mc.PresignedGetObject(c.Context(), results[i].BannerPictureURL, 15*time.Minute)
+				if err == nil {
+					results[i].BannerPictureURL = presignedURL
+				} else {
+					results[i].BannerPictureURL = ""
+				}
+			}
+		}
+	}
+
+	return c.JSON(results)
 }
 
 // UpdateClass godoc
