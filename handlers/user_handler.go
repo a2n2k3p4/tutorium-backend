@@ -55,10 +55,32 @@ func CreateUser(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	if err := db.Create(&user).Error; err != nil {
+	// begin transaction for create User and Learner
+	tx := db.Begin()
+	if tx.Error != nil {
+		return c.Status(500).JSON(tx.Error.Error())
+	}
+
+	if err := tx.Create(&user).Error; err != nil {
+		tx.Rollback()
 		return c.Status(500).JSON(err.Error())
 	}
 
+	learner := models.Learner{
+		UserID:    user.ID,
+		FlagCount: 0,
+	}
+	if err := tx.Create(&learner).Error; err != nil {
+		tx.Rollback()
+		return c.Status(500).JSON(err.Error())
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	// attach to user struct so response contains learner
+	user.Learner = &learner
 	return c.Status(201).JSON(user)
 }
 
@@ -205,7 +227,11 @@ func UpdateUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err := db.Model(&user).Updates(user_update).Error; err != nil {
+	if err := db.Model(&user).
+		Omit("Learner").
+		Omit("Teacher").
+		Omit("Admin").
+		Updates(user_update).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 

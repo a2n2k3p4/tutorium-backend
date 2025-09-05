@@ -157,7 +157,7 @@ func UpdateClassSession(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err := db.Model(&class_session).Updates(class_session_update).Error; err != nil {
+	if err := db.Model(&class_session).Omit("Class").Updates(class_session_update).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 

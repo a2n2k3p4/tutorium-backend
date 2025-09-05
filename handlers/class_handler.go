@@ -55,9 +55,45 @@ func CreateClass(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	if err := db.Create(&class).Error; err != nil {
+	// begin transaction for create Class with ClassCategories
+	tx := db.Begin()
+	if tx.Error != nil {
+		return c.Status(500).JSON(tx.Error.Error())
+	}
+
+	if err := tx.Omit("Categories").Create(&class).Error; err != nil {
+		tx.Rollback()
 		return c.Status(500).JSON(err.Error())
 	}
+
+	// Attach categories if provided
+	if len(class.Categories) > 0 {
+		var cats []models.ClassCategory
+		names := make([]string, len(class.Categories))
+		for i, cat := range class.Categories {
+			names[i] = cat.ClassCategory
+		}
+
+		if err := tx.Where("class_category IN ?", names).Find(&cats).Error; err != nil {
+			tx.Rollback()
+			return c.Status(500).JSON(err.Error())
+		}
+
+		if len(cats) != len(names) {
+			tx.Rollback()
+			return c.Status(400).JSON(fiber.Map{"error": "some categories not found"})
+		}
+
+		if err := tx.Model(&class).Association("Categories").Replace(&cats); err != nil {
+			tx.Rollback()
+			return c.Status(500).JSON(err.Error())
+		}
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	return c.Status(201).JSON(class)
 }
 
@@ -78,7 +114,7 @@ func GetClasses(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	if err := db.Preload("Teacher").Preload("Categories").Find(&classes).Error; err != nil {
+	if err := db.Find(&classes).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
@@ -101,7 +137,7 @@ func GetClasses(c *fiber.Ctx) error {
 }
 
 func findClass(db *gorm.DB, id int, class *models.Class) error {
-	return db.Preload("Teacher").Preload("Categories").First(class, "id = ?", id).Error
+	return db.First(class, "id = ?", id).Error
 }
 
 // GetClass godoc
@@ -130,7 +166,7 @@ func GetClass(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	err = findClass(db, id, &class)
+	err = db.Preload("Teacher").Preload("Categories").First(&class, "id = ?", id).Error
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("class not found")
@@ -197,12 +233,52 @@ func UpdateClass(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err := db.Model(&class).Updates(class_update).Error; err != nil {
+	// begin transaction for create Class with ClassCategories
+	tx := db.Begin()
+	if tx.Error != nil {
+		return c.Status(500).JSON(tx.Error.Error())
+	}
+
+	if err := tx.Model(&class).
+		Omit("Teacher").
+		Omit("Categories").
+		Updates(class_update).Error; err != nil {
+		tx.Rollback()
+		return c.Status(500).JSON(err.Error())
+	}
+
+	if len(class_update.Categories) > 0 {
+		var cats []models.ClassCategory
+		names := make([]string, len(class_update.Categories))
+		for i, cat := range class_update.Categories {
+			names[i] = cat.ClassCategory
+		}
+
+		if err := tx.Where("class_category IN ?", names).Find(&cats).Error; err != nil {
+			tx.Rollback()
+			return c.Status(500).JSON(err.Error())
+		}
+
+		if len(cats) != len(names) {
+			tx.Rollback()
+			return c.Status(400).JSON(fiber.Map{"error": "some categories not found"})
+		}
+
+		if err := tx.Model(&class).Association("Categories").Replace(&cats); err != nil {
+			tx.Rollback()
+			return c.Status(500).JSON(err.Error())
+		}
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	if err := db.First(&class, id).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(class)
-
 }
 
 // DeleteClass godoc

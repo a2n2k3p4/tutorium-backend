@@ -170,7 +170,10 @@ func UpdateReview(c *fiber.Ctx) error {
 		}
 	}
 
-	if err := db.Model(&review).Updates(review_updated).Error; err != nil {
+	if err := db.Model(&review).
+		Omit("Learner").
+		Omit("Class").
+		Updates(review_updated).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 

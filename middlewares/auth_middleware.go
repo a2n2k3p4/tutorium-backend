@@ -2,15 +2,12 @@ package middlewares
 
 import (
 	"fmt"
-	"log"
-	"os"
 	"strings"
-	"sync"
 
+	"github.com/a2n2k3p4/tutorium-backend/config"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/joho/godotenv"
 )
 
 type Claims struct {
@@ -19,41 +16,20 @@ type Claims struct {
 }
 
 // if Status = development you can bypass all routes
-var Status = sync.OnceValue(func() string {
-	_ = godotenv.Load("../.env")
-	s := os.Getenv("STATUS")
-	if s == "" {
-		s = "production"
-	}
-	return s
-})
-
-var Secret func() []byte = sync.OnceValue(func() []byte {
-	// load .env for local dev; no-op if missing
-	_ = godotenv.Load("../.env")
-
-	s := os.Getenv("JWT_SECRET")
-	if s == "" {
-		log.Fatal("JWT_SECRET environment variable is not set")
-	}
-	return []byte(s)
-})
+var Status = config.STATUS
+var Secret = func() []byte {
+	return []byte(config.JWTSecret())
+}
 
 // SetSecret lets tests (or a custom main) override how the secret is provided.
 // Call this once, *before* the middleware is used. Passing nil restores default.
 func SetSecret(f func() []byte) {
 	if f == nil {
-		Secret = sync.OnceValue(func() []byte {
-			_ = godotenv.Load("../.env")
-			s := os.Getenv("JWT_SECRET")
-			if s == "" {
-				log.Fatal("JWT_SECRET environment variable is not set")
-			}
-			return []byte(s)
-		})
+		Secret = func() []byte {
+			return []byte(config.JWTSecret())
+		}
 		return
 	}
-
 	Secret = f
 }
 
