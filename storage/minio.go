@@ -6,15 +6,13 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/joho/godotenv"
+	"github.com/a2n2k3p4/tutorium-backend/config"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
@@ -27,18 +25,11 @@ type Client struct {
 }
 
 func NewClientFromEnv() (*Client, error) {
-	if err := godotenv.Load("../.env"); err != nil {
-		log.Println(".env file not found, using system environment variables")
-	}
-	endpoint := os.Getenv("MINIO_ENDPOINT")
-	accessKey := os.Getenv("MINIO_ACCESS_KEY")
-	secretKey := os.Getenv("MINIO_SECRET_KEY")
-	bucket := os.Getenv("MINIO_BUCKET")
-	useSSL := false
-	if s := os.Getenv("MINIO_USE_SSL"); s != "" {
-		b, _ := strconv.ParseBool(s)
-		useSSL = b
-	}
+	endpoint := config.MINIOEndpoint()
+	accessKey := config.MINIOAccessKey()
+	secretKey := config.MINIOSecretKey()
+	bucket := config.MINIOBucket()
+	useSSL, _ := strconv.ParseBool(config.MINIOUseSSL())
 
 	if endpoint == "" || accessKey == "" || secretKey == "" || bucket == "" {
 		return nil, errors.New("minio config missing (MINIO_ENDPOINT, MINIO_ACCESS_KEY, MINIO_SECRET_KEY, MINIO_BUCKET)")

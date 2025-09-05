@@ -4,7 +4,8 @@ import (
 	"log"
 
 	// module name "github.com/a2n2k3p4/tutorium-backend"
-	"github.com/a2n2k3p4/tutorium-backend/config/dbserver" // store functions related to connecting to PostgreSQL
+	// store functions related to connecting to PostgreSQL
+	"github.com/a2n2k3p4/tutorium-backend/config"
 	"github.com/a2n2k3p4/tutorium-backend/handlers"
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
@@ -17,7 +18,7 @@ import (
 	"github.com/gofiber/swagger"
 )
 
-// Before running the server, change config/dbserver/config.go to correct connection info
+// Before running the server, change config/dbserver.go to correct connection info
 
 //	@title			Tutorium Backend API
 //	@version		1.0
@@ -38,9 +39,9 @@ import (
 // @description Type "Bearer " followed by your JWT token.`
 
 func main() {
-	cfg := dbserver.NewConfig()
+	cfg := config.NewConfig()
 
-	db, err := dbserver.ConnectDB(cfg)
+	db, err := config.ConnectDB(cfg)
 	if err != nil {
 		log.Fatalf("Unable to connect to DB: %v", err)
 	}

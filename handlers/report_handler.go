@@ -198,7 +198,10 @@ func UpdateReport(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err := db.Model(&report).Updates(report_updated).Error; err != nil {
+	if err := db.Model(&report).
+		Omit("Reporter").
+		Omit("Reported").
+		Updates(report_updated).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 

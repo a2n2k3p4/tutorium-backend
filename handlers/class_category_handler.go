@@ -68,7 +68,7 @@ func GetClassCategories(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	if err := db.Preload("Classes").Find(&class_categories).Error; err != nil {
+	if err := db.Find(&class_categories).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
@@ -76,7 +76,7 @@ func GetClassCategories(c *fiber.Ctx) error {
 }
 
 func findClassCategory(db *gorm.DB, id int, class_category *models.ClassCategory) error {
-	return db.Preload("Classes").First(class_category, "id = ?", id).Error
+	return db.First(class_category, "id = ?", id).Error
 }
 
 // GetClassCategory godoc
@@ -105,7 +105,7 @@ func GetClassCategory(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	err = findClassCategory(db, id, &class_category)
+	err = db.Preload("Classes").First(&class_category, "id = ?", id).Error
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("class_category not found")
@@ -157,7 +157,7 @@ func UpdateClassCategory(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err := db.Model(&class_category).Updates(class_category_update).Error; err != nil {
+	if err := db.Model(&class_category).Omit("Classes").Updates(class_category_update).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 

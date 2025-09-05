@@ -1,14 +1,10 @@
-package dbserver
+package config
 
 import (
 	"fmt"
-	"log"
-	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-
-	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -45,15 +41,11 @@ func ConnectDB(cfg *Config) (*gorm.DB, error) {
 }
 
 func NewConfig() *Config {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	return &Config{
-		DBUser:     os.Getenv("DB_USER"),
-		DBPassword: os.Getenv("DB_PASSWORD"),
-		DBHost:     os.Getenv("DB_HOST"),
-		DBPort:     os.Getenv("DB_PORT"),
-		DBName:     os.Getenv("DB_NAME"),
+		DBUser:     DBUser(),
+		DBPassword: DBPassword(),
+		DBHost:     DBHost(),
+		DBPort:     DBPort(),
+		DBName:     DBName(),
 	}
 }

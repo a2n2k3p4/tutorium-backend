@@ -37,8 +37,9 @@ func TestCreateTeacher_OK(t *testing.T) {
 	})
 	wantStatus(t, resp, http.StatusCreated)
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Fatalf("unmet expectations: %v", err)
+		}
 	}
 }
 
