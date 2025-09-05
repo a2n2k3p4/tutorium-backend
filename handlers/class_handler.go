@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -17,6 +18,7 @@ import (
 
 func ClassRoutes(app *fiber.App) {
 	class := app.Group("/classes", middlewares.ProtectedMiddleware())
+	class.Get("/filter", GetFilteredClasses)
 	class.Get("/", GetClasses)
 	class.Get("/:id", GetClass)
 
@@ -186,6 +188,86 @@ func GetClass(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(class)
+}
+
+// GetFilteredClasses godoc
+//
+//		@Summary		Get filtered classes
+//		@Description	Retrieve a list of classes filtered by optional query parameters: categories, price range, and rating range
+//		@Tags			Classes
+//	 @Security 		BearerAuth
+//		@Produce		json
+//		@Param			category		query	[]string	false	"Filter by one or more categories (OR relation)"
+//		@Param			min_price		query	string		false	"Minimum class price"
+//		@Param			max_price		query	string		false	"Maximum class price"
+//		@Param			min_rating		query	string		false	"Minimum class rating"
+//		@Param			max_rating		query	string		false	"Maximum class rating"
+//		@Success		200	{array}		models.ClassDoc
+//		@Failure		400	{object}	map[string]string	"Invalid query parameters"
+//		@Failure		500	{object}	map[string]string	"Server error"
+//		@Router			/classes/filter [get]
+func GetFilteredClasses(c *fiber.Ctx) error {
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	var classes []models.Class
+	query := db.Preload("Categories")
+
+	// Multiple categories
+	var filters struct {
+		Categories []string `query:"category"`
+		MinPrice   string   `query:"min_price"`
+		MaxPrice   string   `query:"max_price"`
+		MinRating  string   `query:"min_rating"`
+		MaxRating  string   `query:"max_rating"`
+	}
+
+	if err := c.QueryParser(&filters); err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	if len(filters.Categories) > 0 {
+		query = query.
+			Joins("JOIN class_class_categories ccc ON ccc.class_id = classes.id").
+			Joins("JOIN class_categories cc ON cc.id = ccc.class_category_id").
+			Where("cc.class_category IN (?)", filters.Categories)
+	}
+
+	// Price filter
+	if filters.MinPrice != "" || filters.MaxPrice != "" {
+		min, minErr := strconv.ParseFloat(filters.MinPrice, 64)
+		max, maxErr := strconv.ParseFloat(filters.MaxPrice, 64)
+
+		if minErr == nil && maxErr == nil {
+			query = query.Where("price BETWEEN ? AND ?", min, max)
+		} else if minErr == nil {
+			query = query.Where("price >= ?", min)
+		} else if maxErr == nil {
+			query = query.Where("price <= ?", max)
+		}
+	}
+
+	// Rating filter
+	if filters.MinRating != "" || filters.MaxRating != "" {
+		min, minErr := strconv.ParseFloat(filters.MinRating, 64)
+		max, maxErr := strconv.ParseFloat(filters.MaxRating, 64)
+
+		if minErr == nil && maxErr == nil {
+			query = query.Where("rating BETWEEN ? AND ?", min, max)
+		} else if minErr == nil {
+			query = query.Where("rating >= ?", min)
+		} else if maxErr == nil {
+			query = query.Where("rating <= ?", max)
+		}
+	}
+
+	if err := query.Find(&classes).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	return c.JSON(classes)
 }
 
 // UpdateClass godoc
