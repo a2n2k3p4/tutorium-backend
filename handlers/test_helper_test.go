@@ -230,6 +230,13 @@ func ExpSoftDeleteOK(table string) Exp {
 	}
 }
 
+func ExpSoftDeleteOKWithAllowNoTransaction(table string) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectExec(fmt.Sprintf(`UPDATE "%s" SET "deleted_at"=`, table)).
+			WillReturnResult(sqlmock.NewResult(0, 1))
+	}
+}
+
 func ExpSoftDeleteError(table string, err error) Exp {
 	return func(m sqlmock.Sqlmock) {
 		m.ExpectBegin()
@@ -248,6 +255,13 @@ func ExpPreloadField(table string, columns []string, vals []any) Exp {
 		r := sqlmock.NewRows(columns).AddRow(values...)
 		m.ExpectQuery(fmt.Sprintf(`SELECT .* FROM "%s".*`, table)).
 			WillReturnRows(r)
+	}
+}
+
+func ExpPreloadCanEmpty(table string, columns []string) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectQuery(fmt.Sprintf(`SELECT .* FROM "%s".*`, table)).
+			WillReturnRows(sqlmock.NewRows(columns))
 	}
 }
 
