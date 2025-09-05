@@ -247,7 +247,7 @@ func GetFilteredClasses(c *fiber.Ctx) error {
 		Joins("JOIN teachers ON teachers.id = classes.teacher_id").
 		Joins("JOIN users ON users.id = teachers.user_id")
 
-	// Categories fitler
+	// Categories filter
 	if len(filters.Categories) > 0 {
 		query = query.Where("classes.id IN (?)",
 			db.Table("class_class_categories ccc").
