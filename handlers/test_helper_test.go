@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"context"
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
@@ -14,18 +15,23 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/a2n2k3p4/tutorium-backend/config"
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
+	"github.com/a2n2k3p4/tutorium-backend/storage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/valyala/fasthttp"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
+/* ------------------ SetSecret Helper ------------------ */
 const secretString = "secret"
 
 func init() {
 	middlewares.SetSecret(func() []byte { return []byte(secretString) })
 }
+
+/* ------------------ Test set-up Helper  ------------------ */
 
 func setupMockGorm(t *testing.T) (sqlmock.Sqlmock, *gorm.DB, func()) {
 	t.Helper()
@@ -48,6 +54,7 @@ func setupApp(gdb *gorm.DB) *fiber.App {
 	return app
 }
 
+/* ------------------ Reader Helper ------------------ */
 func readBody(t *testing.T, r io.Reader) []byte {
 	t.Helper()
 	b, err := io.ReadAll(r)
@@ -57,6 +64,12 @@ func readBody(t *testing.T, r io.Reader) []byte {
 	return b
 }
 
+func jsonBody(v any) []byte {
+	b, _ := json.Marshal(v)
+	return b
+}
+
+/* ------------------ JWT maker Helper ------------------ */
 func makeJWT(t *testing.T, secret []byte, userID uint) string {
 	t.Helper()
 
@@ -74,10 +87,12 @@ func makeJWT(t *testing.T, secret []byte, userID uint) string {
 	return signed
 }
 
+/* ------------------ Authentication Helper ------------------ */
 func preloadUserForAuth(mock sqlmock.Sqlmock, userID uint, hasAdmin bool, hasTeacher bool, hasLearner bool) {
 	if config.STATUS() == "development" {
 		return
 	}
+
 	mock.MatchExpectationsInOrder(false)
 
 	mock.ExpectQuery(`SELECT \* FROM "users" WHERE "users"\."id" = \$1 AND "users"\."deleted_at" IS NULL ORDER BY "users"\."id" LIMIT .*`).
@@ -113,6 +128,7 @@ func preloadUserForAuth(mock sqlmock.Sqlmock, userID uint, hasAdmin bool, hasTea
 
 }
 
+/* ------------------ Expect query Helper ------------------ */
 type Exp func(sqlmock.Sqlmock)
 
 func ExpAuthUser(userID uint, asAdmin, asTeacher, asSomethingElse bool) Exp {
@@ -291,17 +307,24 @@ func ExpPreloadM2M(joinTable string, childTable string, parentKey string,
 	}
 }
 
-// -------- HTTP runner & assertions --------
+/* ------------------Raising Status warning Helper------------------ */
+func wantStatus(t *testing.T, got *http.Response, want int) {
+	t.Helper()
+	if got.StatusCode != want {
+		t.Fatalf("status = %d, want %d; body=%s", got.StatusCode, want, string(readBody(t, got.Body)))
+	}
+}
+
+/* ------------------Http setup ------------------ */
 
 type httpInput struct {
 	Method      string
 	Path        string
 	Body        []byte
 	ContentType string
-	UserID      *uint // if set, attach JWT
+	UserID      *uint
 }
 
-// Accept *fiber.App (your setupApp returns this)
 func runHTTP(t *testing.T, app *fiber.App, in httpInput) *http.Response {
 	t.Helper()
 
@@ -327,14 +350,30 @@ func runHTTP(t *testing.T, app *fiber.App, in httpInput) *http.Response {
 	return resp
 }
 
-func wantStatus(t *testing.T, got *http.Response, want int) {
-	t.Helper()
-	if got.StatusCode != want {
-		t.Fatalf("status = %d, want %d; body=%s", got.StatusCode, want, string(readBody(t, got.Body)))
-	}
+type fakeUploader struct {
+	lastBucket   string
+	lastFilename string
+	lastData     []byte
+	wantErr      error
 }
 
-func jsonBody(v any) []byte {
-	b, _ := json.Marshal(v)
-	return b
+func (f *fakeUploader) UploadBytes(_ context.Context, bucket, filename string, b []byte) (string, error) {
+	f.lastBucket = bucket
+	f.lastFilename = filename
+	f.lastData = append([]byte(nil), b...)
+	if f.wantErr != nil {
+		return "", f.wantErr
+	}
+	return bucket + "/" + filename, nil
 }
+
+func newCtxWithUploader(u storage.Uploader) (*fiber.App, *fiber.Ctx) {
+	app := fiber.New()
+	rc := new(fasthttp.RequestCtx)
+	ctx := app.AcquireCtx(rc)
+	ctx.Locals("minio", u)
+	return app, ctx
+}
+
+// 1×1 transparent PNG (raw base64, no data: prefix)
+const tinyPNGRawBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMBAgK2V9sAAAAASUVORK5CYII="
