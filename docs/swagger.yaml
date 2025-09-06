@@ -1136,8 +1136,32 @@ paths:
       - ClassSessions
   /classes:
     get:
-      description: GetClasses retrieves all Class records with Teacher and Categories
-        relations
+      description: 'Retrieve a list of classes filtered by optional query parameters:
+        categories, price range, and rating range'
+      parameters:
+      - collectionFormat: csv
+        description: Filter by one or more categories (OR relation)
+        in: query
+        items:
+          type: string
+        name: category
+        type: array
+      - description: Minimum class price
+        in: query
+        name: min_price
+        type: string
+      - description: Maximum class price
+        in: query
+        name: max_price
+        type: string
+      - description: Minimum class rating
+        in: query
+        name: min_rating
+        type: string
+      - description: Maximum class rating
+        in: query
+        name: max_rating
+        type: string
       produces:
       - application/json
       responses:
@@ -1147,6 +1171,12 @@ paths:
             items:
               $ref: '#/definitions/models.ClassDoc'
             type: array
+        "400":
+          description: Invalid query parameters
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "500":
           description: Server error
           schema:
@@ -1315,60 +1345,6 @@ paths:
       security:
       - BearerAuth: []
       summary: Update an existing class
-      tags:
-      - Classes
-  /classes/filter:
-    get:
-      description: 'Retrieve a list of classes filtered by optional query parameters:
-        categories, price range, and rating range'
-      parameters:
-      - collectionFormat: csv
-        description: Filter by one or more categories (OR relation)
-        in: query
-        items:
-          type: string
-        name: category
-        type: array
-      - description: Minimum class price
-        in: query
-        name: min_price
-        type: string
-      - description: Maximum class price
-        in: query
-        name: max_price
-        type: string
-      - description: Minimum class rating
-        in: query
-        name: min_rating
-        type: string
-      - description: Maximum class rating
-        in: query
-        name: max_rating
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.ClassDoc'
-            type: array
-        "400":
-          description: Invalid query parameters
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Server error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get filtered classes
       tags:
       - Classes
   /enrollments:

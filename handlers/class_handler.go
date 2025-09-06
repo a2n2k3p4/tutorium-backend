@@ -18,7 +18,6 @@ import (
 
 func ClassRoutes(app *fiber.App) {
 	class := app.Group("/classes", middlewares.ProtectedMiddleware())
-	class.Get("/filter", GetFilteredClasses)
 	class.Get("/", GetClasses)
 	class.Get("/:id", GetClass)
 
@@ -102,97 +101,6 @@ func CreateClass(c *fiber.Ctx) error {
 // GetClasses godoc
 //
 //		@Summary		List all classes
-//		@Description	GetClasses retrieves all Class records with Teacher and Categories relations
-//		@Tags			Classes
-//	 @Security 		BearerAuth
-//		@Produce		json
-//		@Success		200	{array}		models.ClassDoc
-//		@Failure		500	{object}	map[string]string	"Server error"
-//		@Router			/classes [get]
-func GetClasses(c *fiber.Ctx) error {
-	classes := []models.Class{}
-	db, err := middlewares.GetDB(c)
-	if err != nil {
-		return c.Status(500).JSON(err.Error())
-	}
-
-	if err := db.Find(&classes).Error; err != nil {
-		return c.Status(500).JSON(err.Error())
-	}
-
-	// Generate presigned URL if BannerPictureURL exists
-	mc, ok := c.Locals("minio").(*storage.Client)
-	if ok {
-		for i := range classes {
-			if classes[i].BannerPictureURL != "" {
-				presignedURL, err := mc.PresignedGetObject(c.Context(), classes[i].BannerPictureURL, 15*time.Minute)
-				if err == nil {
-					classes[i].BannerPictureURL = presignedURL
-				} else {
-					classes[i].BannerPictureURL = ""
-				}
-			}
-		}
-	}
-
-	return c.Status(200).JSON(classes)
-}
-
-func findClass(db *gorm.DB, id int, class *models.Class) error {
-	return db.First(class, "id = ?", id).Error
-}
-
-// GetClass godoc
-//
-//		@Summary		Get class by ID
-//		@Description	GetClass retrieves a single Class by its ID, including Teacher and Categories
-//		@Tags			Classes
-//	 @Security 		BearerAuth
-//		@Produce		json
-//		@Param			id	path		int	true	"Class ID"
-//		@Success		200	{object}	models.ClassDoc
-//		@Failure		400	{object}	map[string]string	"Invalid ID"
-//		@Failure		404	{object}	map[string]string	"Class not found"
-//		@Failure		500	{object}	map[string]string	"Server error"
-//		@Router			/classes/{id} [get]
-func GetClass(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("id")
-
-	var class models.Class
-
-	if err != nil {
-		return c.Status(400).JSON("Please ensure that :id is an integer")
-	}
-	db, err := middlewares.GetDB(c)
-	if err != nil {
-		return c.Status(500).JSON(err.Error())
-	}
-
-	err = db.Preload("Teacher").Preload("Categories").First(&class, "id = ?", id).Error
-	switch {
-	case errors.Is(err, gorm.ErrRecordNotFound):
-		return c.Status(404).JSON("class not found")
-	case err != nil:
-		return c.Status(500).JSON(err.Error())
-	}
-
-	// Generate presigned URL if BannerPictureURL exists
-	mc, ok := c.Locals("minio").(*storage.Client)
-	if ok && class.BannerPictureURL != "" {
-		presignedURL, err := mc.PresignedGetObject(c.Context(), class.BannerPictureURL, 15*time.Minute)
-		if err == nil {
-			class.BannerPictureURL = presignedURL
-		} else {
-			class.BannerPictureURL = ""
-		}
-	}
-
-	return c.Status(200).JSON(class)
-}
-
-// GetFilteredClasses godoc
-//
-//		@Summary		Get filtered classes
 //		@Description	Retrieve a list of classes filtered by optional query parameters: categories, price range, and rating range
 //		@Tags			Classes
 //	 @Security 		BearerAuth
@@ -205,8 +113,8 @@ func GetClass(c *fiber.Ctx) error {
 //		@Success		200	{array}		models.ClassDoc
 //		@Failure		400	{object}	map[string]string	"Invalid query parameters"
 //		@Failure		500	{object}	map[string]string	"Server error"
-//		@Router			/classes/filter [get]
-func GetFilteredClasses(c *fiber.Ctx) error {
+//		@Router			/classes [get]
+func GetClasses(c *fiber.Ctx) error {
 	db, err := middlewares.GetDB(c)
 	if err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -224,7 +132,14 @@ func GetFilteredClasses(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	type FilteredClassResponse struct {
+	if len(filters.Categories) == 1 && strings.Contains(filters.Categories[0], ",") {
+		filters.Categories = strings.Split(filters.Categories[0], ",")
+		for i := range filters.Categories {
+			filters.Categories[i] = strings.TrimSpace(filters.Categories[i])
+		}
+	}
+
+	type ClassResponse struct {
 		ID               uint    `json:"id"`
 		ClassName        string  `json:"class_name"`
 		BannerPictureURL string  `json:"banner_picture_url"`
@@ -232,7 +147,7 @@ func GetFilteredClasses(c *fiber.Ctx) error {
 		Price            float64 `json:"price"`
 		TeacherName      string  `json:"teacher_name"`
 	}
-	var results []FilteredClassResponse
+	var results []ClassResponse
 
 	// Get teacher's FirstName and LastName from users table
 	query := db.Table("classes").
@@ -242,7 +157,7 @@ func GetFilteredClasses(c *fiber.Ctx) error {
 			classes.banner_picture_url,
 			classes.rating,
 			classes.price,
-			users.first_name || ' ' || users.last_name AS teacher_name
+			CONCAT(users.first_name, ' ', users.last_name) AS teacher_name
 		`).
 		Joins("JOIN teachers ON teachers.id = classes.teacher_id").
 		Joins("JOIN users ON users.id = teachers.user_id")
@@ -305,7 +220,59 @@ func GetFilteredClasses(c *fiber.Ctx) error {
 		}
 	}
 
-	return c.JSON(results)
+	return c.Status(200).JSON(results)
+}
+
+func findClass(db *gorm.DB, id int, class *models.Class) error {
+	return db.First(class, "id = ?", id).Error
+}
+
+// GetClass godoc
+//
+//		@Summary		Get class by ID
+//		@Description	GetClass retrieves a single Class by its ID, including Teacher and Categories
+//		@Tags			Classes
+//	 @Security 		BearerAuth
+//		@Produce		json
+//		@Param			id	path		int	true	"Class ID"
+//		@Success		200	{object}	models.ClassDoc
+//		@Failure		400	{object}	map[string]string	"Invalid ID"
+//		@Failure		404	{object}	map[string]string	"Class not found"
+//		@Failure		500	{object}	map[string]string	"Server error"
+//		@Router			/classes/{id} [get]
+func GetClass(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+
+	var class models.Class
+
+	if err != nil {
+		return c.Status(400).JSON("Please ensure that :id is an integer")
+	}
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	err = db.Preload("Teacher").Preload("Categories").First(&class, "id = ?", id).Error
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return c.Status(404).JSON("class not found")
+	case err != nil:
+		return c.Status(500).JSON(err.Error())
+	}
+
+	// Generate presigned URL if BannerPictureURL exists
+	mc, ok := c.Locals("minio").(*storage.Client)
+	if ok && class.BannerPictureURL != "" {
+		presignedURL, err := mc.PresignedGetObject(c.Context(), class.BannerPictureURL, 15*time.Minute)
+		if err == nil {
+			class.BannerPictureURL = presignedURL
+		} else {
+			class.BannerPictureURL = ""
+		}
+	}
+
+	return c.Status(200).JSON(class)
 }
 
 // UpdateClass godoc
