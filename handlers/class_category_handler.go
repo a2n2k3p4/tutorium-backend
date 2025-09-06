@@ -7,6 +7,7 @@ import (
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func ClassCategoryRoutes(app *fiber.App) {
@@ -157,7 +158,7 @@ func UpdateClassCategory(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err := db.Model(&class_category).Omit("Classes").Updates(class_category_update).Error; err != nil {
+	if err := db.Model(&class_category).Omit(clause.Associations).Updates(class_category_update).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 

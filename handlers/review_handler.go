@@ -7,6 +7,7 @@ import (
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func ReviewRoutes(app *fiber.App) {
@@ -171,8 +172,7 @@ func UpdateReview(c *fiber.Ctx) error {
 	}
 
 	if err := db.Model(&review).
-		Omit("Learner").
-		Omit("Class").
+		Omit(clause.Associations).
 		Updates(review_updated).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
