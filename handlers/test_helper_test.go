@@ -126,6 +126,17 @@ func ExpInsertReturningID(table string, id uint64) Exp {
 	}
 }
 
+func ExpDoubleInsertReturningID(table1 string, table2 string, id1 uint64, id2 uint64) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
+		m.ExpectQuery(fmt.Sprintf(`INSERT INTO "%s".*RETURNING "id"`, table1)).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(id1))
+		m.ExpectQuery(fmt.Sprintf(`INSERT INTO "%s".*RETURNING "id"`, table2)).
+			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(id2))
+		m.ExpectCommit()
+	}
+}
+
 func ExpInsertError(table string, err error) Exp {
 	return func(m sqlmock.Sqlmock) {
 		m.ExpectBegin()
