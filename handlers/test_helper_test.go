@@ -87,6 +87,24 @@ func makeJWT(t *testing.T, secret []byte, userID uint) string {
 	return signed
 }
 
+/* ------------------ Bypass test Helper ------------------ */
+func RunInDifferentStatus(t *testing.T, body func(t *testing.T)) {
+	t.Helper()
+	cases := []struct {
+		name string
+		env  string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.env)
+			body(t)
+		})
+	}
+}
+
 /* ------------------ Authentication Helper ------------------ */
 func preloadUserForAuth(mock sqlmock.Sqlmock, userID uint, hasAdmin bool, hasTeacher bool, hasLearner bool) {
 	if config.STATUS() == "development" {
