@@ -95,6 +95,7 @@ func CreateClass(c *fiber.Ctx) error {
 	if err := tx.Commit().Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
+
 	return c.Status(201).JSON(class)
 }
 
