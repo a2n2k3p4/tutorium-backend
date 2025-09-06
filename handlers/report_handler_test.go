@@ -252,6 +252,7 @@ func TestUpdateReport_OK(t *testing.T) {
 		[]any{reportID, userID, userReportedID, "old_type", "Lorem", "", time.Now()},
 	)(mock)
 
+	ExpPreloadField(preloadTable, []string{"id"}, []any{userReportedID})(mock)
 	ExpPreloadField(preloadTable, []string{"id"}, []any{userID})(mock)
 
 	ExpUpdateOK(table)(mock)

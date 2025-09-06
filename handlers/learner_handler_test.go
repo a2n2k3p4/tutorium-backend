@@ -12,209 +12,326 @@ import (
 
 // 201
 func TestCreateLearner_OK(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-
-	table := "learners"
-	userID := uint(42)
-
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpInsertReturningID(table, 1)(mock)
-
-	app := setupApp(gdb)
-
-	payload := models.Learner{
-		UserID: userID,
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
 	}
 
-	resp := runHTTP(t, app, httpInput{
-		Method:      http.MethodPost,
-		Path:        "/learners/",
-		Body:        jsonBody(payload),
-		ContentType: "application/json",
-		UserID:      &userID,
-	})
-	wantStatus(t, resp, http.StatusCreated)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			table := "learners"
+			userID := uint(42)
+
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpInsertReturningID(table, 1)(mock)
+
+			app := setupApp(gdb)
+
+			payload := models.Learner{
+				UserID: userID,
+			}
+
+			resp := runHTTP(t, app, httpInput{
+				Method:      http.MethodPost,
+				Path:        "/learners/",
+				Body:        jsonBody(payload),
+				ContentType: "application/json",
+				UserID:      &userID,
+			})
+			wantStatus(t, resp, http.StatusCreated)
+
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 400
 func TestCreateLearner_BadRequest(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-	userID := uint(42)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	ExpAuthUser(userID, false, false, false)(mock)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
+			userID := uint(42)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodPost, Path: "/learners/",
-		Body: []byte(`{invalid-json}`), ContentType: "application/json", UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusBadRequest)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodPost, Path: "/learners/",
+				Body: []byte(`{invalid-json}`), ContentType: "application/json", UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusBadRequest)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 500
 func TestCreateLearner_DBError(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-
-	table := "learners"
-	userID := uint(42)
-
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpInsertError(table, fmt.Errorf("db insert failed"))(mock)
-
-	payload := models.Learner{
-		UserID: userID,
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
 	}
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodPost, Path: "/learners/",
-		Body: jsonBody(payload), ContentType: "application/json", UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusInternalServerError)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
+
+			table := "learners"
+			userID := uint(42)
+
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpInsertError(table, fmt.Errorf("db insert failed"))(mock)
+
+			payload := models.Learner{
+				UserID: userID,
+			}
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodPost, Path: "/learners/",
+				Body: jsonBody(payload), ContentType: "application/json", UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusInternalServerError)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 /* ------------------ GetLearners ------------------ */
 // 200
 func TestGetLearners_OK(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-	userID := uint(42)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpListRows("learners", []string{"id"}, []any{1}, []any{2})(mock)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
+			userID := uint(42)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodGet, Path: "/learners/", UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusOK)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpListRows("learners", []string{"id"}, []any{1}, []any{2})(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodGet, Path: "/learners/", UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusOK)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 500
 func TestGetLearners_DBError(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-	userID := uint(42)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpListError("learners", fmt.Errorf("select failed"))(mock)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
+			userID := uint(42)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodGet, Path: "/learners/", UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusInternalServerError)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpListError("learners", fmt.Errorf("select failed"))(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodGet, Path: "/learners/", UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusInternalServerError)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 /* ------------------ GetLearner ------------------ */
 // 200
 func TestGetLearner_OK(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	table := "learners"
-	userID := uint(42)
-	learnerID := uint(7)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpSelectByIDFound(table, learnerID, []string{"id"}, []any{learnerID})(mock)
+			table := "learners"
+			userID := uint(42)
+			learnerID := uint(7)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodGet, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusOK)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpSelectByIDFound(table, learnerID, []string{"id"}, []any{learnerID})(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodGet, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusOK)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 404
 func TestGetLearner_NotFound(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	table := "learners"
-	userID := uint(42)
-	learnerID := uint(999)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpSelectByIDEmpty(table, learnerID)(mock)
+			table := "learners"
+			userID := uint(42)
+			learnerID := uint(999)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodGet, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusNotFound)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpSelectByIDEmpty(table, learnerID)(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodGet, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusNotFound)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 500
 func TestGetLearner_DBError(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	table := "learners"
-	userID := uint(42)
-	learnerID := uint(7)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpSelectByIDError(table, learnerID, fmt.Errorf("select failed"))(mock)
+			table := "learners"
+			userID := uint(42)
+			learnerID := uint(7)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodGet, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusInternalServerError)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpSelectByIDError(table, learnerID, fmt.Errorf("select failed"))(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodGet, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusInternalServerError)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 400
 func TestGetLearner_BadRequest(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-	userID := uint(42)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	ExpAuthUser(userID, false, false, false)(mock)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
+			userID := uint(42)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodGet, Path: "/learners/not-an-int", UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusBadRequest)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodGet, Path: "/learners/not-an-int", UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusBadRequest)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
@@ -222,90 +339,142 @@ func TestGetLearner_BadRequest(t *testing.T) {
 
 // 200
 func TestDeleteLearner_OK_SoftDelete(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	table := "learners"
-	userID := uint(42)
-	learnerID := uint(5)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpSelectByIDFound(table, learnerID, []string{"id"}, []any{learnerID})(mock)
-	ExpSoftDeleteOK(table)(mock)
+			table := "learners"
+			userID := uint(42)
+			learnerID := uint(5)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodDelete, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusOK)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpSelectByIDFound(table, learnerID, []string{"id"}, []any{learnerID})(mock)
+			ExpSoftDeleteOK(table)(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodDelete, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusOK)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 404
 func TestDeleteLearner_NotFound(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	table := "learners"
-	userID := uint(42)
-	learnerID := uint(12345)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpSelectByIDEmpty(table, learnerID)(mock)
+			table := "learners"
+			userID := uint(42)
+			learnerID := uint(12345)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodDelete, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusNotFound)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpSelectByIDEmpty(table, learnerID)(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodDelete, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusNotFound)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 500
 func TestDeleteLearner_DBError(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	table := "learners"
-	userID := uint(42)
-	learnerID := uint(5)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpSelectByIDFound(table, learnerID, []string{"id"}, []any{learnerID})(mock)
-	ExpSoftDeleteError(table, fmt.Errorf("update failed"))(mock)
+			table := "learners"
+			userID := uint(42)
+			learnerID := uint(5)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodDelete, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusInternalServerError)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpSelectByIDFound(table, learnerID, []string{"id"}, []any{learnerID})(mock)
+			ExpSoftDeleteError(table, fmt.Errorf("update failed"))(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodDelete, Path: fmt.Sprintf("/learners/%d", learnerID), UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusInternalServerError)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 400
 func TestDeleteLearner_BadRequest(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-	userID := uint(42)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	ExpAuthUser(userID, false, false, false)(mock)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
+			userID := uint(42)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodDelete, Path: "/learners/not-an-int", UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusBadRequest)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodDelete, Path: "/learners/not-an-int", UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusBadRequest)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }

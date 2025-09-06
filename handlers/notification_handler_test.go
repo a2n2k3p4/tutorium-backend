@@ -13,210 +13,327 @@ import (
 
 // 201
 func TestCreateNotification_OK(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-
-	table := "notifications"
-	userID := uint(42)
-
-	ExpAuthUser(userID, true, false, false)(mock)
-	ExpInsertReturningID(table, 1)(mock)
-
-	app := setupApp(gdb)
-
-	payload := models.Notification{
-		UserID:                  userID,
-		NotificationType:        "test",
-		NotificationDescription: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-		NotificationDate:        time.Now(),
-		ReadFlag:                false,
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
 	}
 
-	resp := runHTTP(t, app, httpInput{
-		Method:      http.MethodPost,
-		Path:        "/notifications/",
-		Body:        jsonBody(payload),
-		ContentType: "application/json",
-		UserID:      &userID,
-	})
-	wantStatus(t, resp, http.StatusCreated)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			table := "notifications"
+			userID := uint(42)
+
+			ExpAuthUser(userID, true, false, false)(mock)
+			ExpInsertReturningID(table, 1)(mock)
+
+			app := setupApp(gdb)
+
+			payload := models.Notification{
+				UserID:                  userID,
+				NotificationType:        "test",
+				NotificationDescription: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+				NotificationDate:        time.Now(),
+				ReadFlag:                false,
+			}
+
+			resp := runHTTP(t, app, httpInput{
+				Method:      http.MethodPost,
+				Path:        "/notifications/",
+				Body:        jsonBody(payload),
+				ContentType: "application/json",
+				UserID:      &userID,
+			})
+			wantStatus(t, resp, http.StatusCreated)
+
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 400
 func TestCreateNotification_BadRequest(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-	userID := uint(42)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	ExpAuthUser(userID, true, false, false)(mock)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
+			userID := uint(42)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodPost, Path: "/notifications/",
-		Body: []byte(`{invalid-json}`), ContentType: "application/json", UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusBadRequest)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, true, false, false)(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodPost, Path: "/notifications/",
+				Body: []byte(`{invalid-json}`), ContentType: "application/json", UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusBadRequest)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 500
 func TestCreateNotification_DBError(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	table := "notifications"
-	userID := uint(42)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	ExpAuthUser(userID, true, false, false)(mock)
-	ExpInsertError(table, fmt.Errorf("db insert failed"))(mock)
+			table := "notifications"
+			userID := uint(42)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodPost, Path: "/notifications/",
-		Body: []byte(`{}`), ContentType: "application/json", UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusInternalServerError)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, true, false, false)(mock)
+			ExpInsertError(table, fmt.Errorf("db insert failed"))(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodPost, Path: "/notifications/",
+				Body: []byte(`{}`), ContentType: "application/json", UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusInternalServerError)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 /* ------------------ GetNotifications ------------------ */
 // 200
 func TestGetNotifications_OK(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-	userID := uint(42)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpListRows("notifications", []string{"id"}, []any{1}, []any{2})(mock)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
+			userID := uint(42)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodGet, Path: "/notifications/", UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusOK)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpListRows("notifications", []string{"id"}, []any{1}, []any{2})(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodGet, Path: "/notifications/", UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusOK)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 500
 func TestGetNotifications_DBError(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-	userID := uint(42)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpListError("notifications", fmt.Errorf("select failed"))(mock)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
+			userID := uint(42)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodGet, Path: "/notifications/", UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusInternalServerError)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpListError("notifications", fmt.Errorf("select failed"))(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodGet, Path: "/notifications/", UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusInternalServerError)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 /* ------------------ GetNotification ------------------ */
 // 200
 func TestGetNotification_OK(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	table := "notifications"
-	userID := uint(42)
-	notificationID := uint(7)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpSelectByIDFound(table, notificationID, []string{"id"}, []any{notificationID})(mock)
+			table := "notifications"
+			userID := uint(42)
+			notificationID := uint(7)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodGet, Path: fmt.Sprintf("/notifications/%d", notificationID), UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusOK)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpSelectByIDFound(table, notificationID, []string{"id"}, []any{notificationID})(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodGet, Path: fmt.Sprintf("/notifications/%d", notificationID), UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusOK)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 404
 func TestGetNotification_NotFound(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	table := "notifications"
-	userID := uint(42)
-	notificationID := uint(999)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpSelectByIDEmpty(table, notificationID)(mock)
+			table := "notifications"
+			userID := uint(42)
+			notificationID := uint(999)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodGet, Path: fmt.Sprintf("/notifications/%d", notificationID), UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusNotFound)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpSelectByIDEmpty(table, notificationID)(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodGet, Path: fmt.Sprintf("/notifications/%d", notificationID), UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusNotFound)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 500
 func TestGetNotification_DBError(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	table := "notifications"
-	userID := uint(42)
-	notificationID := uint(7)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpSelectByIDError(table, notificationID, fmt.Errorf("select failed"))(mock)
+			table := "notifications"
+			userID := uint(42)
+			notificationID := uint(7)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodGet, Path: fmt.Sprintf("/notifications/%d", notificationID), UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusInternalServerError)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpSelectByIDError(table, notificationID, fmt.Errorf("select failed"))(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodGet, Path: fmt.Sprintf("/notifications/%d", notificationID), UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusInternalServerError)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 400
 func TestGetNotification_BadRequest(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-	userID := uint(42)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	ExpAuthUser(userID, false, false, false)(mock)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
+			userID := uint(42)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodGet, Path: "/notifications/not-an-int", UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusBadRequest)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodGet, Path: "/notifications/not-an-int", UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusBadRequest)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
@@ -224,111 +341,161 @@ func TestGetNotification_BadRequest(t *testing.T) {
 
 // 200
 func TestUpdateNotification_OK(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-
-	table := "notifications"
-	const preloadTable = "users"
-	userID := uint(42)
-	notificationID := uint(1)
-
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpSelectByIDFound(table, notificationID,
-		[]string{"id", "user_id", "notification_type", "notification_description", "notification_date", "read_flag"},
-		[]any{notificationID, userID, "original type", "Lorem", time.Now(), false},
-	)(mock)
-
-	ExpPreloadField(preloadTable, []string{"id"}, []any{userID})(mock)
-	ExpPreloadField(preloadTable, []string{"id"}, []any{userID})(mock)
-
-	ExpUpdateOK(table)(mock)
-
-	app := setupApp(gdb)
-	payload := models.Notification{
-		UserID: userID, NotificationType: "edit test",
-		NotificationDescription: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-		NotificationDate:        time.Now(), ReadFlag: false,
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
 	}
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodPut, Path: fmt.Sprintf("/notifications/%d", notificationID),
-		Body: jsonBody(payload), ContentType: "application/json", UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusOK)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
+
+			table := "notifications"
+			const preloadTable = "users"
+			userID := uint(42)
+			notificationID := uint(1)
+
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpSelectByIDFound(table, notificationID,
+				[]string{"id", "user_id", "notification_type", "notification_description", "notification_date", "read_flag"},
+				[]any{notificationID, userID, "original type", "Lorem", time.Now(), false},
+			)(mock)
+
+			ExpPreloadField(preloadTable, []string{"id"}, []any{userID})(mock)
+			ExpUpdateOK(table)(mock)
+
+			app := setupApp(gdb)
+			payload := models.Notification{
+				UserID: userID, NotificationType: "edit test",
+				NotificationDescription: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+				NotificationDate:        time.Now(), ReadFlag: false,
+			}
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodPut, Path: fmt.Sprintf("/notifications/%d", notificationID),
+				Body: jsonBody(payload), ContentType: "application/json", UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusOK)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 404
 func TestUpdateNotification_NotFound(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	table := "notifications"
-	userID := uint(42)
-	notificationID := uint(12345)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpSelectByIDEmpty(table, notificationID)(mock)
+			table := "notifications"
+			userID := uint(42)
+			notificationID := uint(12345)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodPut, Path: fmt.Sprintf("/notifications/%d", notificationID), UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusNotFound)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpSelectByIDEmpty(table, notificationID)(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodPut, Path: fmt.Sprintf("/notifications/%d", notificationID), UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusNotFound)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 500
 func TestUpdateNotification_DBError(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-
-	table := "notifications"
-	userID := uint(42)
-	notificationID := uint(1)
-
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpSelectByIDFound(table, notificationID, []string{"id"}, []any{notificationID})(mock)
-	ExpUpdateError(table, fmt.Errorf("update failed"))(mock)
-
-	app := setupApp(gdb)
-	payload := models.Notification{
-		UserID: userID, NotificationType: "edit test",
-		NotificationDescription: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-		NotificationDate:        time.Now(), ReadFlag: false,
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
 	}
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodPut, Path: fmt.Sprintf("/notifications/%d", notificationID),
-		Body: jsonBody(payload), ContentType: "application/json", UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusInternalServerError)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
+
+			table := "notifications"
+			userID := uint(42)
+			notificationID := uint(1)
+
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpSelectByIDFound(table, notificationID, []string{"id"}, []any{notificationID})(mock)
+			ExpUpdateError(table, fmt.Errorf("update failed"))(mock)
+
+			app := setupApp(gdb)
+			payload := models.Notification{
+				UserID: userID, NotificationType: "edit test",
+				NotificationDescription: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+				NotificationDate:        time.Now(), ReadFlag: false,
+			}
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodPut, Path: fmt.Sprintf("/notifications/%d", notificationID),
+				Body: jsonBody(payload), ContentType: "application/json", UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusInternalServerError)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 400
 func TestUpdateNotification_BadRequest(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-	userID := uint(42)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	ExpAuthUser(userID, false, false, false)(mock)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
+			userID := uint(42)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodPut, Path: "/notifications/not-an-int", UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusBadRequest)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodPut, Path: "/notifications/not-an-int", UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusBadRequest)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
@@ -336,90 +503,142 @@ func TestUpdateNotification_BadRequest(t *testing.T) {
 
 // 200 (soft delete)
 func TestDeleteNotification_OK_SoftDelete(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	table := "notifications"
-	userID := uint(42)
-	notificationID := uint(5)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpSelectByIDFound(table, notificationID, []string{"id"}, []any{notificationID})(mock)
-	ExpSoftDeleteOK(table)(mock)
+			table := "notifications"
+			userID := uint(42)
+			notificationID := uint(5)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodDelete, Path: fmt.Sprintf("/notifications/%d", notificationID), UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusOK)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpSelectByIDFound(table, notificationID, []string{"id"}, []any{notificationID})(mock)
+			ExpSoftDeleteOK(table)(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodDelete, Path: fmt.Sprintf("/notifications/%d", notificationID), UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusOK)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 404
 func TestDeleteNotification_NotFound(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	table := "notifications"
-	userID := uint(42)
-	notificationID := uint(12345)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpSelectByIDEmpty(table, notificationID)(mock)
+			table := "notifications"
+			userID := uint(42)
+			notificationID := uint(12345)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodDelete, Path: fmt.Sprintf("/notifications/%d", notificationID), UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusNotFound)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpSelectByIDEmpty(table, notificationID)(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodDelete, Path: fmt.Sprintf("/notifications/%d", notificationID), UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusNotFound)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 500
 func TestDeleteNotification_DBError(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	table := "notifications"
-	userID := uint(42)
-	notificationID := uint(5)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
 
-	ExpAuthUser(userID, false, false, false)(mock)
-	ExpSelectByIDFound(table, notificationID, []string{"id"}, []any{notificationID})(mock)
-	ExpSoftDeleteError(table, fmt.Errorf("update failed"))(mock)
+			table := "notifications"
+			userID := uint(42)
+			notificationID := uint(5)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodDelete, Path: fmt.Sprintf("/notifications/%d", notificationID), UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusInternalServerError)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+			ExpSelectByIDFound(table, notificationID, []string{"id"}, []any{notificationID})(mock)
+			ExpSoftDeleteError(table, fmt.Errorf("update failed"))(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodDelete, Path: fmt.Sprintf("/notifications/%d", notificationID), UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusInternalServerError)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
 
 // 400
 func TestDeleteNotification_BadRequest(t *testing.T) {
-	mock, gdb, cleanup := setupMockGorm(t)
-	defer cleanup()
-	mock.MatchExpectationsInOrder(false)
-	userID := uint(42)
+	cases := []struct {
+		name       string
+		STATUS_env string
+	}{
+		{"bypass", "development"},
+		{"unbypass", "production"},
+	}
 
-	ExpAuthUser(userID, false, false, false)(mock)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("STATUS", c.STATUS_env)
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
+			userID := uint(42)
 
-	app := setupApp(gdb)
-	resp := runHTTP(t, app, httpInput{
-		Method: http.MethodDelete, Path: "/notifications/not-an-int", UserID: &userID,
-	})
-	wantStatus(t, resp, http.StatusBadRequest)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Fatalf("unmet expectations: %v", err)
+			ExpAuthUser(userID, false, false, false)(mock)
+
+			app := setupApp(gdb)
+			resp := runHTTP(t, app, httpInput{
+				Method: http.MethodDelete, Path: "/notifications/not-an-int", UserID: &userID,
+			})
+			wantStatus(t, resp, http.StatusBadRequest)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
+		})
 	}
 }
