@@ -1339,7 +1339,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "GetClasses retrieves all Class records with Teacher and Categories relations",
+                "description": "Retrieve a list of classes filtered by optional query parameters: categories, price range, and rating range",
                 "produces": [
                     "application/json"
                 ],
@@ -1347,6 +1347,42 @@ const docTemplate = `{
                     "Classes"
                 ],
                 "summary": "List all classes",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Filter by one or more categories (OR relation)",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Minimum class price",
+                        "name": "min_price",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Maximum class price",
+                        "name": "max_price",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Minimum class rating",
+                        "name": "min_rating",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Maximum class rating",
+                        "name": "max_rating",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1354,6 +1390,15 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/models.ClassDoc"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid query parameters",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
                             }
                         }
                     },
