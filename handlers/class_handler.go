@@ -349,7 +349,7 @@ func UpdateClass(c *fiber.Ctx) error {
 			tx.Rollback()
 			return c.Status(400).JSON(fiber.Map{"error": "some categories not found"})
 		}
-    
+
 		if err := tx.Model(&class).Association("Categories").Replace(&cats); err != nil {
 			tx.Rollback()
 			return c.Status(500).JSON(err.Error())
