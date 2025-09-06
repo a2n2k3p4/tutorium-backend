@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/http"
+	"regexp"
 	"testing"
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
+	"github.com/stretchr/testify/require"
 )
 
 /* ------------------ CreateUser ------------------ */
@@ -377,7 +380,7 @@ func TestUpdateUser_OK(t *testing.T) {
 
 			ExpAuthUser(userID, false, false, false)(mock)
 			ExpSelectByIDFound(table, userID,
-				[]string{"id", "student_id", "profile_picture_url", "first_name", "last_name", "gender", "phone_number", "balance"},
+				[]string{"id", "student_id", "profilePicture_url", "first_name", "last_name", "gender", "phone_number", "balance"},
 				[]any{userID, studentID, "", "Janet", "Doe", "Female", "", 50},
 			)(mock)
 
@@ -677,4 +680,62 @@ func TestDeleteUser_BadRequest(t *testing.T) {
 			}
 		})
 	}
+}
+
+/* ------------------ processProfilePicture ------------------ */
+
+func TestProcessProfilePicture_Success(t *testing.T) {
+	fu := &fakeUploader{}
+	app, ctx := newCtxWithUploader(fu)
+	defer app.ReleaseCtx(ctx)
+
+	u := &models.User{ProfilePictureURL: tinyPNGRawBase64}
+
+	err := processProfilePicture(ctx, u)
+	require.NoError(t, err)
+
+	require.Equal(t, "users", fu.lastBucket)
+	require.NotEmpty(t, fu.lastFilename)
+	require.NotEmpty(t, fu.lastData)
+
+	require.Regexp(t, regexp.MustCompile(`^users/\d+\.(png|jpg|jpeg|gif|webp|bin)$`), u.ProfilePictureURL)
+}
+
+func TestProcessProfilePicture_SkipEmptyAndHTTP(t *testing.T) {
+	fu := &fakeUploader{}
+	app, ctx := newCtxWithUploader(fu)
+	defer app.ReleaseCtx(ctx)
+
+	u1 := &models.User{ProfilePictureURL: ""}
+	require.NoError(t, processProfilePicture(ctx, u1))
+	require.Equal(t, "", u1.ProfilePictureURL)
+	require.Equal(t, "", fu.lastFilename)
+
+	u2 := &models.User{ProfilePictureURL: "http://example.com/pic.png"}
+	require.NoError(t, processProfilePicture(ctx, u2))
+	require.Equal(t, "http://example.com/pic.png", u2.ProfilePictureURL)
+	require.Equal(t, "", fu.lastFilename)
+}
+
+func TestProcessProfilePicture_InvalidBase64(t *testing.T) {
+	fu := &fakeUploader{}
+	app, ctx := newCtxWithUploader(fu)
+	defer app.ReleaseCtx(ctx)
+
+	u := &models.User{ProfilePictureURL: "!!!not-b64!!!"}
+	err := processProfilePicture(ctx, u)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "invalid base64 image")
+}
+
+func TestProcessProfilePicture_InvalidImage(t *testing.T) {
+	fu := &fakeUploader{}
+	app, ctx := newCtxWithUploader(fu)
+	defer app.ReleaseCtx(ctx)
+
+	s := base64.StdEncoding.EncodeToString([]byte("hello"))
+	u := &models.User{ProfilePictureURL: s}
+	err := processProfilePicture(ctx, u)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "invalid image")
 }
