@@ -6,15 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/a2n2k3p4/tutorium-backend/config"
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -34,16 +31,7 @@ func setupMockGorm(t *testing.T) (sqlmock.Sqlmock, *gorm.DB, func()) {
 	sqlDB, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherRegexp))
 	gdb, _ := gorm.Open(
 		postgres.New(postgres.Config{Conn: sqlDB, PreferSimpleProtocol: true}),
-		&gorm.Config{
-			Logger: logger.New(
-				log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-				logger.Config{
-					SlowThreshold: time.Second, // Slow SQL threshold
-					LogLevel:      logger.Info, // Show all SQL
-					Colorful:      true,        // Enable color
-				},
-			),
-		},
+		&gorm.Config{Logger: logger.Default.LogMode(logger.Silent)},
 	)
 
 	cleanup := func() { _ = sqlDB.Close() }
@@ -86,10 +74,6 @@ func makeJWT(t *testing.T, secret []byte, userID uint) string {
 }
 
 func preloadUserForAuth(mock sqlmock.Sqlmock, userID uint, hasAdmin bool, hasTeacher bool, hasLearner bool) {
-	if config.STATUS() == "development" {
-		return
-	}
-
 	mock.MatchExpectationsInOrder(false)
 
 	mock.ExpectQuery(`SELECT \* FROM "users" WHERE "users"\."id" = \$1 AND "users"\."deleted_at" IS NULL ORDER BY "users"\."id" LIMIT .*`).
