@@ -88,7 +88,18 @@ func makeJWT(t *testing.T, secret []byte, userID uint) string {
 }
 
 /* ------------------ Bypass test Helper ------------------ */
-func RunInDifferentStatus(t *testing.T, body func(t *testing.T)) {
+func RunInDifferentStatus(t *testing.T,
+	body func(
+		t *testing.T,
+		mock sqlmock.Sqlmock,
+		gdb *gorm.DB,
+		app *fiber.App,
+		payload *[]byte,
+		uID *uint,
+	),
+	want int,
+	method, path string,
+) {
 	t.Helper()
 	cases := []struct {
 		name string
@@ -97,10 +108,38 @@ func RunInDifferentStatus(t *testing.T, body func(t *testing.T)) {
 		{"bypass", "development"},
 		{"unbypass", "production"},
 	}
+
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			t.Setenv("STATUS", c.env)
-			body(t)
+
+			mock, gdb, cleanup := setupMockGorm(t)
+			defer cleanup()
+			mock.MatchExpectationsInOrder(false)
+
+			app := setupApp(gdb)
+
+			var payload []byte
+			var uID uint = 0
+
+			body(t, mock, gdb, app, &payload, &uID)
+
+			input := httpInput{
+				Method: method,
+				Path:   path,
+				UserID: &uID,
+			}
+			if len(payload) > 0 {
+				input.Body = payload
+				input.ContentType = "application/json"
+			}
+			resp := runHTTP(t, app, input)
+
+			wantStatus(t, resp, want)
+
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatalf("unmet expectations: %v", err)
+			}
 		})
 	}
 }
