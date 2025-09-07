@@ -285,9 +285,9 @@ func processProfilePicture(c *fiber.Ctx, user *models.User) error {
 		if err := validateImageBytes(b); err != nil {
 			return fmt.Errorf("invalid image: %w", err)
 		}
-		mc := c.Locals("minio").(*storage.Client)
+		up := c.Locals("minio").(storage.Uploader)
 		filename := storage.GenerateFilename(http.DetectContentType(b[:min(512, len(b))]))
-		objectKey, err := mc.UploadBytes(c.Context(), "users", filename, b)
+		objectKey, err := up.UploadBytes(c.Context(), "users", filename, b)
 		if err != nil {
 			return err
 		}

@@ -418,7 +418,7 @@ func processBannerPicture(c *fiber.Ctx, class *models.Class) error {
 			return fmt.Errorf("invalid image: %w", err)
 		}
 
-		mc := c.Locals("minio").(*storage.Client)
+		mc := c.Locals("minio").(storage.Uploader)
 		filename := storage.GenerateFilename(http.DetectContentType(b[:min(512, len(b))]))
 		uploaded, err := mc.UploadBytes(context.Background(), "classes", filename, b)
 		if err != nil {

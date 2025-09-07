@@ -24,6 +24,10 @@ type Client struct {
 	UseSSL   bool
 }
 
+type Uploader interface {
+	UploadBytes(ctx context.Context, folder, filename string, b []byte) (string, error)
+}
+
 func NewClientFromEnv() (*Client, error) {
 	endpoint := config.MINIOEndpoint()
 	accessKey := config.MINIOAccessKey()

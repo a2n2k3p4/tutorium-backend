@@ -5,9 +5,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func MinioMiddleware(client *storage.Client) fiber.Handler {
+func MinioMiddleware(u storage.Uploader) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		c.Locals("minio", client)
+		c.Locals("minio", u)
 		return c.Next()
 	}
 }
