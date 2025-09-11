@@ -1935,6 +1935,29 @@
                 }
             }
         },
+        "/health": {
+            "get": {
+                "description": "Simple health check for payment service.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/learners": {
             "get": {
                 "security": [
@@ -2481,6 +2504,248 @@
                     },
                     "500": {
                         "description": "Server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/charge": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create an Omise charge. For credit cards, prefer using a token. For testing, server-side tokenization via card fields is supported.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Create a payment charge",
+                "parameters": [
+                    {
+                        "description": "Payment payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_a2n2k3p4_tutorium-backend_models.PaymentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Omise charge response",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/transactions": {
+            "get": {
+                "description": "List transactions with optional filters and pagination.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "List transactions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by user ID",
+                        "name": "user_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status (e.g. successful, failed)",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by channel (e.g. card, promptpay)",
+                        "name": "channel",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit (default 50)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset (default 0)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TransactionListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/transactions/{id}": {
+            "get": {
+                "description": "Get a transaction by internal ID or Omise charge_id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Get a transaction",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Transaction ID or charge_id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_a2n2k3p4_tutorium-backend_models.Transaction"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/transactions/{id}/refund": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Refund an Omise charge by transaction ID or charge_id. Partial refund if amount provided.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Refund a transaction",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Transaction ID or charge_id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Refund payload, e.g. {\\",
+                        "name": "payload",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -3361,7 +3626,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.UserDoc"
+                                "$ref": "#/definitions/github_com_a2n2k3p4_tutorium-backend_models.UserDoc"
                             }
                         }
                     },
@@ -3400,7 +3665,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UserDoc"
+                            "$ref": "#/definitions/github_com_a2n2k3p4_tutorium-backend_models.UserDoc"
                         }
                     }
                 ],
@@ -3408,7 +3673,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.UserDoc"
+                            "$ref": "#/definitions/github_com_a2n2k3p4_tutorium-backend_models.UserDoc"
                         }
                     },
                     "400": {
@@ -3460,7 +3725,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.UserDoc"
+                            "$ref": "#/definitions/github_com_a2n2k3p4_tutorium-backend_models.UserDoc"
                         }
                     },
                     "400": {
@@ -3523,7 +3788,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UserDoc"
+                            "$ref": "#/definitions/github_com_a2n2k3p4_tutorium-backend_models.UserDoc"
                         }
                     }
                 ],
@@ -3531,7 +3796,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.UserDoc"
+                            "$ref": "#/definitions/github_com_a2n2k3p4_tutorium-backend_models.UserDoc"
                         }
                     },
                     "400": {
@@ -3622,9 +3887,191 @@
                     }
                 }
             }
+        },
+        "/webhooks/omise": {
+            "post": {
+                "description": "Handles Omise events by verifying and upserting transaction status.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Omise webhook",
+                "parameters": [
+                    {
+                        "description": "Omise event payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Retryable server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "datatypes.JSONMap": {
+            "type": "object",
+            "additionalProperties": true
+        },
+        "github_com_a2n2k3p4_tutorium-backend_models.PaymentRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "description": "(satang unit : 100 satang = 1 THB)",
+                    "type": "integer"
+                },
+                "bank": {
+                    "description": "e.g. \"bbl\", \"bay\", \"scb\"",
+                    "type": "string"
+                },
+                "card": {
+                    "description": "server-side tokenization (TESTING ONLY)",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "currency": {
+                    "description": "\"THB\"",
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "description": "free-form, attached to the Omise charge",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "paymentType": {
+                    "description": "\"credit_card\" | \"promptpay\" | \"internet_banking\"",
+                    "type": "string"
+                },
+                "return_uri": {
+                    "description": "required for some redirects (3DS/internet banking)",
+                    "type": "string"
+                },
+                "token": {
+                    "description": "for card charges (preferred)",
+                    "type": "string"
+                },
+                "user_id": {
+                    "description": "FK to users.id",
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_a2n2k3p4_tutorium-backend_models.Transaction": {
+            "type": "object",
+            "properties": {
+                "amount_satang": {
+                    "type": "integer"
+                },
+                "channel": {
+                    "type": "string"
+                },
+                "charge_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "failure_code": {
+                    "type": "string"
+                },
+                "failure_message": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "meta": {
+                    "$ref": "#/definitions/datatypes.JSONMap"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_a2n2k3p4_tutorium-backend_models.UserDoc": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "number",
+                    "example": 250.75
+                },
+                "ban_count": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "first_name": {
+                    "type": "string",
+                    "example": "Alice"
+                },
+                "gender": {
+                    "type": "string",
+                    "example": "Female"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 101
+                },
+                "last_name": {
+                    "type": "string",
+                    "example": "Smith"
+                },
+                "phone_number": {
+                    "type": "string",
+                    "example": "+66912345678"
+                },
+                "profile_picture": {
+                    "type": "string",
+                    "example": "\u003cbase64-encoded-image\u003e"
+                },
+                "student_id": {
+                    "type": "string",
+                    "example": "6610505511"
+                }
+            }
+        },
         "models.AdminDoc": {
             "type": "object",
             "properties": {
@@ -3856,7 +4303,7 @@
                     "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                 },
                 "user": {
-                    "$ref": "#/definitions/models.UserDoc"
+                    "$ref": "#/definitions/github_com_a2n2k3p4_tutorium-backend_models.UserDoc"
                 }
             }
         },
@@ -3972,44 +4419,28 @@
                 }
             }
         },
-        "models.UserDoc": {
+        "models.TransactionListResponse": {
             "type": "object",
             "properties": {
-                "balance": {
-                    "type": "number",
-                    "example": 250.75
+                "pagination": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "integer"
+                        },
+                        "offset": {
+                            "type": "integer"
+                        },
+                        "total": {
+                            "type": "integer"
+                        }
+                    }
                 },
-                "ban_count": {
-                    "type": "integer",
-                    "example": 1
-                },
-                "first_name": {
-                    "type": "string",
-                    "example": "Alice"
-                },
-                "gender": {
-                    "type": "string",
-                    "example": "Female"
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 101
-                },
-                "last_name": {
-                    "type": "string",
-                    "example": "Smith"
-                },
-                "phone_number": {
-                    "type": "string",
-                    "example": "+66912345678"
-                },
-                "profile_picture": {
-                    "type": "string",
-                    "example": "\u003cbase64-encoded-image\u003e"
-                },
-                "student_id": {
-                    "type": "string",
-                    "example": "6610505511"
+                "transactions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_a2n2k3p4_tutorium-backend_models.Transaction"
+                    }
                 }
             }
         }
