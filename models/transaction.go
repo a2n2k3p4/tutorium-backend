@@ -22,7 +22,7 @@ type Transaction struct {
 	FailureCode    *string           `json:"failure_code,omitempty"`
 	FailureMessage *string           `json:"failure_message,omitempty"`
 	RawPayload     []byte            `json:"-"`
-	Meta           datatypes.JSONMap `gorm:"type:jsonb" json:"meta,omitempty"`
+    Meta           datatypes.JSONMap `gorm:"type:jsonb" json:"meta,omitempty" swaggertype:"object"`
 
 	User *User `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"-"`
 }

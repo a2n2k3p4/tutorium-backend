@@ -46,10 +46,10 @@ func (h *PaymentHandler) Health(c *fiber.Ctx) error {
 //	@Tags			Payments
 //	@Accept			json
 //	@Produce		json
-//	@Param			payload	body	map[string]interface{}	true	"Omise event payload"
-//	@Success		200		{string}	string	"OK"
-//	@Failure		400		{object}	map[string]string	"Bad request"
-//	@Failure		500		{string}	string	"Retryable server error"
+//	@Param			payload	body		map[string]interface{}	true	"Omise event payload"
+//	@Success		200		{string}	string					"OK"
+//	@Failure		400		{object}	map[string]string		"Bad request"
+//	@Failure		500		{string}	string					"Retryable server error"
 //	@Router			/webhooks/omise [post]
 func (h *PaymentHandler) HandleWebhook(c *fiber.Ctx) error {
 	var envelope struct {

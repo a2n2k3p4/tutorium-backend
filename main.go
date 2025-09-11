@@ -35,10 +35,10 @@ import (
 //	@license.url	https://www.gnu.org/licenses/agpl-3.0.en.
 
 // ------------------ JWT Auth Definition ------------------
-// @securityDefinitions.apikey BearerAuth
-// @in header
-// @name Authorization
-// @description Type "Bearer " followed by your JWT token.`
+//	@securityDefinitions.apikey	BearerAuth
+//	@in							header
+//	@name						Authorization
+//	@description				Type "Bearer " followed by your JWT token.`
 
 func main() {
 	cfg := config.NewConfig()
@@ -58,13 +58,13 @@ func main() {
 	app.Use(cors.New())
 
 	// --- MinIO ---
-    minioClient, err := storage.NewClientFromEnv()
-    if err != nil {
-        // Do not crash the app if MinIO is not available in this environment.
-        log.Printf("MinIO init failed: %v (continuing without storage middleware)", err)
-    } else {
-        app.Use(middlewares.MinioMiddleware(minioClient))
-    }
+	minioClient, err := storage.NewClientFromEnv()
+	if err != nil {
+		// Do not crash the app if MinIO is not available in this environment.
+		log.Printf("MinIO init failed: %v (continuing without storage middleware)", err)
+	} else {
+		app.Use(middlewares.MinioMiddleware(minioClient))
+	}
 
 	// --- Omise (Payments) ---
 	if pk, sk := config.OMISEPublicKey(), config.OMISESecretKey(); pk != "" && sk != "" {

@@ -19,7 +19,7 @@ import (
 //	@Summary		Create a payment charge
 //	@Description	Create an Omise charge. For credit cards, prefer using a token. For testing, server-side tokenization via card fields is supported.
 //	@Tags			Payments
-//	@Security 		BearerAuth
+//	@Security		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			payload	body		models.PaymentRequest	true	"Payment payload"
@@ -90,11 +90,11 @@ func (h *PaymentHandler) createCharge(op *operations.CreateCharge) (*omise.Charg
 //	@Description	List transactions with optional filters and pagination.
 //	@Tags			Payments
 //	@Produce		json
-//	@Param			user_id		query	string	false	"Filter by user ID"
-//	@Param			status		query	string	false	"Filter by status (e.g. successful, failed)"
-//	@Param			channel		query	string	false	"Filter by channel (e.g. card, promptpay)"
-//	@Param			limit		query	int		false	"Limit (default 50)"
-//	@Param			offset		query	int		false	"Offset (default 0)"
+//	@Param			user_id	query		string	false	"Filter by user ID"
+//	@Param			status	query		string	false	"Filter by status (e.g. successful, failed)"
+//	@Param			channel	query		string	false	"Filter by channel (e.g. card, promptpay)"
+//	@Param			limit	query		int		false	"Limit (default 50)"
+//	@Param			offset	query		int		false	"Offset (default 0)"
 //	@Success		200		{object}	models.TransactionListResponse
 //	@Failure		500		{object}	map[string]string	"Server error"
 //	@Router			/payments/transactions [get]
@@ -128,7 +128,7 @@ func (h *PaymentHandler) ListTransactions(c *fiber.Ctx) error {
 //	@Description	Get a transaction by internal ID or Omise charge_id.
 //	@Tags			Payments
 //	@Produce		json
-//	@Param			id	path	string	true	"Transaction ID or charge_id"
+//	@Param			id	path		string	true	"Transaction ID or charge_id"
 //	@Success		200	{object}	models.Transaction
 //	@Failure		404	{object}	map[string]string	"Not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
@@ -155,10 +155,10 @@ func (h *PaymentHandler) GetTransaction(c *fiber.Ctx) error {
 //	@Summary		Refund a transaction
 //	@Description	Refund an Omise charge by transaction ID or charge_id. Partial refund if amount provided.
 //	@Tags			Payments
-//	@Security 		BearerAuth
+//	@Security		BearerAuth
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		path	string	true	"Transaction ID or charge_id"
+//	@Param			id		path		string				true	"Transaction ID or charge_id"
 //	@Param			payload	body		map[string]int64	false	"Refund payload, e.g. {\"amount\": 1000} satang"
 //	@Success		200		{object}	map[string]interface{}
 //	@Failure		400		{object}	map[string]string
