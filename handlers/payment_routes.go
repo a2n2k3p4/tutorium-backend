@@ -9,16 +9,16 @@ import (
 
 // PaymentRoutes registers Omise payment-related endpoints.
 func PaymentRoutes(app *fiber.App) {
-    // Simple health check
-    app.Get("/health", func(c *fiber.Ctx) error {
-        return c.JSON(fiber.Map{"status": "ok"})
-    })
+	// Simple health check
+	app.Get("/health", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{"status": "ok"})
+	})
 
-    // Optional return URI endpoint for redirect-based flows (3DS/IBANKING)
-    app.Get("/payments/return", func(c *fiber.Ctx) error {
-        // Omise will redirect users back here; you can enhance this to show a page.
-        return c.JSON(fiber.Map{"status": "returned"})
-    })
+	// Optional return URI endpoint for redirect-based flows (3DS/IBANKING)
+	app.Get("/payments/return", func(c *fiber.Ctx) error {
+		// Omise will redirect users back here; you can enhance this to show a page.
+		return c.JSON(fiber.Map{"status": "returned"})
+	})
 
 	// Charges
 	app.Post("/payments/charge", func(c *fiber.Ctx) error {

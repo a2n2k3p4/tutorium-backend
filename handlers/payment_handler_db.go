@@ -38,9 +38,9 @@ func (h *PaymentHandler) CreateCharge(c *fiber.Ctx) error {
 	// Fill defaults / enforce currency
 	if req.Currency == "" {
 		req.Currency = config.PAYMENTDefaultCurrency()
-    } else if cfg := config.PAYMENTDefaultCurrency(); cfg != "" && req.Currency != cfg {
-        return c.Status(400).JSON(fiber.Map{"error": "unsupported currency", "allowed": cfg})
-    }
+	} else if cfg := config.PAYMENTDefaultCurrency(); cfg != "" && req.Currency != cfg {
+		return c.Status(400).JSON(fiber.Map{"error": "unsupported currency", "allowed": cfg})
+	}
 	if req.PaymentType == "internet_banking" && req.ReturnURI == "" {
 		req.ReturnURI = config.PAYMENTReturnURI()
 	}
