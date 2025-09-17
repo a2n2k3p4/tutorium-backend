@@ -19,4 +19,5 @@ func AllRoutes(app *fiber.App) {
 	TeacherRoutes(app)
 	UserRoutes(app)
 	LoginRoutes(app)
+	PaymentRoutes(app)
 }
