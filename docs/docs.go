@@ -1339,7 +1339,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Retrieve a list of classes filtered by optional query parameters: categories, price range, and rating range",
+                "description": "Retrieve a list of classes filtered by optional query parameters: categories, and rating range",
                 "produces": [
                     "application/json"
                 ],
@@ -1356,18 +1356,6 @@ const docTemplate = `{
                         "collectionFormat": "csv",
                         "description": "Filter by one or more categories (OR relation)",
                         "name": "category",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Minimum class price",
-                        "name": "min_price",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Maximum class price",
-                        "name": "max_price",
                         "in": "query"
                     },
                     {
@@ -4049,10 +4037,6 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 21
                 },
-                "price": {
-                    "type": "number",
-                    "example": 1999.99
-                },
                 "rating": {
                     "type": "number",
                     "example": 4.7
@@ -4097,6 +4081,10 @@ const docTemplate = `{
                 "learner_limit": {
                     "type": "integer",
                     "example": 50
+                },
+                "price": {
+                    "type": "number",
+                    "example": 1999.99
                 }
             }
         },
@@ -4261,6 +4249,10 @@ const docTemplate = `{
         "models.ReportDoc": {
             "type": "object",
             "properties": {
+                "class_session_id": {
+                    "type": "integer",
+                    "example": 20
+                },
                 "id": {
                     "type": "integer",
                     "example": 12
@@ -4276,6 +4268,14 @@ const docTemplate = `{
                 "report_picture": {
                     "type": "string",
                     "example": "\u003cbase64-encoded-image\u003e"
+                },
+                "report_reason": {
+                    "type": "string",
+                    "example": "teacher_absent"
+                },
+                "report_status": {
+                    "type": "string",
+                    "example": "pending"
                 },
                 "report_type": {
                     "type": "string",

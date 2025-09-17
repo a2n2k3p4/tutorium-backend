@@ -68,6 +68,20 @@ jobs:
                   exit 1
               fi
 
+              # Create compose file on the server (needed for docker-compose)
+              echo "=== Creating compose file for docker-compose ==="
+              # Use a persistent server-side compose file for production secrets
+              COMPOSE_FILE=~/secrets/tutorium-backend.compose.yaml
+              mkdir -p "$(dirname "$COMPOSE_FILE")"
+              if [ -f "$COMPOSE_FILE" ]; then
+                  cp $COMPOSE_FILE compose.yaml
+                  echo "ℹ️ Using compose file: $COMPOSE_FILE"
+              else
+                  echo "❌ $COMPOSE_FILE not found!"
+                  ls -la
+                  exit 1
+              fi
+
               # Check if docker and docker compose are available
               if ! command -v docker &> /dev/null; then
                   echo "ERROR: Docker is not installed on the server"

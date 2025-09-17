@@ -32,7 +32,6 @@ func TestCreateClass_OK(t *testing.T) {
 				ClassName:        "Testing",
 				ClassDescription: "Lorem Ipsum",
 				BannerPictureURL: "",
-				Price:            50,
 				Rating:           5,
 			})
 			*payload = req
@@ -74,7 +73,6 @@ func TestCreateClass_DBError(t *testing.T) {
 				ClassName:        "Testing",
 				ClassDescription: "Lorem Ipsum",
 				BannerPictureURL: "",
-				Price:            50,
 				Rating:           5,
 			})
 			*payload = req
@@ -219,7 +217,6 @@ func TestUpdateClass_OK(t *testing.T) {
 				ClassName:        "Testing",
 				ClassDescription: "Lorem Ipsum",
 				BannerPictureURL: "",
-				Price:            50,
 				Rating:           5,
 			})
 			*payload = req
@@ -267,7 +264,6 @@ func TestUpdateClass_DBError(t *testing.T) {
 				ClassName:        "Testing",
 				ClassDescription: "Lorem Ipsum",
 				BannerPictureURL: "",
-				Price:            50,
 				Rating:           5,
 			})
 			*payload = req

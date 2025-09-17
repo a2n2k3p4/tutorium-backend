@@ -71,9 +71,6 @@ definitions:
       id:
         example: 21
         type: integer
-      price:
-        example: 1999.99
-        type: number
       rating:
         example: 4.7
         type: number
@@ -107,6 +104,9 @@ definitions:
       learner_limit:
         example: 50
         type: integer
+      price:
+        example: 1999.99
+        type: number
     type: object
   models.EnrollmentDoc:
     properties:
@@ -224,6 +224,9 @@ definitions:
     type: object
   models.ReportDoc:
     properties:
+      class_session_id:
+        example: 20
+        type: integer
       id:
         example: 12
         type: integer
@@ -235,6 +238,12 @@ definitions:
         type: string
       report_picture:
         example: <base64-encoded-image>
+        type: string
+      report_reason:
+        example: teacher_absent
+        type: string
+      report_status:
+        example: pending
         type: string
       report_type:
         example: Abuse
@@ -1214,7 +1223,7 @@ paths:
   /classes:
     get:
       description: 'Retrieve a list of classes filtered by optional query parameters:
-        categories, price range, and rating range'
+        categories, and rating range'
       parameters:
       - collectionFormat: csv
         description: Filter by one or more categories (OR relation)
@@ -1223,14 +1232,6 @@ paths:
           type: string
         name: category
         type: array
-      - description: Minimum class price
-        in: query
-        name: min_price
-        type: string
-      - description: Maximum class price
-        in: query
-        name: max_price
-        type: string
       - description: Minimum class rating
         in: query
         name: min_rating

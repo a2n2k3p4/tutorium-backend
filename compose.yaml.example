@@ -5,11 +5,15 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      minio:
+        condition: service_started
     env_file:
       - .env
     ports:
       - "8000:8000"
     restart: unless-stopped
+    networks:
+      - mynet
 
   postgres:
     image: postgres:17
@@ -30,6 +34,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - mynet
 
   pgadmin:
     image: dpage/pgadmin4:9.6
@@ -42,6 +48,31 @@ services:
       postgres:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - mynet
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    restart: always
+    networks:
+      - mynet
+
+networks:
+  mynet:
+    driver: bridge
 
 volumes:
   postgres_data:
+
+  minio_data:
+    driver: local
