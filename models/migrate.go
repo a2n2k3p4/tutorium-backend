@@ -21,6 +21,7 @@ func Migrate(db *gorm.DB) {
 		&Notification{},
 		&Report{},
 		&Review{},
+		&Transaction{},
 	)
 	if err != nil {
 		log.Fatalf("migration failed: %v", err)

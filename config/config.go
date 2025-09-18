@@ -40,4 +40,12 @@ var (
 	MINIOSecretKey = EnvGetter("MINIO_SECRET_KEY", "minioadmin")
 	MINIOBucket    = EnvGetter("MINIO_BUCKET", "tutorium")
 	MINIOUseSSL    = EnvGetter("MINIO_USE_SSL", "false")
+
+	// Payments (Omise)
+	OMISEPublicKey = EnvGetter("OMISE_PUBLIC_KEY", "")
+	OMISESecretKey = EnvGetter("OMISE_SECRET_KEY", "")
+
+	// Payments defaults
+	PAYMENTDefaultCurrency = EnvGetter("PAYMENT_DEFAULT_CURRENCY", "THB")
+	PAYMENTReturnURI       = EnvGetter("PAYMENT_RETURN_URI", "")
 )

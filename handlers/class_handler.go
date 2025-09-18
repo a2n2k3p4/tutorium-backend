@@ -30,17 +30,17 @@ func ClassRoutes(app *fiber.App) {
 
 // CreateClass godoc
 //
-//		@Summary		Create a new class
-//		@Description	CreateClass creates a new Class record
-//		@Tags			Classes
-//	 @Security 		BearerAuth
-//		@Accept			json
-//		@Produce		json
-//		@Param			class	body		models.ClassDoc	true	"Class payload"
-//		@Success		201		{object}	models.ClassDoc
-//		@Failure		400		{object}	map[string]string	"Invalid input"
-//		@Failure		500		{object}	map[string]string	"Server error"
-//		@Router			/classes [post]
+//	@Summary		Create a new class
+//	@Description	CreateClass creates a new Class record
+//	@Tags			Classes
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			class	body		models.ClassDoc	true	"Class payload"
+//	@Success		201		{object}	models.ClassDoc
+//	@Failure		400		{object}	map[string]string	"Invalid input"
+//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Router			/classes [post]
 func CreateClass(c *fiber.Ctx) error {
 	var class models.Class
 
@@ -102,13 +102,11 @@ func CreateClass(c *fiber.Ctx) error {
 // GetClasses godoc
 //
 //		@Summary		List all classes
-//		@Description	Retrieve a list of classes filtered by optional query parameters: categories, price range, and rating range
+//		@Description	Retrieve a list of classes filtered by optional query parameters: categories, and rating range
 //		@Tags			Classes
 //	 @Security 		BearerAuth
 //		@Produce		json
 //		@Param			category		query	[]string	false	"Filter by one or more categories (OR relation)"
-//		@Param			min_price		query	string		false	"Minimum class price"
-//		@Param			max_price		query	string		false	"Maximum class price"
 //		@Param			min_rating		query	string		false	"Minimum class rating"
 //		@Param			max_rating		query	string		false	"Maximum class rating"
 //		@Success		200	{array}		models.ClassDoc
@@ -123,8 +121,6 @@ func GetClasses(c *fiber.Ctx) error {
 
 	var filters struct {
 		Categories []string `query:"category"`
-		MinPrice   string   `query:"min_price"`
-		MaxPrice   string   `query:"max_price"`
 		MinRating  string   `query:"min_rating"`
 		MaxRating  string   `query:"max_rating"`
 	}
@@ -145,7 +141,6 @@ func GetClasses(c *fiber.Ctx) error {
 		ClassName        string  `json:"class_name"`
 		BannerPictureURL string  `json:"banner_picture_url"`
 		Rating           float64 `json:"rating"`
-		Price            float64 `json:"price"`
 		TeacherName      string  `json:"teacher_name"`
 	}
 	var results []ClassResponse
@@ -157,7 +152,6 @@ func GetClasses(c *fiber.Ctx) error {
 			classes.class_name,
 			classes.banner_picture_url,
 			classes.rating,
-			classes.price,
 			CONCAT(users.first_name, ' ', users.last_name) AS teacher_name
 		`).
 		Joins("JOIN teachers ON teachers.id = classes.teacher_id").
@@ -171,20 +165,6 @@ func GetClasses(c *fiber.Ctx) error {
 				Select("ccc.class_id").
 				Where("cc.class_category IN ?", filters.Categories),
 		)
-	}
-
-	// Price filter
-	if filters.MinPrice != "" || filters.MaxPrice != "" {
-		min, minErr := strconv.ParseFloat(filters.MinPrice, 64)
-		max, maxErr := strconv.ParseFloat(filters.MaxPrice, 64)
-
-		if minErr == nil && maxErr == nil {
-			query = query.Where("price BETWEEN ? AND ?", min, max)
-		} else if minErr == nil {
-			query = query.Where("price >= ?", min)
-		} else if maxErr == nil {
-			query = query.Where("price <= ?", max)
-		}
 	}
 
 	// Rating filter
@@ -230,17 +210,17 @@ func findClass(db *gorm.DB, id int, class *models.Class) error {
 
 // GetClass godoc
 //
-//		@Summary		Get class by ID
-//		@Description	GetClass retrieves a single Class by its ID, including Teacher and Categories
-//		@Tags			Classes
-//	 @Security 		BearerAuth
-//		@Produce		json
-//		@Param			id	path		int	true	"Class ID"
-//		@Success		200	{object}	models.ClassDoc
-//		@Failure		400	{object}	map[string]string	"Invalid ID"
-//		@Failure		404	{object}	map[string]string	"Class not found"
-//		@Failure		500	{object}	map[string]string	"Server error"
-//		@Router			/classes/{id} [get]
+//	@Summary		Get class by ID
+//	@Description	GetClass retrieves a single Class by its ID, including Teacher and Categories
+//	@Tags			Classes
+//	@Security		BearerAuth
+//	@Produce		json
+//	@Param			id	path		int	true	"Class ID"
+//	@Success		200	{object}	models.ClassDoc
+//	@Failure		400	{object}	map[string]string	"Invalid ID"
+//	@Failure		404	{object}	map[string]string	"Class not found"
+//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Router			/classes/{id} [get]
 func GetClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -278,19 +258,19 @@ func GetClass(c *fiber.Ctx) error {
 
 // UpdateClass godoc
 //
-//		@Summary		Update an existing class
-//		@Description	UpdateClass updates a Class record by its ID
-//		@Tags			Classes
-//	 @Security 		BearerAuth
-//		@Accept			json
-//		@Produce		json
-//		@Param			id		path		int				true	"Class ID"
-//		@Param			class	body		models.ClassDoc	true	"Updated class payload"
-//		@Success		200		{object}	models.ClassDoc
-//		@Failure		400		{object}	map[string]string	"Invalid input"
-//		@Failure		404		{object}	map[string]string	"Class not found"
-//		@Failure		500		{object}	map[string]string	"Server error"
-//		@Router			/classes/{id} [put]
+//	@Summary		Update an existing class
+//	@Description	UpdateClass updates a Class record by its ID
+//	@Tags			Classes
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int				true	"Class ID"
+//	@Param			class	body		models.ClassDoc	true	"Updated class payload"
+//	@Success		200		{object}	models.ClassDoc
+//	@Failure		400		{object}	map[string]string	"Invalid input"
+//	@Failure		404		{object}	map[string]string	"Class not found"
+//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Router			/classes/{id} [put]
 func UpdateClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -370,17 +350,17 @@ func UpdateClass(c *fiber.Ctx) error {
 
 // DeleteClass godoc
 //
-//		@Summary		Delete a class by ID
-//		@Description	DeleteClass removes a Class record by its ID
-//		@Tags			Classes
-//	 @Security 		BearerAuth
-//		@Produce		json
-//		@Param			id	path		int					true	"Class ID"
-//		@Success		200	{string}	string				"Successfully deleted class"
-//		@Failure		400	{object}	map[string]string	"Invalid ID"
-//		@Failure		404	{object}	map[string]string	"Class not found"
-//		@Failure		500	{object}	map[string]string	"Server error"
-//		@Router			/classes/{id} [delete]
+//	@Summary		Delete a class by ID
+//	@Description	DeleteClass removes a Class record by its ID
+//	@Tags			Classes
+//	@Security		BearerAuth
+//	@Produce		json
+//	@Param			id	path		int					true	"Class ID"
+//	@Success		200	{string}	string				"Successfully deleted class"
+//	@Failure		400	{object}	map[string]string	"Invalid ID"
+//	@Failure		404	{object}	map[string]string	"Class not found"
+//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Router			/classes/{id} [delete]
 func DeleteClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 

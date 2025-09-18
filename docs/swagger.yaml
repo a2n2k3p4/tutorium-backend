@@ -71,9 +71,6 @@ definitions:
       id:
         example: 21
         type: integer
-      price:
-        example: 1999.99
-        type: number
       rating:
         example: 4.7
         type: number
@@ -107,6 +104,9 @@ definitions:
       learner_limit:
         example: 50
         type: integer
+      price:
+        example: 1999.99
+        type: number
     type: object
   models.EnrollmentDoc:
     properties:
@@ -188,8 +188,45 @@ definitions:
         example: 42
         type: integer
     type: object
+  models.PaymentRequest:
+    properties:
+      amount:
+        description: '(satang unit : 100 satang = 1 THB)'
+        type: integer
+      bank:
+        description: e.g. "bbl", "bay", "scb"
+        type: string
+      card:
+        additionalProperties: true
+        description: server-side tokenization (TESTING ONLY)
+        type: object
+      currency:
+        description: '"THB"'
+        type: string
+      description:
+        type: string
+      metadata:
+        additionalProperties: true
+        description: free-form, attached to the Omise charge
+        type: object
+      paymentType:
+        description: '"credit_card" | "promptpay" | "internet_banking"'
+        type: string
+      return_uri:
+        description: required for some redirects (3DS/internet banking)
+        type: string
+      token:
+        description: for card charges (preferred)
+        type: string
+      user_id:
+        description: FK to users.id
+        type: integer
+    type: object
   models.ReportDoc:
     properties:
+      class_session_id:
+        example: 20
+        type: integer
       id:
         example: 12
         type: integer
@@ -201,6 +238,12 @@ definitions:
         type: string
       report_picture:
         example: <base64-encoded-image>
+        type: string
+      report_reason:
+        example: teacher_absent
+        type: string
+      report_status:
+        example: pending
         type: string
       report_type:
         example: Abuse
@@ -248,6 +291,49 @@ definitions:
       user_id:
         example: 5
         type: integer
+    type: object
+  models.Transaction:
+    properties:
+      amount_satang:
+        type: integer
+      channel:
+        type: string
+      charge_id:
+        type: string
+      created_at:
+        type: string
+      currency:
+        type: string
+      failure_code:
+        type: string
+      failure_message:
+        type: string
+      id:
+        type: integer
+      meta:
+        type: object
+      status:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.TransactionListResponse:
+    properties:
+      pagination:
+        properties:
+          limit:
+            type: integer
+          offset:
+            type: integer
+          total:
+            type: integer
+        type: object
+      transactions:
+        items:
+          $ref: '#/definitions/models.Transaction'
+        type: array
     type: object
   models.UserDoc:
     properties:
@@ -1137,7 +1223,7 @@ paths:
   /classes:
     get:
       description: 'Retrieve a list of classes filtered by optional query parameters:
-        categories, price range, and rating range'
+        categories, and rating range'
       parameters:
       - collectionFormat: csv
         description: Filter by one or more categories (OR relation)
@@ -1146,14 +1232,6 @@ paths:
           type: string
         name: category
         type: array
-      - description: Minimum class price
-        in: query
-        name: min_price
-        type: string
-      - description: Maximum class price
-        in: query
-        name: max_price
-        type: string
       - description: Minimum class rating
         in: query
         name: min_rating
@@ -1530,6 +1608,21 @@ paths:
       summary: Update an existing enrollment
       tags:
       - Enrollments
+  /health:
+    get:
+      description: Simple health check for payment service.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - Payments
   /learners:
     get:
       description: GetLearners retrieves all Learner records
@@ -1889,6 +1982,165 @@ paths:
       summary: Update an existing notification
       tags:
       - Notifications
+  /payments/charge:
+    post:
+      consumes:
+      - application/json
+      description: Create an Omise charge. For credit cards, prefer using a token.
+        For testing, server-side tokenization via card fields is supported.
+      parameters:
+      - description: Payment payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/models.PaymentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Omise charge response
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a payment charge
+      tags:
+      - Payments
+  /payments/transactions:
+    get:
+      description: List transactions with optional filters and pagination.
+      parameters:
+      - description: Filter by user ID
+        in: query
+        name: user_id
+        type: string
+      - description: Filter by status (e.g. successful, failed)
+        in: query
+        name: status
+        type: string
+      - description: Filter by channel (e.g. card, promptpay)
+        in: query
+        name: channel
+        type: string
+      - description: Limit (default 50)
+        in: query
+        name: limit
+        type: integer
+      - description: Offset (default 0)
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TransactionListResponse'
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List transactions
+      tags:
+      - Payments
+  /payments/transactions/{id}:
+    get:
+      description: Get a transaction by internal ID or Omise charge_id.
+      parameters:
+      - description: Transaction ID or charge_id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Transaction'
+        "404":
+          description: Not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a transaction
+      tags:
+      - Payments
+  /payments/transactions/{id}/refund:
+    post:
+      consumes:
+      - application/json
+      description: Refund an Omise charge by transaction ID or charge_id. Partial
+        refund if amount provided.
+      parameters:
+      - description: Transaction ID or charge_id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Refund payload, e.g. {\
+        in: body
+        name: payload
+        schema:
+          additionalProperties:
+            type: integer
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Refund a transaction
+      tags:
+      - Payments
   /reports:
     get:
       description: GetReports retrieves all Report records with Reporter and Reported
@@ -2619,6 +2871,39 @@ paths:
       summary: Update an existing user
       tags:
       - Users
+  /webhooks/omise:
+    post:
+      consumes:
+      - application/json
+      description: Handles Omise events by verifying and upserting transaction status.
+      parameters:
+      - description: Omise event payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Retryable server error
+          schema:
+            type: string
+      summary: Omise webhook
+      tags:
+      - Payments
 securityDefinitions:
   BearerAuth:
     description: Type "Bearer " followed by your JWT token.`

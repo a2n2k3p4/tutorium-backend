@@ -1,5 +1,6 @@
 tutorium-backend
 .env
+compose.yaml
 
 # Devenv
 .devenv*
