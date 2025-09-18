@@ -12,9 +12,9 @@ import (
 
 // Minimal login request/response structs
 type LoginRequest struct {
-	Action   string `json:"action"`
-	ID       string `json:"id"`
-	Password string `json:"pass"`
+	Action   string `json:"Action"`
+	ID       string `json:"ID"`
+	Password string `json:"Password"`
 }
 
 type LoginResponse struct {
