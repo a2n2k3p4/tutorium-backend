@@ -7,7 +7,7 @@ import (
 // Define a struct matching the columns (use pointers for nullable FKs)
 type User struct {
 	gorm.Model
-	StudentID         string  `json:"student_id" gorm:"size:10;uniqueIndex;not null"`
+	StudentID         string  `json:"student_id" gorm:"size:20;uniqueIndex;not null"`
 	ProfilePictureURL string  `json:"profile_picture,omitempty"`
 	FirstName         string  `json:"first_name" gorm:"size:30;not null"`
 	LastName          string  `json:"last_name" gorm:"size:30;not null"`
