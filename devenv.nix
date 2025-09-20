@@ -10,7 +10,7 @@
 
   # https://devenv.sh/packages/
   # packages = [ pkgs.git ];
-  packages = with pkgs; [codespell go-swag];
+  packages = with pkgs; [codespell go-swag git-filter-repo];
 
   # https://devenv.sh/languages/
   # languages.rust.enable = true;
