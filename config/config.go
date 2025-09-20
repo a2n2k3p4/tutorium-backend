@@ -32,7 +32,7 @@ var (
 	// JWT & App
 	JWTSecret = EnvGetter("JWT_SECRET", "secret")
 	STATUS    = EnvGetter("STATUS", "development")
-	KUAPI     = EnvGetter("KU_API", "http://65.108.156.197:8001/auth/login")
+	KUAPI     = EnvGetter("KU_API", "xxx.xxx.xxx.xxx/route")
 
 	// MinIO
 	MINIOEndpoint  = EnvGetter("MINIO_ENDPOINT", "localhost:9000")
