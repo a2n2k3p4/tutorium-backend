@@ -2111,7 +2111,6 @@ paths:
         name: payload
         schema:
           additionalProperties:
-            format: int64
             type: integer
           type: object
       produces:
