@@ -16,6 +16,7 @@ type ClassSession struct {
 	ClassStart         time.Time `json:"class_start" gorm:"not null"`
 	ClassFinish        time.Time `json:"class_finish" gorm:"not null"`
 	ClassStatus        string    `json:"class_status" gorm:"size:20"`
+	ClassURL           string    `json:"class_url" gorm:"size:128"`
 
 	Class Class `gorm:"foreignKey:ClassID;references:ID;constraint:OnDelete:CASCADE"`
 }
@@ -32,4 +33,5 @@ type ClassSessionDoc struct {
 	ClassStart         time.Time `json:"class_start" example:"2025-09-05T14:00:00Z"`
 	ClassFinish        time.Time `json:"class_finish" example:"2025-09-05T16:00:00Z"`
 	ClassStatus        string    `json:"class_status" example:"Scheduled"`
+	ClassURL           string    `json:"class_url" example:"https://meet.jit.si/KUtutorium_12_1758630058"`
 }
