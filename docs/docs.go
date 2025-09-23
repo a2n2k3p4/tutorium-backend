@@ -2709,7 +2709,8 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "type": "integer"
+                                "type": "integer",
+                                "format": "int64"
                             }
                         }
                     }
@@ -4065,6 +4066,10 @@ const docTemplate = `{
                 "class_status": {
                     "type": "string",
                     "example": "Scheduled"
+                },
+                "class_url": {
+                    "type": "string",
+                    "example": "https://meet.jit.si/KUtutorium_12_1758630058"
                 },
                 "description": {
                     "type": "string",
