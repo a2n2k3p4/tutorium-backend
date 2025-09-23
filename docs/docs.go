@@ -2710,7 +2710,6 @@ const docTemplate = `{
                             "type": "object",
                             "additionalProperties": {
                                 "type": "integer",
-                                "format": "int64"
                             }
                         }
                     }
