@@ -159,7 +159,7 @@ func (h *PaymentHandler) GetTransaction(c *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			id		path		string				true	"Transaction ID or charge_id"
-//	@Param			payload	body		map[string]int64	false	"Refund payload, e.g. {\"amount\": 1000} satang"
+//	@Param			payload	body		map[string]int	false	"Refund payload, e.g. {\"amount\": 1000} satang"
 //	@Success		200		{object}	map[string]interface{}
 //	@Failure		400		{object}	map[string]string
 //	@Failure		404		{object}	map[string]string
