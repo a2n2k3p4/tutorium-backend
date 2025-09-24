@@ -2709,7 +2709,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "type": "integer",
+                                "type": "integer"
                             }
                         }
                     }
