@@ -33,6 +33,7 @@ func TestCreateClassSession_OK(t *testing.T) {
 				ClassStart:         time.Now().Add(108 * time.Hour),
 				ClassFinish:        time.Now().Add(110 * time.Hour),
 				ClassStatus:        "Available",
+				ClassURL:           "https://meet.jit.si/KUtutorium-test",
 			})
 			*payload = req
 			*uID = userID
@@ -77,6 +78,7 @@ func TestCreateClassSession_DBError(t *testing.T) {
 				ClassStart:         time.Now().Add(108 * time.Hour),
 				ClassFinish:        time.Now().Add(110 * time.Hour),
 				ClassStatus:        "Available",
+				ClassURL:           "https://meet.jit.si/KUtutorium-test",
 			})
 			*payload = req
 			*uID = userID
@@ -205,8 +207,8 @@ func TestUpdateClassSession_OK(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, true, false)(mock)
 			ExpSelectByIDFound(table, classSessionID,
-				[]string{"id", "class_id", "description", "learner_limit", "enrollment_deadline", "class_start", "class_finish", "class_status"},
-				[]any{classSessionID, classID, "Lorem", 40, time.Now().Add(72 * time.Hour), time.Now().Add(108 * time.Hour), time.Now().Add(110 * time.Hour), "pending"},
+				[]string{"id", "class_id", "description", "learner_limit", "enrollment_deadline", "class_start", "class_finish", "class_status", "class_url"},
+				[]any{classSessionID, classID, "Lorem", 40, time.Now().Add(72 * time.Hour), time.Now().Add(108 * time.Hour), time.Now().Add(110 * time.Hour), "pending", "https://meet.jit.si/KUtutorium-test"},
 			)(mock)
 
 			ExpPreloadField("classes", []string{"id"}, []any{classID})(mock)
@@ -220,6 +222,7 @@ func TestUpdateClassSession_OK(t *testing.T) {
 				ClassStart:         time.Now().Add(108 * time.Hour),
 				ClassFinish:        time.Now().Add(110 * time.Hour),
 				ClassStatus:        "Available",
+				ClassURL:           "https://meet.jit.si/KUtutorium-test",
 			})
 			*payload = req
 			*uID = userID
@@ -269,6 +272,7 @@ func TestUpdateClassSession_DBError(t *testing.T) {
 				ClassStart:         time.Now().Add(108 * time.Hour),
 				ClassFinish:        time.Now().Add(110 * time.Hour),
 				ClassStatus:        "Available",
+				ClassURL:           "https://meet.jit.si/KUtutorium-test",
 			})
 			*payload = req
 			*uID = userID
