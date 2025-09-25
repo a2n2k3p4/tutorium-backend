@@ -37,4 +37,5 @@ type ReportDoc struct {
 	ReportPicture     string    `json:"report_picture,omitempty" example:"<base64-encoded-image>"`
 	ReportDate        time.Time `json:"report_date" example:"2025-08-20T14:30:00Z"`
 	ReportStatus      string    `json:"report_status" example:"pending"`
+	ReportResult      string    `json:"report_result,omitempty" example:"Report approved"`
 }
