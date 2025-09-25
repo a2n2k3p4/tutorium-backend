@@ -92,6 +92,9 @@ definitions:
       class_status:
         example: Scheduled
         type: string
+      class_url:
+        example: https://meet.jit.si/KUtutorium_12_1758630058
+        type: string
       description:
         example: Weekly tutoring session for calculus
         type: string

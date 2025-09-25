@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
+	"time"
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
@@ -35,15 +37,34 @@ func ClassSessionRoutes(app *fiber.App) {
 //	@Failure		500				{object}	map[string]string	"Server error"
 //	@Router			/class_sessions [post]
 func CreateClassSession(c *fiber.Ctx) error {
-	var class_session models.ClassSession
+	var class_session_request models.CreateClassSessionRequest
 
-	if err := c.BodyParser(&class_session); err != nil {
+	if err := c.BodyParser(&class_session_request); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+
 	db, err := middlewares.GetDB(c)
 	if err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
+
+	// Autogenerate ClassURL for new class session
+	var teacher_id uint
+	meeting_url := NewMeetingHandler()
+
+	err = db.Table("classes").
+		Select("teacher_id").
+		Where("id = ?", class_session_request.ClassID).
+		Scan(&teacher_id).Error
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	var class_session models.ClassSession
+	copy_class_session_content(&class_session, &class_session_request)
+
+	link := fmt.Sprintf("%s/KUtutorium_%d_%d", meeting_url.BaseURL, teacher_id, time.Now().Unix())
+	class_session.MeetingUrl = link
 
 	if err := db.Create(&class_session).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
@@ -204,4 +225,15 @@ func DeleteClassSession(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted class session")
+}
+
+func copy_class_session_content(dest *models.ClassSession, src *models.CreateClassSessionRequest) {
+	dest.ClassID = src.ClassID
+	dest.Description = src.Description
+	dest.Price = src.Price
+	dest.LearnerLimit = src.LearnerLimit
+	dest.EnrollmentDeadline = src.EnrollmentDeadline
+	dest.ClassStart = src.ClassStart
+	dest.ClassFinish = src.ClassFinish
+	dest.ClassStatus = src.ClassStatus
 }
