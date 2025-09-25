@@ -35,7 +35,7 @@ type ClassSession struct {
 
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
 
-type ClassSessionRequestDoc struct {
+type CreateClassSessionRequestDoc struct {
 	ClassID            uint      `json:"class_id" example:"12"`
 	Description        string    `json:"description" example:"Weekly tutoring session for calculus"`
 	Price              float64   `json:"price" example:"1999.99"`
