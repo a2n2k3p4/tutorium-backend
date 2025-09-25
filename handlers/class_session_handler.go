@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
+	"time"
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
@@ -40,10 +42,26 @@ func CreateClassSession(c *fiber.Ctx) error {
 	if err := c.BodyParser(&class_session); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
+
 	db, err := middlewares.GetDB(c)
 	if err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
+
+	// Autogenerate ClassURL for new class session
+	var teacher_id uint
+	meeting_url := NewMeetingHandler()
+
+	err = db.Table("classes").
+		Select("teacher_id").
+		Where("id = ?", class_session.ClassID).
+		Scan(&teacher_id).Error
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	link := fmt.Sprintf("%s/KUtutorium_%d_%d", meeting_url.BaseURL, teacher_id, time.Now().Unix())
+	class_session.ClassURL = link
 
 	if err := db.Create(&class_session).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
