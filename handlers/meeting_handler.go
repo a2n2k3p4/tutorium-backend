@@ -9,6 +9,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const BASE_JITSI_URL = "https://meet.jit.si"
+
 func MeetingRoutes(app *fiber.App) {
 	meetingurl := NewMeetingHandler()
 	meeting := app.Group("/meeting", middlewares.ProtectedMiddleware(), middlewares.TeacherRequired(), middlewares.LearnerRequired())
@@ -21,7 +23,7 @@ type MeetingURL struct {
 }
 
 func NewMeetingHandler() *MeetingURL {
-	return &MeetingURL{BaseURL: "https://meet.jit.si"}
+	return &MeetingURL{BaseURL: BASE_JITSI_URL}
 }
 
 func (h *MeetingURL) GetMeetingLink(c *fiber.Ctx) error {
