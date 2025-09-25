@@ -17,6 +17,7 @@ type Report struct {
 	ReportPictureURL  string    `json:"report_picture,omitempty"`
 	ReportDate        time.Time `json:"report_date" gorm:"default:CURRENT_TIMESTAMP"`
 	ReportStatus      string    `json:"report_status" gorm:"size:10;default:'pending'"`
+	ReportResult      string    `json:"report_result" gorm:"size:255"`
 
 	Reporter     User         `gorm:"foreignKey:ReportUserID;constraint:OnDelete:SET NULL"`
 	Reported     User         `gorm:"foreignKey:ReportedUserID;constraint:OnDelete:CASCADE"`
