@@ -51,7 +51,7 @@ func (h *MeetingURL) GetMeetingLink(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	link := classSession.ClassURL
+	link := classSession.MeetingUrl
 	if link == "" {
 		return c.Status(404).JSON(fiber.Map{"error": "no meeting was created for your class session yet"})
 	}

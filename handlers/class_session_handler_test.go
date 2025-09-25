@@ -34,7 +34,7 @@ func TestCreateClassSession_OK(t *testing.T) {
 				ClassStart:         time.Now().Add(108 * time.Hour),
 				ClassFinish:        time.Now().Add(110 * time.Hour),
 				ClassStatus:        "Available",
-				ClassURL:           "https://meet.jit.si/KUtutorium-test",
+				MeetingUrl:         "https://meet.jit.si/KUtutorium-test",
 			})
 			*payload = req
 			*uID = userID
@@ -80,7 +80,7 @@ func TestCreateClassSession_DBError(t *testing.T) {
 				ClassStart:         time.Now().Add(108 * time.Hour),
 				ClassFinish:        time.Now().Add(110 * time.Hour),
 				ClassStatus:        "Available",
-				ClassURL:           "https://meet.jit.si/KUtutorium-test",
+				MeetingUrl:         "https://meet.jit.si/KUtutorium-test",
 			})
 			*payload = req
 			*uID = userID
@@ -224,7 +224,7 @@ func TestUpdateClassSession_OK(t *testing.T) {
 				ClassStart:         time.Now().Add(108 * time.Hour),
 				ClassFinish:        time.Now().Add(110 * time.Hour),
 				ClassStatus:        "Available",
-				ClassURL:           "https://meet.jit.si/KUtutorium-test",
+				MeetingUrl:         "https://meet.jit.si/KUtutorium-test",
 			})
 			*payload = req
 			*uID = userID
@@ -274,7 +274,7 @@ func TestUpdateClassSession_DBError(t *testing.T) {
 				ClassStart:         time.Now().Add(108 * time.Hour),
 				ClassFinish:        time.Now().Add(110 * time.Hour),
 				ClassStatus:        "Available",
-				ClassURL:           "https://meet.jit.si/KUtutorium-test",
+				MeetingUrl:         "https://meet.jit.si/KUtutorium-test",
 			})
 			*payload = req
 			*uID = userID
