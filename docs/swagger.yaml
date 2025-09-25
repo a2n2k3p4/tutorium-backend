@@ -242,6 +242,9 @@ definitions:
       report_reason:
         example: teacher_absent
         type: string
+      report_result:
+        example: Report approved
+        type: string
       report_status:
         example: pending
         type: string

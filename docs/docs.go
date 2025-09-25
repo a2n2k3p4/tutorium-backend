@@ -4273,6 +4273,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "teacher_absent"
                 },
+                "report_result": {
+                    "type": "string",
+                    "example": "Report approved"
+                },
                 "report_status": {
                     "type": "string",
                     "example": "pending"
