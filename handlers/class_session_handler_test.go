@@ -23,6 +23,7 @@ func TestCreateClassSession_OK(t *testing.T) {
 	RunInDifferentStatus(t,
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, true, false)(mock)
+			ExpListRows("classes", []string{"teacher_id"}, []any{classID})(mock)
 			ExpInsertReturningID(table, 1)(mock)
 
 			req := jsonBody(models.ClassSession{
@@ -68,6 +69,7 @@ func TestCreateClassSession_DBError(t *testing.T) {
 	RunInDifferentStatus(t,
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, true, false)(mock)
+			ExpListRows("classes", []string{"teacher_id"}, []any{classID})(mock)
 			ExpInsertError(table, fmt.Errorf("db insert failed"))(mock)
 
 			req := jsonBody(models.ClassSession{
