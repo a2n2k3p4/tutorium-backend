@@ -37,7 +37,7 @@ func ClassSessionRoutes(app *fiber.App) {
 //	@Failure		500				{object}	map[string]string	"Server error"
 //	@Router			/class_sessions [post]
 func CreateClassSession(c *fiber.Ctx) error {
-	var class_session_request models.ClassSessionRequest
+	var class_session_request models.CreateClassSessionRequest
 
 	if err := c.BodyParser(&class_session_request); err != nil {
 		return c.Status(400).JSON(err.Error())
@@ -227,7 +227,7 @@ func DeleteClassSession(c *fiber.Ctx) error {
 	return c.Status(200).JSON("Successfully deleted class session")
 }
 
-func copy_class_session_content(dest *models.ClassSession, src *models.ClassSessionRequest) {
+func copy_class_session_content(dest *models.ClassSession, src *models.CreateClassSessionRequest) {
 	dest.ClassID = src.ClassID
 	dest.Description = src.Description
 	dest.Price = src.Price
