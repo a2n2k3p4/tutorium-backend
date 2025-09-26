@@ -24,8 +24,8 @@ import (
 //	@Produce		json
 //	@Param			payload	body		models.PaymentRequest	true	"Payment payload"
 //	@Success		200		{object}	map[string]interface{}	"Omise charge response"
-//	@Failure		400		{object}	map[string]string		"Invalid request"
-//	@Failure		500		{object}	map[string]string		"Server error"
+//	@Failure		400		{object}	map[string]string	"Invalid request"
+//	@Failure		500		{object}	map[string]string	"Server error"
 //	@Router			/payments/charge [post]
 func (h *PaymentHandler) CreateCharge(c *fiber.Ctx) error {
 	var req models.PaymentRequest
@@ -130,6 +130,7 @@ func (h *PaymentHandler) ListTransactions(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			id	path		string	true	"Transaction ID or charge_id"
 //	@Success		200	{object}	models.Transaction
+//	@Failure		400	{object}	map[string]string	"Invalid transaction ID"
 //	@Failure		404	{object}	map[string]string	"Not found"
 //	@Failure		500	{object}	map[string]string	"Server error"
 //	@Router			/payments/transactions/{id} [get]
@@ -161,9 +162,9 @@ func (h *PaymentHandler) GetTransaction(c *fiber.Ctx) error {
 //	@Param			id		path		string				true	"Transaction ID or charge_id"
 //	@Param			payload	body		map[string]int	false	"Refund payload, e.g. {\"amount\": 1000} satang"
 //	@Success		200		{object}	map[string]interface{}
-//	@Failure		400		{object}	map[string]string
-//	@Failure		404		{object}	map[string]string
-//	@Failure		500		{object}	map[string]string
+//	@Failure		400		{object}	map[string]string	"Invalid request"
+//	@Failure		404		{object}	map[string]string	"Transaction not found"
+//	@Failure		500		{object}	map[string]string	"Server error"
 //	@Router			/payments/transactions/{id}/refund [post]
 func (h *PaymentHandler) RefundTransaction(c *fiber.Ctx) error {
 	id := c.Params("id")

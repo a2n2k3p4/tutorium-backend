@@ -1109,7 +1109,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ClassSessionDoc"
+                            "$ref": "#/definitions/models.CreateClassSessionRequestDoc"
                         }
                     }
                 ],
@@ -3939,10 +3939,6 @@ const docTemplate = `{
         "models.AdminDoc": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer",
-                    "example": 43
-                },
                 "user_id": {
                     "type": "integer",
                     "example": 5
@@ -3963,10 +3959,6 @@ const docTemplate = `{
                 "ban_start": {
                     "type": "string",
                     "example": "2025-08-20T12:00:00Z"
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 1
                 },
                 "learner_id": {
                     "type": "integer",
@@ -3989,10 +3981,6 @@ const docTemplate = `{
                     "type": "string",
                     "example": "2025-08-20T12:00:00Z"
                 },
-                "id": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "teacher_id": {
                     "type": "integer",
                     "example": 7
@@ -4011,10 +3999,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.ClassDoc"
                     }
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 3
                 }
             }
         },
@@ -4023,7 +4007,7 @@ const docTemplate = `{
             "properties": {
                 "banner_picture": {
                     "type": "string",
-                    "example": "\u003cbase64-encoded-image\u003e"
+                    "example": "https://example.com/images/python_course_banner.jpg"
                 },
                 "class_description": {
                     "type": "string",
@@ -4078,13 +4062,46 @@ const docTemplate = `{
                     "type": "string",
                     "example": "2025-09-01T23:59:59Z"
                 },
-                "id": {
-                    "type": "integer",
-                    "example": 15
-                },
                 "learner_limit": {
                     "type": "integer",
                     "example": 50
+                },
+                "price": {
+                    "type": "number",
+                    "example": 199.99
+                }
+            }
+        },
+        "models.CreateClassSessionRequestDoc": {
+            "type": "object",
+            "properties": {
+                "class_finish": {
+                    "type": "string",
+                    "example": "2025-09-05T16:00:00Z"
+                },
+                "class_id": {
+                    "type": "integer",
+                    "example": 12
+                },
+                "class_start": {
+                    "type": "string",
+                    "example": "2025-09-05T14:00:00Z"
+                },
+                "class_status": {
+                    "type": "string",
+                    "example": "Scheduled"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Weekly tutoring session for calculus"
+                },
+                "enrollment_deadline": {
+                    "type": "string",
+                    "example": "2025-09-01T23:59:59Z"
+                },
+                "learner_limit": {
+                    "type": "integer",
+                    "example": 5
                 },
                 "price": {
                     "type": "number",
@@ -4097,19 +4114,15 @@ const docTemplate = `{
             "properties": {
                 "class_session_id": {
                     "type": "integer",
-                    "example": 21
+                    "example": 3
                 },
                 "enrollment_status": {
                     "type": "string",
                     "example": "active"
                 },
-                "id": {
-                    "type": "integer",
-                    "example": 101
-                },
                 "learner_id": {
                     "type": "integer",
-                    "example": 42
+                    "example": 1
                 }
             }
         },
@@ -4118,15 +4131,11 @@ const docTemplate = `{
             "properties": {
                 "flag_count": {
                     "type": "integer",
-                    "example": 3
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 42
+                    "example": 1
                 },
                 "user_id": {
                     "type": "integer",
-                    "example": 5
+                    "example": 1
                 }
             }
         },
@@ -4178,10 +4187,6 @@ const docTemplate = `{
         "models.NotificationDoc": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer",
-                    "example": 100
-                },
                 "notification_date": {
                     "type": "string",
                     "example": "2025-08-20T15:04:05Z"
@@ -4255,11 +4260,7 @@ const docTemplate = `{
             "properties": {
                 "class_session_id": {
                     "type": "integer",
-                    "example": 20
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 12
+                    "example": 1
                 },
                 "report_date": {
                     "type": "string",
@@ -4271,7 +4272,7 @@ const docTemplate = `{
                 },
                 "report_picture": {
                     "type": "string",
-                    "example": "\u003cbase64-encoded-image\u003e"
+                    "example": "http://example.com/report_image.png"
                 },
                 "report_reason": {
                     "type": "string",
@@ -4291,11 +4292,11 @@ const docTemplate = `{
                 },
                 "report_user_id": {
                     "type": "integer",
-                    "example": 5
+                    "example": 1
                 },
                 "reported_user_id": {
                     "type": "integer",
-                    "example": 8
+                    "example": 1
                 }
             }
         },
@@ -4309,10 +4310,6 @@ const docTemplate = `{
                 "comment": {
                     "type": "string",
                     "example": "This class was very informative and well-structured."
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 101
                 },
                 "learner_id": {
                     "type": "integer",
@@ -4338,10 +4335,6 @@ const docTemplate = `{
                 "flag_count": {
                     "type": "integer",
                     "example": 3
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 12
                 },
                 "user_id": {
                     "type": "integer",
@@ -4434,10 +4427,6 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Female"
                 },
-                "id": {
-                    "type": "integer",
-                    "example": 101
-                },
                 "last_name": {
                     "type": "string",
                     "example": "Smith"
@@ -4448,11 +4437,11 @@ const docTemplate = `{
                 },
                 "profile_picture": {
                     "type": "string",
-                    "example": "\u003cbase64-encoded-image\u003e"
+                    "example": "https://example.com/images/profile_picture.jpg"
                 },
                 "student_id": {
                     "type": "string",
-                    "example": "6610505511"
+                    "example": "b6600000000"
                 }
             }
         }

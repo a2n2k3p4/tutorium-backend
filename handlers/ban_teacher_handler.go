@@ -30,8 +30,8 @@ func BanTeacherRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			banteacher	body		models.BanDetailsTeacherDoc	true	"BanTeacher payload"
 //	@Success		201			{object}	models.BanDetailsTeacherDoc
-//	@Failure		400			{object}	map[string]string	"Invalid input"
-//	@Failure		500			{object}	map[string]string	"Server error"
+//	@Failure		400			{string}	string	"Invalid input"
+//	@Failure		500			{string}	string	"Server error"
 //	@Router			/banteachers [post]
 func CreateBanTeacher(c *fiber.Ctx) error {
 	var banteacher models.BanDetailsTeacher
@@ -58,7 +58,7 @@ func CreateBanTeacher(c *fiber.Ctx) error {
 //	@Security		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.BanDetailsTeacherDoc
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/banteachers [get]
 func GetBanTeachers(c *fiber.Ctx) error {
 	banteachers := []models.BanDetailsTeacher{}
@@ -87,9 +87,9 @@ func findBanTeacher(db *gorm.DB, id int, banteacher *models.BanDetailsTeacher) e
 //	@Produce		json
 //	@Param			id	path		int	true	"BanTeacher ID"
 //	@Success		200	{object}	models.BanDetailsTeacherDoc
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"BanTeacher not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"BanTeacher not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/banteachers/{id} [get]
 func GetBanTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -126,9 +126,9 @@ func GetBanTeacher(c *fiber.Ctx) error {
 //	@Param			id			path		int							true	"BanTeacher ID"
 //	@Param			banteacher	body		models.BanDetailsTeacherDoc	true	"Updated payload"
 //	@Success		200			{object}	models.BanDetailsTeacherDoc
-//	@Failure		400			{object}	map[string]string	"Invalid input or not found"
-//	@Failure		404			{object}	map[string]string	"BanTeacher not found"
-//	@Failure		500			{object}	map[string]string	"Server error"
+//	@Failure		400			{string}	string	"Invalid input"
+//	@Failure		404			{string}	string	"BanTeacher not found"
+//	@Failure		500			{string}	string	"Server error"
 //	@Router			/banteachers/{id} [put]
 func UpdateBanTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -172,9 +172,9 @@ func UpdateBanTeacher(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			id	path		int					true	"BanTeacher ID"
 //	@Success		200	{string}	string				"Successfully deleted ban teacher"
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"BanTeacher not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"BanTeacher not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/banteachers/{id} [delete]
 func DeleteBanTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")

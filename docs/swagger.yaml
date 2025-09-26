@@ -1,9 +1,6 @@
 definitions:
   models.AdminDoc:
     properties:
-      id:
-        example: 43
-        type: integer
       user_id:
         example: 5
         type: integer
@@ -19,9 +16,6 @@ definitions:
       ban_start:
         example: "2025-08-20T12:00:00Z"
         type: string
-      id:
-        example: 1
-        type: integer
       learner_id:
         example: 42
         type: integer
@@ -37,9 +31,6 @@ definitions:
       ban_start:
         example: "2025-08-20T12:00:00Z"
         type: string
-      id:
-        example: 1
-        type: integer
       teacher_id:
         example: 7
         type: integer
@@ -53,14 +44,11 @@ definitions:
         items:
           $ref: '#/definitions/models.ClassDoc'
         type: array
-      id:
-        example: 3
-        type: integer
     type: object
   models.ClassDoc:
     properties:
       banner_picture:
-        example: <base64-encoded-image>
+        example: https://example.com/images/python_course_banner.jpg
         type: string
       class_description:
         example: Advanced Python programming course
@@ -101,11 +89,35 @@ definitions:
       enrollment_deadline:
         example: "2025-09-01T23:59:59Z"
         type: string
-      id:
-        example: 15
-        type: integer
       learner_limit:
         example: 50
+        type: integer
+      price:
+        example: 199.99
+        type: number
+    type: object
+  models.CreateClassSessionRequestDoc:
+    properties:
+      class_finish:
+        example: "2025-09-05T16:00:00Z"
+        type: string
+      class_id:
+        example: 12
+        type: integer
+      class_start:
+        example: "2025-09-05T14:00:00Z"
+        type: string
+      class_status:
+        example: Scheduled
+        type: string
+      description:
+        example: Weekly tutoring session for calculus
+        type: string
+      enrollment_deadline:
+        example: "2025-09-01T23:59:59Z"
+        type: string
+      learner_limit:
+        example: 5
         type: integer
       price:
         example: 1999.99
@@ -114,28 +126,22 @@ definitions:
   models.EnrollmentDoc:
     properties:
       class_session_id:
-        example: 21
+        example: 3
         type: integer
       enrollment_status:
         example: active
         type: string
-      id:
-        example: 101
-        type: integer
       learner_id:
-        example: 42
+        example: 1
         type: integer
     type: object
   models.LearnerDoc:
     properties:
       flag_count:
-        example: 3
-        type: integer
-      id:
-        example: 42
+        example: 1
         type: integer
       user_id:
-        example: 5
+        example: 1
         type: integer
     type: object
   models.LoginRequestDoc:
@@ -172,9 +178,6 @@ definitions:
     type: object
   models.NotificationDoc:
     properties:
-      id:
-        example: 100
-        type: integer
       notification_date:
         example: "2025-08-20T15:04:05Z"
         type: string
@@ -228,10 +231,7 @@ definitions:
   models.ReportDoc:
     properties:
       class_session_id:
-        example: 20
-        type: integer
-      id:
-        example: 12
+        example: 1
         type: integer
       report_date:
         example: "2025-08-20T14:30:00Z"
@@ -240,7 +240,7 @@ definitions:
         example: User sent inappropriate messages
         type: string
       report_picture:
-        example: <base64-encoded-image>
+        example: http://example.com/report_image.png
         type: string
       report_reason:
         example: teacher_absent
@@ -255,10 +255,10 @@ definitions:
         example: Abuse
         type: string
       report_user_id:
-        example: 5
+        example: 1
         type: integer
       reported_user_id:
-        example: 8
+        example: 1
         type: integer
     type: object
   models.ReviewDoc:
@@ -269,9 +269,6 @@ definitions:
       comment:
         example: This class was very informative and well-structured.
         type: string
-      id:
-        example: 101
-        type: integer
       learner_id:
         example: 42
         type: integer
@@ -290,9 +287,6 @@ definitions:
         type: string
       flag_count:
         example: 3
-        type: integer
-      id:
-        example: 12
         type: integer
       user_id:
         example: 5
@@ -355,9 +349,6 @@ definitions:
       gender:
         example: Female
         type: string
-      id:
-        example: 101
-        type: integer
       last_name:
         example: Smith
         type: string
@@ -365,10 +356,10 @@ definitions:
         example: "+66912345678"
         type: string
       profile_picture:
-        example: <base64-encoded-image>
+        example: https://example.com/images/profile_picture.jpg
         type: string
       student_id:
-        example: "6610505511"
+        example: b6600000000
         type: string
     type: object
 info:
@@ -1077,7 +1068,7 @@ paths:
         name: class_session
         required: true
         schema:
-          $ref: '#/definitions/models.ClassSessionDoc'
+          $ref: '#/definitions/models.CreateClassSessionRequestDoc'
       produces:
       - application/json
       responses:

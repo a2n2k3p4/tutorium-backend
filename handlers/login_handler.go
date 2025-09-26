@@ -29,7 +29,7 @@ func LoginRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			login	body		models.LoginRequestDoc	true	"Login payload"
 //	@Success		200		{object}	models.LoginResponseDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
+//	@Failure		400		{object}	map[string]interface{}	"Invalid input"
 //	@Failure		401		{object}	map[string]string	"Unauthorized"
 //	@Failure		500		{object}	map[string]string	"Server error"
 //	@Router			/login [post]
@@ -46,7 +46,7 @@ func LoginHandler(c *fiber.Ctx) error {
 
 	var req LoginRequest
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(400).JSON(err.Error())
+		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	NisitKUBaseURL := config.KUAPI()
@@ -54,7 +54,7 @@ func LoginHandler(c *fiber.Ctx) error {
 
 	loginResp, err := nisitClient.Login(req.Username, req.Password)
 	if err != nil {
-		return c.Status(401).JSON(err.Error())
+		return c.Status(401).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	if loginResp == nil || loginResp.Status != "true" {
@@ -92,7 +92,7 @@ func LoginHandler(c *fiber.Ctx) error {
 	}
 	db, err := middlewares.GetDB(c)
 	if err != nil {
-		return c.Status(500).JSON(err.Error())
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	var user models.User
@@ -110,12 +110,12 @@ func LoginHandler(c *fiber.Ctx) error {
 		// begin transaction for create User and Learner
 		tx := db.Begin()
 		if tx.Error != nil {
-			return c.Status(500).JSON(tx.Error.Error())
+			return c.Status(500).JSON(fiber.Map{"error": tx.Error.Error()})
 		}
 
 		if err := tx.Create(&user).Error; err != nil {
 			tx.Rollback()
-			return c.Status(500).JSON(err.Error())
+			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 		}
 
 		learner := models.Learner{
@@ -124,16 +124,16 @@ func LoginHandler(c *fiber.Ctx) error {
 		}
 		if err := tx.Create(&learner).Error; err != nil {
 			tx.Rollback()
-			return c.Status(500).JSON(err.Error())
+			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 		}
 
 		if err := tx.Commit().Error; err != nil {
-			return c.Status(500).JSON(err.Error())
+			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 		}
 
 		user.Learner = &learner
 	} else if err != nil {
-		return c.Status(500).JSON(err.Error())
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	token, err := generateJWT(user)

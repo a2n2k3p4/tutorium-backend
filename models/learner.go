@@ -11,7 +11,6 @@ type Learner struct {
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
 
 type LearnerDoc struct {
-	ID        uint `json:"id" example:"42"`
-	UserID    uint `json:"user_id" example:"5"`
-	FlagCount int  `json:"flag_count" example:"3"`
+	UserID    uint `json:"user_id" example:"1"`
+	FlagCount int  `json:"flag_count" example:"1"`
 }
