@@ -394,7 +394,7 @@ paths:
       - BearerAuth: []
       summary: Get all admins
       tags:
-      - admins
+      - Admins
     post:
       consumes:
       - application/json
@@ -425,7 +425,7 @@ paths:
       - BearerAuth: []
       summary: Create a new admin
       tags:
-      - admins
+      - Admins
   /admins/{id}:
     delete:
       consumes:
@@ -460,7 +460,7 @@ paths:
       - BearerAuth: []
       summary: Delete admin by ID
       tags:
-      - admins
+      - Admins
     get:
       consumes:
       - application/json
@@ -494,7 +494,7 @@ paths:
       - BearerAuth: []
       summary: Get admin by ID
       tags:
-      - admins
+      - Admins
   /banlearners:
     get:
       description: GetBanLearners returns a list of all ban records

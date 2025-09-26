@@ -39,7 +39,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "admins"
+                    "Admins"
                 ],
                 "summary": "Get all admins",
                 "responses": {
@@ -74,7 +74,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "admins"
+                    "Admins"
                 ],
                 "summary": "Create a new admin",
                 "parameters": [
@@ -125,7 +125,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "admins"
+                    "Admins"
                 ],
                 "summary": "Get admin by ID",
                 "parameters": [
@@ -178,7 +178,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "admins"
+                    "Admins"
                 ],
                 "summary": "Delete admin by ID",
                 "parameters": [
