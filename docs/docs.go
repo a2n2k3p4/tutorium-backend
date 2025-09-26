@@ -998,7 +998,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "CreateClassSession creates a new ClassSession record",
+                "description": "CreateClassSession creates a new ClassSessionRequestDoc record",
                 "consumes": [
                     "application/json"
                 ],
@@ -1011,8 +1011,8 @@ const docTemplate = `{
                 "summary": "Create a new class session",
                 "parameters": [
                     {
-                        "description": "ClassSession payload",
-                        "name": "class_session",
+                        "description": "CreateClassSessionRequest payload",
+                        "name": "create_class_session_request",
                         "in": "body",
                         "required": true,
                         "schema": {

@@ -994,11 +994,11 @@ paths:
     post:
       consumes:
       - application/json
-      description: CreateClassSession creates a new ClassSession record
+      description: CreateClassSession creates a new ClassSessionRequestDoc record
       parameters:
-      - description: ClassSession payload
+      - description: CreateClassSessionRequest payload
         in: body
-        name: class_session
+        name: create_class_session_request
         required: true
         schema:
           $ref: '#/definitions/models.CreateClassSessionRequestDoc'

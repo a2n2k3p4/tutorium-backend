@@ -26,12 +26,12 @@ func ClassSessionRoutes(app *fiber.App) {
 // CreateClassSession godoc
 //
 //	@Summary		Create a new class session
-//	@Description	CreateClassSession creates a new ClassSession record
+//	@Description	CreateClassSession creates a new ClassSessionRequestDoc record
 //	@Tags			ClassSessions
 //	@Security		BearerAuth
 //	@Accept			json
 //	@Produce		json
-//	@Param			class_session	body		models.CreateClassSessionRequestDoc	true	"ClassSession payload"
+//	@Param			create_class_session_request	body		models.CreateClassSessionRequestDoc	true	"CreateClassSessionRequest payload"
 //	@Success		201				{object}	models.ClassSessionDoc
 //	@Failure		400				{string}	string	"Invalid input"
 //	@Failure		500				{string}	string	"Server error"
