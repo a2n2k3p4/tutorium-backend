@@ -2280,7 +2280,9 @@ const docTemplate = `{
                         "description": "Omise charge response",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": true
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "400": {

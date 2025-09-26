@@ -1817,7 +1817,8 @@ paths:
         "200":
           description: Omise charge response
           schema:
-            additionalProperties: true
+            additionalProperties:
+              type: string
             type: object
         "400":
           description: Invalid request

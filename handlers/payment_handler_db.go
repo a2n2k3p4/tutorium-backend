@@ -23,23 +23,23 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Param			payload	body		models.PaymentRequest	true	"Payment payload"
-//	@Success		200		{object}	map[string]interface{}	"Omise charge response"
+//	@Success		200		{object}	map[string]string	"Omise charge response"
 //	@Failure		400		{object}	map[string]string	"Invalid request"
 //	@Failure		500		{object}	map[string]string	"Server error"
 //	@Router			/payments/charge [post]
 func (h *PaymentHandler) CreateCharge(c *fiber.Ctx) error {
 	var req models.PaymentRequest
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": "Invalid request: " + err.Error()})
+		return c.Status(400).JSON(err.Error())
 	}
 	if req.Amount <= 0 {
-		return c.Status(400).JSON(fiber.Map{"error": "amount is required"})
+		return c.Status(400).JSON("error amount is required")
 	}
 	// Fill defaults / enforce currency
 	if req.Currency == "" {
 		req.Currency = config.PAYMENTDefaultCurrency()
 	} else if cfg := config.PAYMENTDefaultCurrency(); cfg != "" && req.Currency != cfg {
-		return c.Status(400).JSON(fiber.Map{"error": "unsupported currency", "allowed": cfg})
+		return c.Status(400).JSON("error currency must be " + cfg)
 	}
 	if req.PaymentType == "internet_banking" && req.ReturnURI == "" {
 		req.ReturnURI = config.PAYMENTReturnURI()
