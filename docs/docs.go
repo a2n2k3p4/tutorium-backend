@@ -751,7 +751,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "CreateClassCategory creates a new ClassCategory record",
+                "description": "CreateClassCategory creates a new ClassSession record",
                 "consumes": [
                     "application/json"
                 ],

@@ -835,7 +835,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: CreateClassCategory creates a new ClassCategory record
+      description: CreateClassCategory creates a new ClassSession record
       parameters:
       - description: ClassCategory payload
         in: body
