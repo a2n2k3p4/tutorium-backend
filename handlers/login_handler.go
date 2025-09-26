@@ -29,7 +29,7 @@ func LoginRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			login	body		models.LoginRequestDoc	true	"Login payload"
 //	@Success		200		{object}	models.LoginResponseDoc
-//	@Failure		400		{object}	map[string]interface{}	"Invalid input"
+//	@Failure		400		{object}	map[string]string	"Invalid input"
 //	@Failure		401		{object}	map[string]string	"Unauthorized"
 //	@Failure		500		{object}	map[string]string	"Server error"
 //	@Router			/login [post]
@@ -46,7 +46,7 @@ func LoginHandler(c *fiber.Ctx) error {
 
 	var req LoginRequest
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(400).JSON(err.Error())
 	}
 
 	NisitKUBaseURL := config.KUAPI()
@@ -71,10 +71,10 @@ func LoginHandler(c *fiber.Ctx) error {
 			// decode base64 -> validate -> upload to minio
 			profileBytes, err := storage.DecodeBase64Image(req.ProfilePicture)
 			if err != nil {
-				return c.Status(400).JSON(fiber.Map{"error": "invalid profile_picture", "detail": err.Error()})
+				return c.Status(400).JSON(err.Error())
 			}
 			if err := validateImageBytes(profileBytes); err != nil {
-				return c.Status(400).JSON(fiber.Map{"error": "invalid profile_picture", "detail": err.Error()})
+				return c.Status(400).JSON(err.Error())
 			}
 
 			mc := c.Locals("minio").(*storage.Client)

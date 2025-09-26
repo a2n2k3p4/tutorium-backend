@@ -998,7 +998,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "CreateClassSession creates a new ClassSessionRequestDoc record",
+                "description": "CreateClassSession creates a new ClassSession record",
                 "consumes": [
                     "application/json"
                 ],
@@ -1973,7 +1973,9 @@ const docTemplate = `{
                         "description": "Invalid input",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": true
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "401": {

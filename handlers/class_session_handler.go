@@ -26,7 +26,7 @@ func ClassSessionRoutes(app *fiber.App) {
 // CreateClassSession godoc
 //
 //	@Summary		Create a new class session
-//	@Description	CreateClassSession creates a new ClassSessionRequestDoc record
+//	@Description	CreateClassSession creates a new ClassSession record
 //	@Tags			ClassSessions
 //	@Security		BearerAuth
 //	@Accept			json

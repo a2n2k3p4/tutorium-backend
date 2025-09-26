@@ -994,7 +994,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: CreateClassSession creates a new ClassSessionRequestDoc record
+      description: CreateClassSession creates a new ClassSession record
       parameters:
       - description: CreateClassSessionRequest payload
         in: body
@@ -1621,7 +1621,8 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties: true
+            additionalProperties:
+              type: string
             type: object
         "401":
           description: Unauthorized
