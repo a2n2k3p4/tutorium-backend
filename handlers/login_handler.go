@@ -29,9 +29,9 @@ func LoginRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			login	body		models.LoginRequestDoc	true	"Login payload"
 //	@Success		200		{object}	models.LoginResponseDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
-//	@Failure		401		{object}	map[string]string	"Unauthorized"
-//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Failure		400		{string}    string	"Invalid input"
+//	@Failure		401		{string}    string	"Unauthorized"
+//	@Failure		500		{string}	string	"Server error"
 //	@Router			/login [post]
 func LoginHandler(c *fiber.Ctx) error {
 	type LoginRequest struct {
@@ -58,7 +58,7 @@ func LoginHandler(c *fiber.Ctx) error {
 	}
 
 	if loginResp == nil || loginResp.Status != "true" {
-		return c.Status(401).JSON(fiber.Map{"error": "invalid credentials"})
+		return c.Status(401).JSON("invalid credentials")
 	}
 
 	// ProfilePictureURL
@@ -71,10 +71,10 @@ func LoginHandler(c *fiber.Ctx) error {
 			// decode base64 -> validate -> upload to minio
 			profileBytes, err := storage.DecodeBase64Image(req.ProfilePicture)
 			if err != nil {
-				return c.Status(400).JSON(fiber.Map{"error": "invalid profile_picture", "detail": err.Error()})
+				return c.Status(400).JSON(err.Error())
 			}
 			if err := validateImageBytes(profileBytes); err != nil {
-				return c.Status(400).JSON(fiber.Map{"error": "invalid profile_picture", "detail": err.Error()})
+				return c.Status(400).JSON(err.Error())
 			}
 
 			mc := c.Locals("minio").(*storage.Client)
@@ -84,7 +84,7 @@ func LoginHandler(c *fiber.Ctx) error {
 
 			objectKey, err := mc.UploadBytes(c.Context(), "users", filename, profileBytes)
 			if err != nil {
-				return c.Status(500).JSON(fiber.Map{"error": "upload failed", "detail": err.Error()})
+				return c.Status(500).JSON(err.Error())
 			}
 
 			uploadedURL = objectKey
@@ -138,7 +138,7 @@ func LoginHandler(c *fiber.Ctx) error {
 
 	token, err := generateJWT(user)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "cannot generate token"})
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.JSON(fiber.Map{

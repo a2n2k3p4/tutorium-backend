@@ -38,8 +38,8 @@ func ClassRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			class	body		models.ClassDoc	true	"Class payload"
 //	@Success		201		{object}	models.ClassDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
-//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Failure		400		{string}	string	"Invalid input"
+//	@Failure		500		{string}	string	"Server error"
 //	@Router			/classes [post]
 func CreateClass(c *fiber.Ctx) error {
 	var class models.Class
@@ -83,7 +83,7 @@ func CreateClass(c *fiber.Ctx) error {
 
 		if len(cats) != len(names) {
 			tx.Rollback()
-			return c.Status(400).JSON(fiber.Map{"error": "some categories not found"})
+			return c.Status(400).JSON("some categories not found")
 		}
 
 		if err := tx.Model(&class).Association("Categories").Replace(&cats); err != nil {
@@ -101,18 +101,18 @@ func CreateClass(c *fiber.Ctx) error {
 
 // GetClasses godoc
 //
-//		@Summary		List all classes
-//		@Description	Retrieve a list of classes filtered by optional query parameters: categories, and rating range
-//		@Tags			Classes
-//	 @Security 		BearerAuth
-//		@Produce		json
-//		@Param			category		query	[]string	false	"Filter by one or more categories (OR relation)"
-//		@Param			min_rating		query	string		false	"Minimum class rating"
-//		@Param			max_rating		query	string		false	"Maximum class rating"
-//		@Success		200	{array}		models.ClassDoc
-//		@Failure		400	{object}	map[string]string	"Invalid query parameters"
-//		@Failure		500	{object}	map[string]string	"Server error"
-//		@Router			/classes [get]
+//	@Summary		List all classes
+//	@Description	Retrieve a list of classes filtered by optional query parameters: categories, and rating range
+//	@Tags			Classes
+//	@Security		BearerAuth
+//	@Produce		json
+//	@Param			category		query	[]string	false	"Filter by one or more categories (OR relation)"
+//	@Param			min_rating		query	string		false	"Minimum class rating"
+//	@Param			max_rating		query	string		false	"Maximum class rating"
+//	@Success		200	{array}		models.ClassDoc
+//	@Failure		400	{string}	string	"Invalid query parameters"
+//	@Failure		500	{string}	string	"Server error"
+//	@Router			/classes [get]
 func GetClasses(c *fiber.Ctx) error {
 	db, err := middlewares.GetDB(c)
 	if err != nil {
@@ -217,9 +217,9 @@ func findClass(db *gorm.DB, id int, class *models.Class) error {
 //	@Produce		json
 //	@Param			id	path		int	true	"Class ID"
 //	@Success		200	{object}	models.ClassDoc
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Class not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"Class not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/classes/{id} [get]
 func GetClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -267,9 +267,9 @@ func GetClass(c *fiber.Ctx) error {
 //	@Param			id		path		int				true	"Class ID"
 //	@Param			class	body		models.ClassDoc	true	"Updated class payload"
 //	@Success		200		{object}	models.ClassDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
-//	@Failure		404		{object}	map[string]string	"Class not found"
-//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Failure		400		{string}	string	"Invalid input"
+//	@Failure		404		{string}	string	"Class not found"
+//	@Failure		500		{string}	string	"Server error"
 //	@Router			/classes/{id} [put]
 func UpdateClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -328,7 +328,7 @@ func UpdateClass(c *fiber.Ctx) error {
 
 		if len(cats) != len(names) {
 			tx.Rollback()
-			return c.Status(400).JSON(fiber.Map{"error": "some categories not found"})
+			return c.Status(400).JSON("some categories not found")
 		}
 
 		if err := tx.Model(&class).Association("Categories").Replace(&cats); err != nil {
@@ -357,9 +357,9 @@ func UpdateClass(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			id	path		int					true	"Class ID"
 //	@Success		200	{string}	string				"Successfully deleted class"
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Class not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"Class not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/classes/{id} [delete]
 func DeleteClass(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")

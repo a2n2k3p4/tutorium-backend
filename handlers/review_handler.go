@@ -31,8 +31,8 @@ func ReviewRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			review	body		models.ReviewDoc	true	"Review payload"
 //	@Success		201		{object}	models.ReviewDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input or rating out of range"
-//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Failure		400		{string}	string	"Invalid input or rating out of range"
+//	@Failure		500		{string}	string	"Server error"
 //	@Router			/reviews [post]
 func CreateReview(c *fiber.Ctx) error {
 	var review models.Review
@@ -64,7 +64,7 @@ func CreateReview(c *fiber.Ctx) error {
 //	@Security		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.ReviewDoc
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/reviews [get]
 func GetReviews(c *fiber.Ctx) error {
 	var reviews []models.Review
@@ -92,9 +92,9 @@ func findReview(db *gorm.DB, id int, review *models.Review) error {
 //	@Produce		json
 //	@Param			id	path		int	true	"Review ID"
 //	@Success		200	{object}	models.ReviewDoc
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Review not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"Review not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/reviews/{id} [get]
 func GetReview(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -131,9 +131,9 @@ func GetReview(c *fiber.Ctx) error {
 //	@Param			id		path		int					true	"Review ID"
 //	@Param			review	body		models.ReviewDoc	true	"Updated review payload"
 //	@Success		200		{object}	models.ReviewDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input or rating out of range"
-//	@Failure		404		{object}	map[string]string	"Review not found"
-//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Failure		400		{string}	string	"Invalid input or rating out of range"
+//	@Failure		404		{string}	string	"Review not found"
+//	@Failure		500		{string}	string	"Server error"
 //	@Router			/reviews/{id} [put]
 func UpdateReview(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -189,9 +189,9 @@ func UpdateReview(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			id	path		int					true	"Review ID"
 //	@Success		200	{string}	string				"Successfully deleted review"
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Review not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"Review not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/reviews/{id} [delete]
 func DeleteReview(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")

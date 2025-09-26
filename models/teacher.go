@@ -13,7 +13,6 @@ type Teacher struct {
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
 
 type TeacherDoc struct {
-	ID          uint   `json:"id" example:"12"`
 	UserID      uint   `json:"user_id" example:"5"`
 	Description string `json:"description" example:"Experienced Mathematics teacher specializing in calculus and linear algebra."`
 	FlagCount   int    `json:"flag_count" example:"3"`

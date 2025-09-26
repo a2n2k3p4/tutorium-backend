@@ -36,8 +36,8 @@ func UserRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			user	body		models.UserDoc	true	"User payload"
 //	@Success		201		{object}	models.UserDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
-//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Failure		400		{string}	string	"Invalid input"
+//	@Failure		500		{string}	string	"Server error"
 //	@Router			/users [post]
 func CreateUser(c *fiber.Ctx) error {
 	var user models.User
@@ -92,7 +92,7 @@ func CreateUser(c *fiber.Ctx) error {
 //	@Security		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.UserDoc
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/users [get]
 func GetUsers(c *fiber.Ctx) error {
 	users := []models.User{}
@@ -142,9 +142,9 @@ func findUser(db *gorm.DB, id int, user *models.User) error {
 //	@Produce		json
 //	@Param			id	path		int	true	"User ID"
 //	@Success		200	{object}	models.UserDoc
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"User not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"User not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/users/{id} [get]
 func GetUser(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -193,9 +193,9 @@ func GetUser(c *fiber.Ctx) error {
 //	@Param			id		path		int				true	"User ID"
 //	@Param			user	body		models.UserDoc	true	"Updated user payload"
 //	@Success		200		{object}	models.UserDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
-//	@Failure		404		{object}	map[string]string	"User not found"
-//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Failure		400		{string}	string	"Invalid input"
+//	@Failure		404		{string}	string	"User not found"
+//	@Failure		500		{string}	string	"Server error"
 //	@Router			/users/{id} [put]
 func UpdateUser(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -245,9 +245,9 @@ func UpdateUser(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			id	path		int					true	"User ID"
 //	@Success		200	{string}	string				"Successfully deleted User and associated roles"
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"User not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"User not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/users/{id} [delete]
 func DeleteUser(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")

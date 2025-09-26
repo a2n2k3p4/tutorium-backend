@@ -24,7 +24,6 @@ type User struct {
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
 
 type UserDoc struct {
-	ID             uint    `json:"id" example:"101"`
 	StudentID      string  `json:"student_id" example:"6610505511"`
 	ProfilePicture string  `json:"profile_picture,omitempty" example:"<base64-encoded-image>"`
 	FirstName      string  `json:"first_name" example:"Alice"`

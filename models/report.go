@@ -27,7 +27,6 @@ type Report struct {
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
 
 type ReportDoc struct {
-	ID                uint      `json:"id" example:"12"`
 	ReportUserID      uint      `json:"report_user_id" example:"5"`
 	ReportedUserID    uint      `json:"reported_user_id" example:"8"`
 	ClassSessionID    uint      `json:"class_session_id" example:"20"`

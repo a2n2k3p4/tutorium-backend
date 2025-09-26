@@ -30,8 +30,8 @@ func BanLearnerRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			banlearner	body		models.BanDetailsLearnerDoc	true	"Ban Learner Payload"
 //	@Success		201			{object}	models.BanDetailsLearnerDoc
-//	@Failure		400			{object}	map[string]string
-//	@Failure		500			{object}	map[string]string
+//	@Failure		400			{string}	string	"Invalid input"
+//	@Failure		500			{string}	string	"Server error"
 //	@Router			/banlearners [post]
 func CreateBanLearner(c *fiber.Ctx) error {
 	var banlearner models.BanDetailsLearner
@@ -58,7 +58,7 @@ func CreateBanLearner(c *fiber.Ctx) error {
 //	@Security		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.BanDetailsLearnerDoc
-//	@Failure		500	{object}	map[string]string
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/banlearners [get]
 func GetBanLearners(c *fiber.Ctx) error {
 	banlearners := []models.BanDetailsLearner{}
@@ -87,9 +87,9 @@ func findBanLearner(db *gorm.DB, id int, banlearner *models.BanDetailsLearner) e
 //	@Produce		json
 //	@Param			id	path		int	true	"Ban Learner ID"
 //	@Success		200	{object}	models.BanDetailsLearnerDoc
-//	@Failure		400	{object}	map[string]string
-//	@Failure		404	{object}	map[string]string
-//	@Failure		500	{object}	map[string]string
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"banlearner not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/banlearners/{id} [get]
 func GetBanLearner(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -126,9 +126,9 @@ func GetBanLearner(c *fiber.Ctx) error {
 //	@Param			id			path		int							true	"Ban Learner ID"
 //	@Param			banlearner	body		models.BanDetailsLearnerDoc	true	"Updated ban record"
 //	@Success		200			{object}	models.BanDetailsLearnerDoc
-//	@Failure		400			{object}	map[string]string
-//	@Failure		404			{object}	map[string]string
-//	@Failure		500			{object}	map[string]string
+//	@Failure		400			{string}	string	"Invalid input"
+//	@Failure		404			{string}	string	"banlearner not found"
+//	@Failure		500			{string}	string	"Server error"
 //	@Router			/banlearners/{id} [put]
 func UpdateBanLearner(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -173,9 +173,9 @@ func UpdateBanLearner(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			id	path		int		true	"Ban Learner ID"
 //	@Success		200	{string}	string	"Successfully deleted ban learner"
-//	@Failure		400	{object}	map[string]string
-//	@Failure		404	{object}	map[string]string
-//	@Failure		500	{object}	map[string]string
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"banlearner not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/banlearners/{id} [delete]
 func DeleteBanLearner(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")

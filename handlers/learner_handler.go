@@ -29,8 +29,8 @@ func LearnerRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			learner	body		models.LearnerDoc	true	"Learner payload"
 //	@Success		201		{object}	models.LearnerDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
-//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Failure		400		{string}	string	"Invalid input"
+//	@Failure		500		{string}	string	"Server error"
 //	@Router			/learners [post]
 func CreateLearner(c *fiber.Ctx) error {
 	var learner models.Learner
@@ -58,7 +58,7 @@ func CreateLearner(c *fiber.Ctx) error {
 //	@Security		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.LearnerDoc
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/learners [get]
 func GetLearners(c *fiber.Ctx) error {
 	learners := []models.Learner{}
@@ -87,9 +87,9 @@ func findLearner(db *gorm.DB, id int, learner *models.Learner) error {
 //	@Produce		json
 //	@Param			id	path		int	true	"Learner ID"
 //	@Success		200	{object}	models.LearnerDoc
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Learner not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"Learner not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/learners/{id} [get]
 func GetLearner(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -124,9 +124,9 @@ func GetLearner(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			id	path		int					true	"Learner ID"
 //	@Success		200	{string}	string				"Successfully deleted Learner"
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Learner not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"Learner not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/learners/{id} [delete]
 func DeleteLearner(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
