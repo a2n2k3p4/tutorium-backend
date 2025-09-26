@@ -1633,6 +1633,52 @@ paths:
       summary: Login with KU/Nisit credentials
       tags:
       - Login
+  /meetings/{id}:
+    get:
+      description: Retrieves the meeting link associated with a given ClassSession
+        ID.
+      parameters:
+      - description: ClassSession ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: meeting_link
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid class session ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Class session not found or meeting not created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get meeting link by ClassSession ID
+      tags:
+      - Meetings
   /notifications:
     get:
       description: GetNotifications retrieves all Notification records with associated

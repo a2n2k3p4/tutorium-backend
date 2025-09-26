@@ -13,7 +13,7 @@ const BASE_JITSI_URL = "https://meet.jit.si"
 
 func MeetingRoutes(app *fiber.App) {
 	meetingurl := NewMeetingHandler()
-	meeting := app.Group("/meeting", middlewares.ProtectedMiddleware(), middlewares.TeacherRequired(), middlewares.LearnerRequired())
+	meeting := app.Group("/meetings", middlewares.ProtectedMiddleware(), middlewares.TeacherRequired(), middlewares.LearnerRequired())
 	meeting.Get("/:id", meetingurl.GetMeetingLink)
 }
 
@@ -26,6 +26,20 @@ func NewMeetingHandler() *MeetingURL {
 	return &MeetingURL{BaseURL: BASE_JITSI_URL}
 }
 
+// GetMeetingLink godoc
+//
+//	@Summary		Get meeting link by ClassSession ID
+//	@Description	Retrieves the meeting link associated with a given ClassSession ID.
+//	@Tags			Meetings
+//	@Security		BearerAuth
+//	@Produce		json
+//	@Param			id	path		int	true	"ClassSession ID"
+//	@Success		200	{object}	map[string]string	"meeting_link"
+//	@Failure		400	{object}	map[string]string	"Invalid class session ID"
+//	@Failure		401	{object}	map[string]string	"Unauthorized"
+//	@Failure		404	{object}	map[string]string	"Class session not found or meeting not created"
+//	@Failure		500	{string}	string				"Server error"
+//	@Router			/meetings/{id} [get]
 func (h *MeetingURL) GetMeetingLink(c *fiber.Ctx) error {
 	_, ok := c.Locals("currentUser").(*models.User)
 	if !ok {
