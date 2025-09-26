@@ -24,7 +24,7 @@ func ClassCategoryRoutes(app *fiber.App) {
 // CreateClassCategory godoc
 //
 //	@Summary		Create a new class category
-//	@Description	CreateClassCategory creates a new ClassSession record
+//	@Description	CreateClassCategory creates a new ClassCategory record
 //	@Tags			ClassCategories
 //	@Security		BearerAuth
 //	@Accept			json

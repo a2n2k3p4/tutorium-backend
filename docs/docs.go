@@ -751,7 +751,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "CreateClassCategory creates a new ClassSession record",
+                "description": "CreateClassCategory creates a new ClassCategory record",
                 "consumes": [
                     "application/json"
                 ],
@@ -1972,28 +1972,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }

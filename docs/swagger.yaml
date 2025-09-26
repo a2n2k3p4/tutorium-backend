@@ -835,7 +835,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: CreateClassCategory creates a new ClassSession record
+      description: CreateClassCategory creates a new ClassCategory record
       parameters:
       - description: ClassCategory payload
         in: body
@@ -1621,21 +1621,15 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "401":
           description: Unauthorized
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       summary: Login with KU/Nisit credentials
       tags:
       - Login

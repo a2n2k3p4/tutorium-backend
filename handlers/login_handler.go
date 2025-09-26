@@ -29,9 +29,9 @@ func LoginRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			login	body		models.LoginRequestDoc	true	"Login payload"
 //	@Success		200		{object}	models.LoginResponseDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
-//	@Failure		401		{object}	map[string]string	"Unauthorized"
-//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Failure		400		{string}    string	"Invalid input"
+//	@Failure		401		{string}    string	"Unauthorized"
+//	@Failure		500		{string}	string	"Server error"
 //	@Router			/login [post]
 func LoginHandler(c *fiber.Ctx) error {
 	type LoginRequest struct {
@@ -54,11 +54,11 @@ func LoginHandler(c *fiber.Ctx) error {
 
 	loginResp, err := nisitClient.Login(req.Username, req.Password)
 	if err != nil {
-		return c.Status(401).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(401).JSON(err.Error())
 	}
 
 	if loginResp == nil || loginResp.Status != "true" {
-		return c.Status(401).JSON(fiber.Map{"error": "invalid credentials"})
+		return c.Status(401).JSON("invalid credentials")
 	}
 
 	// ProfilePictureURL
@@ -84,7 +84,7 @@ func LoginHandler(c *fiber.Ctx) error {
 
 			objectKey, err := mc.UploadBytes(c.Context(), "users", filename, profileBytes)
 			if err != nil {
-				return c.Status(500).JSON(fiber.Map{"error": "upload failed", "detail": err.Error()})
+				return c.Status(500).JSON(err.Error())
 			}
 
 			uploadedURL = objectKey
@@ -92,7 +92,7 @@ func LoginHandler(c *fiber.Ctx) error {
 	}
 	db, err := middlewares.GetDB(c)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(500).JSON(err.Error())
 	}
 
 	var user models.User
@@ -110,12 +110,12 @@ func LoginHandler(c *fiber.Ctx) error {
 		// begin transaction for create User and Learner
 		tx := db.Begin()
 		if tx.Error != nil {
-			return c.Status(500).JSON(fiber.Map{"error": tx.Error.Error()})
+			return c.Status(500).JSON(tx.Error.Error())
 		}
 
 		if err := tx.Create(&user).Error; err != nil {
 			tx.Rollback()
-			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+			return c.Status(500).JSON(err.Error())
 		}
 
 		learner := models.Learner{
@@ -124,21 +124,21 @@ func LoginHandler(c *fiber.Ctx) error {
 		}
 		if err := tx.Create(&learner).Error; err != nil {
 			tx.Rollback()
-			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+			return c.Status(500).JSON(err.Error())
 		}
 
 		if err := tx.Commit().Error; err != nil {
-			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+			return c.Status(500).JSON(err.Error())
 		}
 
 		user.Learner = &learner
 	} else if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(500).JSON(err.Error())
 	}
 
 	token, err := generateJWT(user)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "cannot generate token"})
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.JSON(fiber.Map{
