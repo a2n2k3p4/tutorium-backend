@@ -48,7 +48,7 @@ definitions:
   models.ClassDoc:
     properties:
       banner_picture:
-        example: https://example.com/images/python_course_banner.jpg
+        example: <base64-encoded-image>
         type: string
       class_description:
         example: Advanced Python programming course
@@ -56,9 +56,6 @@ definitions:
       class_name:
         example: Advanced Python Programming
         type: string
-      id:
-        example: 21
-        type: integer
       rating:
         example: 4.7
         type: number
@@ -231,7 +228,7 @@ definitions:
   models.ReportDoc:
     properties:
       class_session_id:
-        example: 1
+        example: 20
         type: integer
       report_date:
         example: "2025-08-20T14:30:00Z"
@@ -240,7 +237,7 @@ definitions:
         example: User sent inappropriate messages
         type: string
       report_picture:
-        example: http://example.com/report_image.png
+        example: <base64-encoded-image>
         type: string
       report_reason:
         example: teacher_absent
@@ -255,10 +252,10 @@ definitions:
         example: Abuse
         type: string
       report_user_id:
-        example: 1
+        example: 5
         type: integer
       reported_user_id:
-        example: 1
+        example: 8
         type: integer
     type: object
   models.ReviewDoc:
@@ -356,10 +353,10 @@ definitions:
         example: "+66912345678"
         type: string
       profile_picture:
-        example: https://example.com/images/profile_picture.jpg
+        example: <base64-encoded-image>
         type: string
       student_id:
-        example: b6600000000
+        example: "6610505511"
         type: string
     type: object
 info:
@@ -389,11 +386,10 @@ paths:
             items:
               $ref: '#/definitions/models.AdminDoc'
             type: array
-        "404":
-          description: Admins not found
+        "500":
+          description: Internal server error
           schema:
-            additionalProperties: true
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Get all admins
@@ -413,15 +409,18 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/models.AdminDoc'
         "400":
-          description: Bad request
+          description: Invalid request body
           schema:
-            additionalProperties: true
-            type: object
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: Create a new admin
@@ -444,18 +443,19 @@ paths:
         "200":
           description: Successfully deleted admin
           schema:
-            additionalProperties: true
-            type: object
+            type: string
         "400":
-          description: Bad request - Invalid ID or admin not found
+          description: Invalid admin ID
           schema:
-            additionalProperties: true
-            type: object
+            type: string
+        "404":
+          description: admin not found
+          schema:
+            type: string
         "500":
-          description: Internal server error during deletion
+          description: Internal server error
           schema:
-            additionalProperties: true
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Delete admin by ID
@@ -479,10 +479,17 @@ paths:
           schema:
             $ref: '#/definitions/models.AdminDoc'
         "400":
-          description: Bad request - Invalid ID or admin not found
+          description: Invalid admin ID
           schema:
-            additionalProperties: true
-            type: object
+            type: string
+        "404":
+          description: admin not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: Get admin by ID
@@ -501,11 +508,9 @@ paths:
               $ref: '#/definitions/models.BanDetailsLearnerDoc'
             type: array
         "500":
-          description: Internal Server Error
+          description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Get all banned learners
@@ -530,17 +535,13 @@ paths:
           schema:
             $ref: '#/definitions/models.BanDetailsLearnerDoc'
         "400":
-          description: Bad Request
+          description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
-          description: Internal Server Error
+          description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Create a new banned learner record
@@ -563,23 +564,17 @@ paths:
           schema:
             type: string
         "400":
-          description: Bad Request
+          description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
-          description: Not Found
+          description: banlearner not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
-          description: Internal Server Error
+          description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Delete a banned learner record
@@ -601,23 +596,17 @@ paths:
           schema:
             $ref: '#/definitions/models.BanDetailsLearnerDoc'
         "400":
-          description: Bad Request
+          description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
-          description: Not Found
+          description: banlearner not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
-          description: Internal Server Error
+          description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Get a banned learner by ID
@@ -647,23 +636,17 @@ paths:
           schema:
             $ref: '#/definitions/models.BanDetailsLearnerDoc'
         "400":
-          description: Bad Request
+          description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
-          description: Not Found
+          description: banlearner not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
-          description: Internal Server Error
+          description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Update a banned learner record
@@ -685,9 +668,7 @@ paths:
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: List all ban records for teachers
@@ -714,15 +695,11 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Create a new ban record for a teacher
@@ -747,21 +724,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: BanTeacher not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Delete a ban record by ID
@@ -785,21 +756,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: BanTeacher not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Get ban record by ID
@@ -829,23 +794,17 @@ paths:
           schema:
             $ref: '#/definitions/models.BanDetailsTeacherDoc'
         "400":
-          description: Invalid input or not found
+          description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: BanTeacher not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Update a ban record by ID
@@ -867,9 +826,7 @@ paths:
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: List all class categories
@@ -896,15 +853,11 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Create a new class category
@@ -929,21 +882,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: ClassCategory not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Delete a class category by ID
@@ -968,21 +915,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: ClassCategory not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Get class category by ID
@@ -1014,21 +955,15 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: ClassCategory not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Update an existing class category
@@ -1050,9 +985,7 @@ paths:
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: List all class sessions
@@ -1079,15 +1012,11 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Create a new class session
@@ -1112,21 +1041,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: ClassSession not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Delete a class session by ID
@@ -1151,21 +1074,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: ClassSession not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Get class session by ID
@@ -1197,21 +1114,15 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: ClassSession not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Update an existing class session
@@ -1249,15 +1160,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: List all classes
@@ -1284,15 +1191,11 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Create a new class
@@ -1317,21 +1220,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Class not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Delete a class by ID
@@ -1356,21 +1253,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Class not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Get class by ID
@@ -1402,21 +1293,15 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Class not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Update an existing class
@@ -1438,9 +1323,7 @@ paths:
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: List all enrollments
@@ -1467,15 +1350,11 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Create a new enrollment
@@ -1500,21 +1379,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Enrollment not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Delete an enrollment by ID
@@ -1539,21 +1412,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Enrollment not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Get enrollment by ID
@@ -1585,21 +1452,15 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Enrollment not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Update an existing enrollment
@@ -1635,9 +1496,7 @@ paths:
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: List all learners
@@ -1664,15 +1523,11 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Create a new learner
@@ -1697,21 +1552,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Learner not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Delete a learner by ID
@@ -1735,21 +1584,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Learner not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Get learner by ID
@@ -1778,8 +1621,7 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
+            additionalProperties: true
             type: object
         "401":
           description: Unauthorized
@@ -1812,9 +1654,7 @@ paths:
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: List all notifications
@@ -1841,15 +1681,11 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Create a new notification
@@ -1874,21 +1710,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Notification not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Delete a notification by ID
@@ -1913,21 +1743,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Notification not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Get notification by ID
@@ -1959,21 +1783,15 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Notification not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Update an existing notification
@@ -2073,6 +1891,12 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Transaction'
+        "400":
+          description: Invalid transaction ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "404":
           description: Not found
           schema:
@@ -2116,19 +1940,19 @@ paths:
             additionalProperties: true
             type: object
         "400":
-          description: Bad Request
+          description: Invalid request
           schema:
             additionalProperties:
               type: string
             type: object
         "404":
-          description: Not Found
+          description: Transaction not found
           schema:
             additionalProperties:
               type: string
             type: object
         "500":
-          description: Internal Server Error
+          description: Server error
           schema:
             additionalProperties:
               type: string
@@ -2154,9 +1978,7 @@ paths:
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: List all reports
@@ -2183,15 +2005,11 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Create a new report
@@ -2216,21 +2034,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Report not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Delete a report by ID
@@ -2255,21 +2067,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Report not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Get report by ID
@@ -2301,21 +2107,15 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Report not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Update an existing report
@@ -2337,9 +2137,7 @@ paths:
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: List all reviews
@@ -2366,15 +2164,11 @@ paths:
         "400":
           description: Invalid input or rating out of range
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Create a new review
@@ -2399,21 +2193,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Review not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Delete a review by ID
@@ -2438,21 +2226,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Review not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Get review by ID
@@ -2485,21 +2267,15 @@ paths:
         "400":
           description: Invalid input or rating out of range
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Review not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Update an existing review
@@ -2520,9 +2296,7 @@ paths:
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: List all teachers
@@ -2549,15 +2323,11 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Create a new teacher
@@ -2582,21 +2352,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Teacher not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Delete a teacher by ID
@@ -2620,21 +2384,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Teacher not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Get teacher by ID
@@ -2666,21 +2424,15 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Teacher not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Update an existing teacher
@@ -2701,9 +2453,7 @@ paths:
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: List all users
@@ -2730,15 +2480,11 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Create a new user
@@ -2764,21 +2510,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: User not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Delete a user by ID
@@ -2802,21 +2542,15 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: User not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Get user by ID
@@ -2848,21 +2582,15 @@ paths:
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: User not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Update an existing user
