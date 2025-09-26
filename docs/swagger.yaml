@@ -1811,21 +1811,15 @@ paths:
         "200":
           description: Omise charge response
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "400":
           description: Invalid request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Create a payment charge
@@ -1865,9 +1859,7 @@ paths:
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       summary: List transactions
       tags:
       - Payments
@@ -1890,21 +1882,15 @@ paths:
         "400":
           description: Invalid transaction ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       summary: Get a transaction
       tags:
       - Payments
@@ -1938,21 +1924,15 @@ paths:
         "400":
           description: Invalid request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "404":
           description: Transaction not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
         "500":
           description: Server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            type: string
       security:
       - BearerAuth: []
       summary: Refund a transaction
