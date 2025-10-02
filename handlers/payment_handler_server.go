@@ -9,7 +9,6 @@ import (
 	"github.com/omise/omise-go/operations"
 	"gorm.io/gorm"
 
-	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/a2n2k3p4/tutorium-backend/services"
 )
 
@@ -34,6 +33,12 @@ func (h *PaymentHandler) Health(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"status": "ok"})
 }
 
+// OmiseWebhookPayload represents the webhook payload from Omise.
+type OmiseWebhookPayload struct {
+	Object string `json:"object" example:"charge"` // "event" or "charge"
+	ID     string `json:"id" example:"chrg_test_658q8luocil7hlhd07n"`
+}
+
 // HandleWebhook accepts either an Event payload (object:"event") or a Charge payload (object:"charge").
 // Flow:
 //   - if event: RetrieveEvent -> extract charge.id -> RetrieveCharge -> upsert
@@ -47,10 +52,10 @@ func (h *PaymentHandler) Health(c *fiber.Ctx) error {
 //	@Tags			Payments
 //	@Accept			json
 //	@Produce		json
-//	@Param			payload	body		models.OmiseWebhookPayload	true	"Omise webhook payload (event or charge object)"
-//	@Success		200		{string}	string						"OK"
-//	@Failure		400		{object}	map[string]string			"Bad request"
-//	@Failure		500		{string}	string						"Retryable server error"
+//	@Param			payload	body		OmiseWebhookPayload	true	"Omise webhook payload (event or charge object)"
+//	@Success		200		{string}	string				"OK"
+//	@Failure		400		{object}	map[string]string	"Bad request"
+//	@Failure		500		{string}	string				"Retryable server error"
 //	@Router			/webhooks/omise [post]
 func (h *PaymentHandler) HandleWebhook(c *fiber.Ctx) error {
 	var envelope struct {
