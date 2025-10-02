@@ -215,8 +215,8 @@ func UpdateReport(c *fiber.Ctx) error {
 //	@Tags			Reports
 //	@Security		BearerAuth
 //	@Produce		json
-//	@Param			id	path		int					true	"Report ID"
-//	@Success		200	{string}	string				"Successfully deleted Report"
+//	@Param			id	path		int		true	"Report ID"
+//	@Success		200	{string}	string	"Successfully deleted Report"
 //	@Failure		400	{string}	string	"Invalid ID"
 //	@Failure		404	{string}	string	"Report not found"
 //	@Failure		500	{string}	string	"Server error"

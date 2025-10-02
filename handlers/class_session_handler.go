@@ -32,9 +32,9 @@ func ClassSessionRoutes(app *fiber.App) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			create_class_session_request	body		models.CreateClassSessionRequestDoc	true	"CreateClassSessionRequest payload"
-//	@Success		201				{object}	models.ClassSessionDoc
-//	@Failure		400				{string}	string	"Invalid input"
-//	@Failure		500				{string}	string	"Server error"
+//	@Success		201								{object}	models.ClassSessionDoc
+//	@Failure		400								{string}	string	"Invalid input"
+//	@Failure		500								{string}	string	"Server error"
 //	@Router			/class_sessions [post]
 func CreateClassSession(c *fiber.Ctx) error {
 	var class_session_request models.CreateClassSessionRequest
@@ -194,8 +194,8 @@ func UpdateClassSession(c *fiber.Ctx) error {
 //	@Tags			ClassSessions
 //	@Security		BearerAuth
 //	@Produce		json
-//	@Param			id	path		int					true	"ClassSession ID"
-//	@Success		200	{string}	string				"Successfully deleted class session"
+//	@Param			id	path		int		true	"ClassSession ID"
+//	@Success		200	{string}	string	"Successfully deleted class session"
 //	@Failure		400	{string}	string	"Invalid ID"
 //	@Failure		404	{string}	string	"ClassSession not found"
 //	@Failure		500	{string}	string	"Server error"
