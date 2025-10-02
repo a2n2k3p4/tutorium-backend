@@ -50,3 +50,10 @@ type TransactionListResponse struct {
 		Offset int   `json:"offset"`
 	} `json:"pagination"`
 }
+
+// OmiseWebhookPayload represents the webhook payload from Omise.
+// It can be either an Event object or a Charge object.
+type OmiseWebhookPayload struct {
+	Object string `json:"object" example:"charge"` // "event" or "charge"
+	ID     string `json:"id" example:"chrg_test_658q8luocil7hlhd07n"`
+}
