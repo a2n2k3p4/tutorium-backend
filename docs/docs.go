@@ -3538,7 +3538,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.OmiseWebhookPayload"
+                            "$ref": "#/definitions/handlers.OmiseWebhookPayload"
                         }
                     }
                 ],
@@ -3569,6 +3569,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "handlers.OmiseWebhookPayload": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "chrg_test_658q8luocil7hlhd07n"
+                },
+                "object": {
+                    "description": "\"event\" or \"charge\"",
+                    "type": "string",
+                    "example": "charge"
+                }
+            }
+        },
         "models.AdminDoc": {
             "type": "object",
             "properties": {
@@ -3835,20 +3849,6 @@ const docTemplate = `{
                 "user_id": {
                     "type": "integer",
                     "example": 42
-                }
-            }
-        },
-        "models.OmiseWebhookPayload": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string",
-                    "example": "chrg_test_658q8luocil7hlhd07n"
-                },
-                "object": {
-                    "description": "\"event\" or \"charge\"",
-                    "type": "string",
-                    "example": "charge"
                 }
             }
         },

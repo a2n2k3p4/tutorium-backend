@@ -1,4 +1,14 @@
 definitions:
+  handlers.OmiseWebhookPayload:
+    properties:
+      id:
+        example: chrg_test_658q8luocil7hlhd07n
+        type: string
+      object:
+        description: '"event" or "charge"'
+        example: charge
+        type: string
+    type: object
   models.AdminDoc:
     properties:
       user_id:
@@ -190,16 +200,6 @@ definitions:
       user_id:
         example: 42
         type: integer
-    type: object
-  models.OmiseWebhookPayload:
-    properties:
-      id:
-        example: chrg_test_658q8luocil7hlhd07n
-        type: string
-      object:
-        description: '"event" or "charge"'
-        example: charge
-        type: string
     type: object
   models.PaymentRequest:
     properties:
@@ -2640,7 +2640,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/models.OmiseWebhookPayload'
+          $ref: '#/definitions/handlers.OmiseWebhookPayload'
       produces:
       - application/json
       responses:
