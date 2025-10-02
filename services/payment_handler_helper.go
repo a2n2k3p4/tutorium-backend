@@ -88,6 +88,10 @@ func (s *PaymentService) UpsertTransactionFromCharge(charge *omise.Charge, userI
 	}
 	prevWasSuccessful := prev.Status == "successful"
 
+	if userID == nil && prev.UserID != nil {
+		userID = prev.UserID
+	}
+
 	newTx := models.Transaction{
 		UserID:         userID,
 		ChargeID:       charge.ID,
@@ -175,6 +179,11 @@ func extractUserIDFromCharge(charge *omise.Charge, userID *uint) *uint {
 		case float64:
 			u := uint(vv)
 			return &u
+		case json.Number:
+			if n, err := vv.Int64(); err == nil {
+				u := uint(n)
+				return &u
+			}
 		}
 	}
 	return userID

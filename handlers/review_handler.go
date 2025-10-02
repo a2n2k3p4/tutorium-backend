@@ -187,8 +187,8 @@ func UpdateReview(c *fiber.Ctx) error {
 //	@Tags			Reviews
 //	@Security		BearerAuth
 //	@Produce		json
-//	@Param			id	path		int					true	"Review ID"
-//	@Success		200	{string}	string				"Successfully deleted review"
+//	@Param			id	path		int		true	"Review ID"
+//	@Success		200	{string}	string	"Successfully deleted review"
 //	@Failure		400	{string}	string	"Invalid ID"
 //	@Failure		404	{string}	string	"Review not found"
 //	@Failure		500	{string}	string	"Server error"

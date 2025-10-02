@@ -33,7 +33,7 @@ func NewMeetingHandler() *MeetingURL {
 //	@Tags			Meetings
 //	@Security		BearerAuth
 //	@Produce		json
-//	@Param			id	path		int	true	"ClassSession ID"
+//	@Param			id	path		int					true	"ClassSession ID"
 //	@Success		200	{object}	map[string]string	"meeting_link"
 //	@Failure		400	{object}	map[string]string	"Invalid class session ID"
 //	@Failure		401	{object}	map[string]string	"Unauthorized"

@@ -169,8 +169,8 @@ func UpdateTeacher(c *fiber.Ctx) error {
 //	@Tags			Teachers
 //	@Security		BearerAuth
 //	@Produce		json
-//	@Param			id	path		int					true	"Teacher ID"
-//	@Success		200	{string}	string				"Successfully deleted Teacher"
+//	@Param			id	path		int		true	"Teacher ID"
+//	@Success		200	{string}	string	"Successfully deleted Teacher"
 //	@Failure		400	{string}	string	"Invalid ID"
 //	@Failure		404	{string}	string	"Teacher not found"
 //	@Failure		500	{string}	string	"Server error"

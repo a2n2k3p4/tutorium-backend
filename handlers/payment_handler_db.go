@@ -23,9 +23,9 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Param			payload	body		models.PaymentRequest	true	"Payment payload"
-//	@Success		200		{object} string	"Omise charge response"
-//	@Failure		400		{string} string	"Invalid request"
-//	@Failure		500		{string} string	"Server error"
+//	@Success		200		{object}	string					"Omise charge response"
+//	@Failure		400		{string}	string					"Invalid request"
+//	@Failure		500		{string}	string					"Server error"
 //	@Router			/payments/charge [post]
 func (h *PaymentHandler) CreateCharge(c *fiber.Ctx) error {
 	var req models.PaymentRequest
@@ -159,12 +159,12 @@ func (h *PaymentHandler) GetTransaction(c *fiber.Ctx) error {
 //	@Security		BearerAuth
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		path		string				true	"Transaction ID or charge_id"
+//	@Param			id		path		string			true	"Transaction ID or charge_id"
 //	@Param			payload	body		map[string]int	false	"Refund payload, e.g. {\"amount\": 1000} satang"
 //	@Success		200		{object}	map[string]interface{}
 //	@Failure		400		{string}	string	"Invalid request"
-//	@Failure		404		{string} string	"Transaction not found"
-//	@Failure		500		{string} string	"Server error"
+//	@Failure		404		{string}	string	"Transaction not found"
+//	@Failure		500		{string}	string	"Server error"
 //	@Router			/payments/transactions/{id}/refund [post]
 func (h *PaymentHandler) RefundTransaction(c *fiber.Ctx) error {
 	id := c.Params("id")

@@ -126,7 +126,7 @@ func GetAdmin(c *fiber.Ctx) error {
 //	@Security		BearerAuth
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		int						true	"Admin ID"
+//	@Param			id	path		int		true	"Admin ID"
 //	@Success		200	{string}	string	"Successfully deleted admin"
 //	@Failure		400	{string}	string	"Invalid admin ID"
 //	@Failure		404	{string}	string	"admin not found"

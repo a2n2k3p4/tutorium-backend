@@ -243,8 +243,8 @@ func UpdateUser(c *fiber.Ctx) error {
 //	@Tags			Users
 //	@Security		BearerAuth
 //	@Produce		json
-//	@Param			id	path		int					true	"User ID"
-//	@Success		200	{string}	string				"Successfully deleted User and associated roles"
+//	@Param			id	path		int		true	"User ID"
+//	@Success		200	{string}	string	"Successfully deleted User and associated roles"
 //	@Failure		400	{string}	string	"Invalid ID"
 //	@Failure		404	{string}	string	"User not found"
 //	@Failure		500	{string}	string	"Server error"

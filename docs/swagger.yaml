@@ -1,4 +1,14 @@
 definitions:
+  handlers.OmiseWebhookPayload:
+    properties:
+      id:
+        example: chrg_test_658q8luocil7hlhd07n
+        type: string
+      object:
+        description: '"event" or "charge"'
+        example: charge
+        type: string
+    type: object
   models.AdminDoc:
     properties:
       user_id:
@@ -2623,14 +2633,14 @@ paths:
       consumes:
       - application/json
       description: Handles Omise events by verifying and upserting transaction status.
+        Accepts either an Event payload (object:"event") or a Charge payload (object:"charge").
       parameters:
-      - description: Omise event payload
+      - description: Omise webhook payload (event or charge object)
         in: body
         name: payload
         required: true
         schema:
-          additionalProperties: true
-          type: object
+          $ref: '#/definitions/handlers.OmiseWebhookPayload'
       produces:
       - application/json
       responses:

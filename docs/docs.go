@@ -3520,7 +3520,7 @@ const docTemplate = `{
         },
         "/webhooks/omise": {
             "post": {
-                "description": "Handles Omise events by verifying and upserting transaction status.",
+                "description": "Handles Omise events by verifying and upserting transaction status. Accepts either an Event payload (object:\"event\") or a Charge payload (object:\"charge\").",
                 "consumes": [
                     "application/json"
                 ],
@@ -3533,13 +3533,12 @@ const docTemplate = `{
                 "summary": "Omise webhook",
                 "parameters": [
                     {
-                        "description": "Omise event payload",
+                        "description": "Omise webhook payload (event or charge object)",
                         "name": "payload",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/handlers.OmiseWebhookPayload"
                         }
                     }
                 ],
@@ -3570,6 +3569,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "handlers.OmiseWebhookPayload": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "chrg_test_658q8luocil7hlhd07n"
+                },
+                "object": {
+                    "description": "\"event\" or \"charge\"",
+                    "type": "string",
+                    "example": "charge"
+                }
+            }
+        },
         "models.AdminDoc": {
             "type": "object",
             "properties": {
