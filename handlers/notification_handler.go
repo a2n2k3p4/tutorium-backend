@@ -31,8 +31,8 @@ func NotificationRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			notification	body		models.NotificationDoc	true	"Notification payload"
 //	@Success		201				{object}	models.NotificationDoc
-//	@Failure		400				{object}	map[string]string	"Invalid input"
-//	@Failure		500				{object}	map[string]string	"Server error"
+//	@Failure		400				{string}	string	"Invalid input"
+//	@Failure		500				{string}	string	"Server error"
 //	@Router			/notifications [post]
 func CreateNotification(c *fiber.Ctx) error {
 	var notification models.Notification
@@ -60,7 +60,7 @@ func CreateNotification(c *fiber.Ctx) error {
 //	@Security		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.NotificationDoc
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/notifications [get]
 func GetNotifications(c *fiber.Ctx) error {
 	var notifications []models.Notification
@@ -88,9 +88,9 @@ func findNotification(db *gorm.DB, id int, notification *models.Notification) er
 //	@Produce		json
 //	@Param			id	path		int	true	"Notification ID"
 //	@Success		200	{object}	models.NotificationDoc
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Notification not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"Notification not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/notifications/{id} [get]
 func GetNotification(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -127,9 +127,9 @@ func GetNotification(c *fiber.Ctx) error {
 //	@Param			id				path		int						true	"Notification ID"
 //	@Param			notification	body		models.NotificationDoc	true	"Updated notification payload"
 //	@Success		200				{object}	models.NotificationDoc
-//	@Failure		400				{object}	map[string]string	"Invalid input"
-//	@Failure		404				{object}	map[string]string	"Notification not found"
-//	@Failure		500				{object}	map[string]string	"Server error"
+//	@Failure		400				{string}	string	"Invalid input"
+//	@Failure		404				{string}	string	"Notification not found"
+//	@Failure		500				{string}	string	"Server error"
 //	@Router			/notifications/{id} [put]
 func UpdateNotification(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -173,9 +173,9 @@ func UpdateNotification(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			id	path		int					true	"Notification ID"
 //	@Success		200	{string}	string				"Successfully deleted notification"
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Notification not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"Notification not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/notifications/{id} [delete]
 func DeleteNotification(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")

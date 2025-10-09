@@ -28,8 +28,8 @@ func TeacherRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			teacher	body		models.TeacherDoc	true	"Teacher payload"
 //	@Success		201		{object}	models.TeacherDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
-//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Failure		400		{string}	string	"Invalid input"
+//	@Failure		500		{string}	string	"Server error"
 //	@Router			/teachers [post]
 func CreateTeacher(c *fiber.Ctx) error {
 	var teacher models.Teacher
@@ -57,7 +57,7 @@ func CreateTeacher(c *fiber.Ctx) error {
 //	@Security		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.TeacherDoc
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/teachers [get]
 func GetTeachers(c *fiber.Ctx) error {
 	teachers := []models.Teacher{}
@@ -86,9 +86,9 @@ func findTeacher(db *gorm.DB, id int, teacher *models.Teacher) error {
 //	@Produce		json
 //	@Param			id	path		int	true	"Teacher ID"
 //	@Success		200	{object}	models.TeacherDoc
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Teacher not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"Teacher not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/teachers/{id} [get]
 func GetTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -125,9 +125,9 @@ func GetTeacher(c *fiber.Ctx) error {
 //	@Param			id		path		int					true	"Teacher ID"
 //	@Param			teacher	body		models.TeacherDoc	true	"Updated teacher payload"
 //	@Success		200		{object}	models.TeacherDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
-//	@Failure		404		{object}	map[string]string	"Teacher not found"
-//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Failure		400		{string}	string	"Invalid input"
+//	@Failure		404		{string}	string	"Teacher not found"
+//	@Failure		500		{string}	string	"Server error"
 //	@Router			/teachers/{id} [put]
 func UpdateTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -171,9 +171,9 @@ func UpdateTeacher(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			id	path		int					true	"Teacher ID"
 //	@Success		200	{string}	string				"Successfully deleted Teacher"
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Teacher not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"Teacher not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/teachers/{id} [delete]
 func DeleteTeacher(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")

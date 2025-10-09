@@ -33,14 +33,24 @@ func Migrate(db *gorm.DB) {
 	log.Println("Database migrated successfully")
 
 	if config.STATUS() == "development" {
-		err := Seed(db)
-		if err != nil {
-			log.Fatalf("seed failed: %v", err)
+		var dummy int
+		tx := db.Table("users").Select("1").Limit(1).Scan(&dummy)
+		if tx.Error != nil {
+			log.Fatalf("can't check users table: %v", tx.Error)
 		}
-		log.Println("Database seeded successfully")
+
+		if tx.RowsAffected == 0 {
+			if err := Seed(db); err != nil {
+				log.Fatalf("seed failed: %v", err)
+			}
+			log.Println("Database seeded successfully")
+		} else {
+			log.Println("Skip seeding: data already present")
+		}
 	} else {
-		log.Println("Skip seeded")
+		log.Println("Skip seeding: in production")
 	}
+
 }
 
 /* -------------------- Helper for seed the database ,it will do nothing if entry already exist -------------------- */

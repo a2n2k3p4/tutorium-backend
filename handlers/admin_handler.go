@@ -23,13 +23,14 @@ func AdminRoutes(app *fiber.App) {
 //
 //	@Summary		Create a new admin
 //	@Description	Create a new admin with the provided data
-//	@Tags			admins
+//	@Tags			Admins
 //	@Security		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			admin	body		models.AdminDoc	true	"Admin data"
-//	@Success		200		{object}	models.AdminDoc
-//	@Failure		400		{object}	map[string]interface{}	"Bad request"
+//	@Success		201		{object}	models.AdminDoc
+//	@Failure		400		{string}	string	"Invalid request body"
+//	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/admins [post]
 func CreateAdmin(c *fiber.Ctx) error {
 	var admin models.Admin
@@ -53,12 +54,12 @@ func CreateAdmin(c *fiber.Ctx) error {
 //
 //	@Summary		Get all admins
 //	@Description	Retrieve a list of all admins
-//	@Tags			admins
+//	@Tags			Admins
 //	@Security		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{array}		models.AdminDoc
-//	@Failure		404	{object}	map[string]interface{}	"Admins not found"
+//	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/admins [get]
 func GetAdmins(c *fiber.Ctx) error {
 	admins := []models.Admin{}
@@ -82,13 +83,15 @@ func findAdmin(db *gorm.DB, id int, admin *models.Admin) error {
 //
 //	@Summary		Get admin by ID
 //	@Description	Retrieve a specific admin by their ID
-//	@Tags			admins
+//	@Tags			Admins
 //	@Security		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	path		int	true	"Admin ID"
 //	@Success		200	{object}	models.AdminDoc
-//	@Failure		400	{object}	map[string]interface{}	"Bad request - Invalid ID or admin not found"
+//	@Failure		400	{string}	string	"Invalid admin ID"
+//	@Failure		404	{string}	string	"admin not found"
+//	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/admins/{id} [get]
 func GetAdmin(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -119,14 +122,15 @@ func GetAdmin(c *fiber.Ctx) error {
 //
 //	@Summary		Delete admin by ID
 //	@Description	Delete a specific admin by their ID
-//	@Tags			admins
+//	@Tags			Admins
 //	@Security		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	path		int						true	"Admin ID"
-//	@Success		200	{object}	map[string]interface{}	"Successfully deleted admin"
-//	@Failure		400	{object}	map[string]interface{}	"Bad request - Invalid ID or admin not found"
-//	@Failure		500	{object}	map[string]interface{}	"Internal server error during deletion"
+//	@Success		200	{string}	string	"Successfully deleted admin"
+//	@Failure		400	{string}	string	"Invalid admin ID"
+//	@Failure		404	{string}	string	"admin not found"
+//	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/admins/{id} [delete]
 func DeleteAdmin(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")

@@ -19,7 +19,6 @@ type BanDetailsTeacher struct {
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
 
 type BanDetailsTeacherDoc struct {
-	ID             uint      `json:"id" example:"1"`
 	TeacherID      uint      `json:"teacher_id" example:"7"`
 	BanStart       time.Time `json:"ban_start" example:"2025-08-20T12:00:00Z"`
 	BanEnd         time.Time `json:"ban_end" example:"2025-08-30T12:00:00Z"`

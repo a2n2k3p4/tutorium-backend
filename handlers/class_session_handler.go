@@ -31,10 +31,10 @@ func ClassSessionRoutes(app *fiber.App) {
 //	@Security		BearerAuth
 //	@Accept			json
 //	@Produce		json
-//	@Param			class_session	body		models.ClassSessionDoc	true	"ClassSession payload"
+//	@Param			create_class_session_request	body		models.CreateClassSessionRequestDoc	true	"CreateClassSessionRequest payload"
 //	@Success		201				{object}	models.ClassSessionDoc
-//	@Failure		400				{object}	map[string]string	"Invalid input"
-//	@Failure		500				{object}	map[string]string	"Server error"
+//	@Failure		400				{string}	string	"Invalid input"
+//	@Failure		500				{string}	string	"Server error"
 //	@Router			/class_sessions [post]
 func CreateClassSession(c *fiber.Ctx) error {
 	var class_session_request models.CreateClassSessionRequest
@@ -81,7 +81,7 @@ func CreateClassSession(c *fiber.Ctx) error {
 //	@Security		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.ClassSessionDoc
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/class_sessions [get]
 func GetClassSessions(c *fiber.Ctx) error {
 	class_sessions := []models.ClassSession{}
@@ -110,9 +110,9 @@ func findClassSession(db *gorm.DB, id int, class_session *models.ClassSession) e
 //	@Produce		json
 //	@Param			id	path		int	true	"ClassSession ID"
 //	@Success		200	{object}	models.ClassSessionDoc
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"ClassSession not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"ClassSession not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/class_sessions/{id} [get]
 func GetClassSession(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -149,9 +149,9 @@ func GetClassSession(c *fiber.Ctx) error {
 //	@Param			id				path		int						true	"ClassSession ID"
 //	@Param			class_session	body		models.ClassSessionDoc	true	"Updated ClassSession payload"
 //	@Success		200				{object}	models.ClassSessionDoc
-//	@Failure		400				{object}	map[string]string	"Invalid input"
-//	@Failure		404				{object}	map[string]string	"ClassSession not found"
-//	@Failure		500				{object}	map[string]string	"Server error"
+//	@Failure		400				{string}	string	"Invalid input"
+//	@Failure		404				{string}	string	"ClassSession not found"
+//	@Failure		500				{string}	string	"Server error"
 //	@Router			/class_sessions/{id} [put]
 func UpdateClassSession(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -196,9 +196,9 @@ func UpdateClassSession(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			id	path		int					true	"ClassSession ID"
 //	@Success		200	{string}	string				"Successfully deleted class session"
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"ClassSession not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"ClassSession not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/class_sessions/{id} [delete]
 func DeleteClassSession(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")

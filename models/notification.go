@@ -20,7 +20,6 @@ type Notification struct {
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
 
 type NotificationDoc struct {
-	ID                      uint      `json:"id" example:"100"`
 	UserID                  uint      `json:"user_id" example:"42"`
 	NotificationType        string    `json:"notification_type" example:"System Alert"`
 	NotificationDescription string    `json:"notification_description" example:"Your class has been rescheduled"`

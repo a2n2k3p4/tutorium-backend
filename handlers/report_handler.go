@@ -37,8 +37,8 @@ func ReportRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			report	body		models.ReportDoc	true	"Report payload"
 //	@Success		201		{object}	models.ReportDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
-//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Failure		400		{string}	string	"Invalid input"
+//	@Failure		500		{string}	string	"Server error"
 //	@Router			/reports [post]
 func CreateReport(c *fiber.Ctx) error {
 	var report models.Report
@@ -71,7 +71,7 @@ func CreateReport(c *fiber.Ctx) error {
 //	@Security		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.ReportDoc
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/reports [get]
 func GetReports(c *fiber.Ctx) error {
 	reports := []models.Report{}
@@ -115,9 +115,9 @@ func findReport(db *gorm.DB, id int, report *models.Report) error {
 //	@Produce		json
 //	@Param			id	path		int	true	"Report ID"
 //	@Success		200	{object}	models.ReportDoc
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Report not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"Report not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/reports/{id} [get]
 func GetReport(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -165,9 +165,9 @@ func GetReport(c *fiber.Ctx) error {
 //	@Param			id		path		int					true	"Report ID"
 //	@Param			report	body		models.ReportDoc	true	"Updated report payload"
 //	@Success		200		{object}	models.ReportDoc
-//	@Failure		400		{object}	map[string]string	"Invalid input"
-//	@Failure		404		{object}	map[string]string	"Report not found"
-//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Failure		400		{string}	string	"Invalid input"
+//	@Failure		404		{string}	string	"Report not found"
+//	@Failure		500		{string}	string	"Server error"
 //	@Router			/reports/{id} [put]
 func UpdateReport(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -217,9 +217,9 @@ func UpdateReport(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			id	path		int					true	"Report ID"
 //	@Success		200	{string}	string				"Successfully deleted Report"
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Report not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"Report not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/reports/{id} [delete]
 func DeleteReport(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")

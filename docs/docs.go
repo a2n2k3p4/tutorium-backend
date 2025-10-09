@@ -39,7 +39,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "admins"
+                    "Admins"
                 ],
                 "summary": "Get all admins",
                 "responses": {
@@ -52,11 +52,10 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "404": {
-                        "description": "Admins not found",
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "string"
                         }
                     }
                 }
@@ -75,7 +74,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "admins"
+                    "Admins"
                 ],
                 "summary": "Create a new admin",
                 "parameters": [
@@ -90,17 +89,22 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/models.AdminDoc"
                         }
                     },
                     "400": {
-                        "description": "Bad request",
+                        "description": "Invalid request body",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -121,7 +125,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "admins"
+                    "Admins"
                 ],
                 "summary": "Get admin by ID",
                 "parameters": [
@@ -141,10 +145,21 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Invalid ID or admin not found",
+                        "description": "Invalid admin ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "admin not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -163,7 +178,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "admins"
+                    "Admins"
                 ],
                 "summary": "Delete admin by ID",
                 "parameters": [
@@ -179,22 +194,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully deleted admin",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "string"
                         }
                     },
                     "400": {
-                        "description": "Bad request - Invalid ID or admin not found",
+                        "description": "Invalid admin ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "admin not found",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "500": {
-                        "description": "Internal server error during deletion",
+                        "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "string"
                         }
                     }
                 }
@@ -226,12 +244,9 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -272,21 +287,15 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -324,30 +333,21 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "banlearner not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -395,30 +395,21 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "banlearner not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -454,30 +445,21 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "banlearner not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -511,10 +493,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -557,19 +536,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -609,28 +582,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "BanTeacher not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -678,30 +642,21 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid input or not found",
+                        "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "BanTeacher not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -739,28 +694,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "BanTeacher not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -794,10 +740,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -840,19 +783,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -892,28 +829,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "ClassCategory not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -963,28 +891,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "ClassCategory not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1022,28 +941,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "ClassCategory not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1077,10 +987,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1104,12 +1011,12 @@ const docTemplate = `{
                 "summary": "Create a new class session",
                 "parameters": [
                     {
-                        "description": "ClassSession payload",
-                        "name": "class_session",
+                        "description": "CreateClassSessionRequest payload",
+                        "name": "create_class_session_request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ClassSessionDoc"
+                            "$ref": "#/definitions/models.CreateClassSessionRequestDoc"
                         }
                     }
                 ],
@@ -1123,19 +1030,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1175,28 +1076,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "ClassSession not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1246,28 +1138,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "ClassSession not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1305,28 +1188,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "ClassSession not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1384,19 +1258,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1439,19 +1307,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1491,28 +1353,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Class not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1562,28 +1415,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Class not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1621,28 +1465,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Class not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1676,10 +1511,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1722,19 +1554,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1774,28 +1600,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Enrollment not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1845,28 +1662,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Enrollment not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1904,28 +1712,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Enrollment not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -1982,10 +1781,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2028,19 +1824,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2080,28 +1870,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Learner not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2139,28 +1920,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Learner not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2200,6 +1972,61 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/meetings/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieves the meeting link associated with a given ClassSession ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Meetings"
+                ],
+                "summary": "Get meeting link by ClassSession ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ClassSession ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "meeting_link",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid class session ID",
+                        "schema": {
                             "type": "object",
                             "additionalProperties": {
                                 "type": "string"
@@ -2215,13 +2042,19 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "500": {
-                        "description": "Server error",
+                    "404": {
+                        "description": "Class session not found or meeting not created",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
                                 "type": "string"
                             }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -2255,10 +2088,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2301,19 +2131,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2353,28 +2177,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Notification not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2424,28 +2239,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Notification not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2483,28 +2289,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Notification not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2543,26 +2340,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Omise charge response",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "string"
                         }
                     },
                     "400": {
                         "description": "Invalid request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2620,10 +2410,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2655,22 +2442,22 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.Transaction"
                         }
                     },
+                    "400": {
+                        "description": "Invalid transaction ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
                     "404": {
                         "description": "Not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2723,30 +2510,21 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Transaction not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2780,10 +2558,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2826,19 +2601,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2878,28 +2647,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Report not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -2949,28 +2709,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Report not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3008,28 +2759,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Report not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3063,10 +2805,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3109,19 +2848,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input or rating out of range",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3161,28 +2894,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Review not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3232,28 +2956,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input or rating out of range",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Review not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3291,28 +3006,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Review not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3346,10 +3052,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3392,19 +3095,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3444,28 +3141,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Teacher not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3515,28 +3203,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Teacher not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3574,28 +3253,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "Teacher not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3629,10 +3299,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3675,19 +3342,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3727,28 +3388,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3798,28 +3450,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3857,28 +3500,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -3939,10 +3573,6 @@ const docTemplate = `{
         "models.AdminDoc": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer",
-                    "example": 43
-                },
                 "user_id": {
                     "type": "integer",
                     "example": 5
@@ -3963,10 +3593,6 @@ const docTemplate = `{
                 "ban_start": {
                     "type": "string",
                     "example": "2025-08-20T12:00:00Z"
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 1
                 },
                 "learner_id": {
                     "type": "integer",
@@ -3989,10 +3615,6 @@ const docTemplate = `{
                     "type": "string",
                     "example": "2025-08-20T12:00:00Z"
                 },
-                "id": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "teacher_id": {
                     "type": "integer",
                     "example": 7
@@ -4011,10 +3633,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.ClassDoc"
                     }
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 3
                 }
             }
         },
@@ -4032,10 +3650,6 @@ const docTemplate = `{
                 "class_name": {
                     "type": "string",
                     "example": "Advanced Python Programming"
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 21
                 },
                 "rating": {
                     "type": "number",
@@ -4078,13 +3692,46 @@ const docTemplate = `{
                     "type": "string",
                     "example": "2025-09-01T23:59:59Z"
                 },
-                "id": {
-                    "type": "integer",
-                    "example": 15
-                },
                 "learner_limit": {
                     "type": "integer",
                     "example": 50
+                },
+                "price": {
+                    "type": "number",
+                    "example": 199.99
+                }
+            }
+        },
+        "models.CreateClassSessionRequestDoc": {
+            "type": "object",
+            "properties": {
+                "class_finish": {
+                    "type": "string",
+                    "example": "2025-09-05T16:00:00Z"
+                },
+                "class_id": {
+                    "type": "integer",
+                    "example": 12
+                },
+                "class_start": {
+                    "type": "string",
+                    "example": "2025-09-05T14:00:00Z"
+                },
+                "class_status": {
+                    "type": "string",
+                    "example": "Scheduled"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Weekly tutoring session for calculus"
+                },
+                "enrollment_deadline": {
+                    "type": "string",
+                    "example": "2025-09-01T23:59:59Z"
+                },
+                "learner_limit": {
+                    "type": "integer",
+                    "example": 5
                 },
                 "price": {
                     "type": "number",
@@ -4097,19 +3744,15 @@ const docTemplate = `{
             "properties": {
                 "class_session_id": {
                     "type": "integer",
-                    "example": 21
+                    "example": 3
                 },
                 "enrollment_status": {
                     "type": "string",
                     "example": "active"
                 },
-                "id": {
-                    "type": "integer",
-                    "example": 101
-                },
                 "learner_id": {
                     "type": "integer",
-                    "example": 42
+                    "example": 1
                 }
             }
         },
@@ -4118,15 +3761,11 @@ const docTemplate = `{
             "properties": {
                 "flag_count": {
                     "type": "integer",
-                    "example": 3
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 42
+                    "example": 1
                 },
                 "user_id": {
                     "type": "integer",
-                    "example": 5
+                    "example": 1
                 }
             }
         },
@@ -4178,10 +3817,6 @@ const docTemplate = `{
         "models.NotificationDoc": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer",
-                    "example": 100
-                },
                 "notification_date": {
                     "type": "string",
                     "example": "2025-08-20T15:04:05Z"
@@ -4257,10 +3892,6 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 20
                 },
-                "id": {
-                    "type": "integer",
-                    "example": 12
-                },
                 "report_date": {
                     "type": "string",
                     "example": "2025-08-20T14:30:00Z"
@@ -4310,10 +3941,6 @@ const docTemplate = `{
                     "type": "string",
                     "example": "This class was very informative and well-structured."
                 },
-                "id": {
-                    "type": "integer",
-                    "example": 101
-                },
                 "learner_id": {
                     "type": "integer",
                     "example": 42
@@ -4338,10 +3965,6 @@ const docTemplate = `{
                 "flag_count": {
                     "type": "integer",
                     "example": 3
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 12
                 },
                 "user_id": {
                     "type": "integer",
@@ -4433,10 +4056,6 @@ const docTemplate = `{
                 "gender": {
                     "type": "string",
                     "example": "Female"
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 101
                 },
                 "last_name": {
                     "type": "string",

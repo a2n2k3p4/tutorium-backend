@@ -18,7 +18,6 @@ type Review struct {
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
 
 type ReviewDoc struct {
-	ID        uint   `json:"id" example:"101"`
 	LearnerID uint   `json:"learner_id" example:"42"`
 	ClassID   uint   `json:"class_id" example:"9"`
 	Rating    int    `json:"rating" example:"5"`

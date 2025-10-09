@@ -17,8 +17,7 @@ type Enrollment struct {
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
 
 type EnrollmentDoc struct {
-	ID               uint   `json:"id" example:"101"`
-	LearnerID        uint   `json:"learner_id" example:"42"`
-	ClassSessionID   uint   `json:"class_session_id" example:"21"`
+	LearnerID        uint   `json:"learner_id" example:"1"`
+	ClassSessionID   uint   `json:"class_session_id" example:"3"`
 	EnrollmentStatus string `json:"enrollment_status" example:"active"`
 }

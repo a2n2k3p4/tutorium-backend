@@ -31,8 +31,8 @@ func ClassCategoryRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			class_category	body		models.ClassCategoryDoc	true	"ClassCategory payload"
 //	@Success		201				{object}	models.ClassCategoryDoc
-//	@Failure		400				{object}	map[string]string	"Invalid input"
-//	@Failure		500				{object}	map[string]string	"Server error"
+//	@Failure		400				{string}	string	"Invalid input"
+//	@Failure		500				{string}	string	"Server error"
 //	@Router			/class_categories [post]
 func CreateClassCategory(c *fiber.Ctx) error {
 	var class_category models.ClassCategory
@@ -60,7 +60,7 @@ func CreateClassCategory(c *fiber.Ctx) error {
 //	@Security		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.ClassCategoryDoc
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/class_categories [get]
 func GetClassCategories(c *fiber.Ctx) error {
 	class_categories := []models.ClassCategory{}
@@ -89,9 +89,9 @@ func findClassCategory(db *gorm.DB, id int, class_category *models.ClassCategory
 //	@Produce		json
 //	@Param			id	path		int	true	"ClassCategory ID"
 //	@Success		200	{object}	models.ClassCategoryDoc
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"ClassCategory not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"ClassCategory not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/class_categories/{id} [get]
 func GetClassCategory(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -128,9 +128,9 @@ func GetClassCategory(c *fiber.Ctx) error {
 //	@Param			id				path		int						true	"ClassCategory ID"
 //	@Param			class_category	body		models.ClassCategoryDoc	true	"Updated payload"
 //	@Success		200				{object}	models.ClassCategoryDoc
-//	@Failure		400				{object}	map[string]string	"Invalid input"
-//	@Failure		404				{object}	map[string]string	"ClassCategory not found"
-//	@Failure		500				{object}	map[string]string	"Server error"
+//	@Failure		400				{string}	string	"Invalid input"
+//	@Failure		404				{string}	string	"ClassCategory not found"
+//	@Failure		500				{string}	string	"Server error"
 //	@Router			/class_categories/{id} [put]
 func UpdateClassCategory(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -175,9 +175,9 @@ func UpdateClassCategory(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			id	path		int					true	"ClassCategory ID"
 //	@Success		200	{string}	string				"Successfully deleted class category"
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"ClassCategory not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"ClassCategory not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/class_categories/{id} [delete]
 func DeleteClassCategory(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")

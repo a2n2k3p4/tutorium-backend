@@ -18,7 +18,6 @@ type Class struct {
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
 
 type ClassDoc struct {
-	ID               uint    `json:"id" example:"21"`
 	TeacherID        uint    `json:"teacher_id" example:"7"`
 	ClassName        string  `json:"class_name" example:"Advanced Python Programming"`
 	ClassDescription string  `json:"class_description" example:"Advanced Python programming course"`

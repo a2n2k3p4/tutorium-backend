@@ -30,8 +30,8 @@ func EnrollmentRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			enrollment	body		models.EnrollmentDoc	true	"Enrollment payload"
 //	@Success		201			{object}	models.EnrollmentDoc
-//	@Failure		400			{object}	map[string]string	"Invalid input"
-//	@Failure		500			{object}	map[string]string	"Server error"
+//	@Failure		400			{string}	string	"Invalid input"
+//	@Failure		500			{string}	string	"Server error"
 //	@Router			/enrollments [post]
 func CreateEnrollment(c *fiber.Ctx) error {
 	var enrollment models.Enrollment
@@ -59,7 +59,7 @@ func CreateEnrollment(c *fiber.Ctx) error {
 //	@Security		BearerAuth
 //	@Produce		json
 //	@Success		200	{array}		models.EnrollmentDoc
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/enrollments [get]
 func GetEnrollments(c *fiber.Ctx) error {
 	enrollments := []models.Enrollment{}
@@ -87,9 +87,9 @@ func findEnrollment(db *gorm.DB, id int, enrollment *models.Enrollment) error {
 //	@Produce		json
 //	@Param			id	path		int	true	"Enrollment ID"
 //	@Success		200	{object}	models.EnrollmentDoc
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Enrollment not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"Enrollment not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/enrollments/{id} [get]
 func GetEnrollment(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -126,9 +126,9 @@ func GetEnrollment(c *fiber.Ctx) error {
 //	@Param			id			path		int						true	"Enrollment ID"
 //	@Param			enrollment	body		models.EnrollmentDoc	true	"Updated enrollment payload"
 //	@Success		200			{object}	models.EnrollmentDoc
-//	@Failure		400			{object}	map[string]string	"Invalid input"
-//	@Failure		404			{object}	map[string]string	"Enrollment not found"
-//	@Failure		500			{object}	map[string]string	"Server error"
+//	@Failure		400			{string}	string	"Invalid input"
+//	@Failure		404			{string}	string	"Enrollment not found"
+//	@Failure		500			{string}	string	"Server error"
 //	@Router			/enrollments/{id} [put]
 func UpdateEnrollment(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
@@ -175,9 +175,9 @@ func UpdateEnrollment(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			id	path		int					true	"Enrollment ID"
 //	@Success		200	{string}	string				"Successfully deleted enrollment"
-//	@Failure		400	{object}	map[string]string	"Invalid ID"
-//	@Failure		404	{object}	map[string]string	"Enrollment not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		404	{string}	string	"Enrollment not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/enrollments/{id} [delete]
 func DeleteEnrollment(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")

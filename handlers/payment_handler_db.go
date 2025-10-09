@@ -23,23 +23,23 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Param			payload	body		models.PaymentRequest	true	"Payment payload"
-//	@Success		200		{object}	map[string]interface{}	"Omise charge response"
-//	@Failure		400		{object}	map[string]string		"Invalid request"
-//	@Failure		500		{object}	map[string]string		"Server error"
+//	@Success		200		{object} string	"Omise charge response"
+//	@Failure		400		{string} string	"Invalid request"
+//	@Failure		500		{string} string	"Server error"
 //	@Router			/payments/charge [post]
 func (h *PaymentHandler) CreateCharge(c *fiber.Ctx) error {
 	var req models.PaymentRequest
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": "Invalid request: " + err.Error()})
+		return c.Status(400).JSON(err.Error())
 	}
 	if req.Amount <= 0 {
-		return c.Status(400).JSON(fiber.Map{"error": "amount is required"})
+		return c.Status(400).JSON("error amount is required")
 	}
 	// Fill defaults / enforce currency
 	if req.Currency == "" {
 		req.Currency = config.PAYMENTDefaultCurrency()
 	} else if cfg := config.PAYMENTDefaultCurrency(); cfg != "" && req.Currency != cfg {
-		return c.Status(400).JSON(fiber.Map{"error": "unsupported currency", "allowed": cfg})
+		return c.Status(400).JSON("error currency must be " + cfg)
 	}
 	if req.PaymentType == "internet_banking" && req.ReturnURI == "" {
 		req.ReturnURI = config.PAYMENTReturnURI()
@@ -65,7 +65,7 @@ func (h *PaymentHandler) CreateCharge(c *fiber.Ctx) error {
 	)
 	charge, err = svc.CreateCharge(req)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(500).JSON(err.Error())
 	}
 
 	// Persist/Upsert a local transaction row (idempotent on charge_id)
@@ -96,7 +96,7 @@ func (h *PaymentHandler) createCharge(op *operations.CreateCharge) (*omise.Charg
 //	@Param			limit	query		int		false	"Limit (default 50)"
 //	@Param			offset	query		int		false	"Offset (default 0)"
 //	@Success		200		{object}	models.TransactionListResponse
-//	@Failure		500		{object}	map[string]string	"Server error"
+//	@Failure		500		{string}	string	"Server error"
 //	@Router			/payments/transactions [get]
 func (h *PaymentHandler) ListTransactions(c *fiber.Ctx) error {
 	f := services.TxFilters{
@@ -109,7 +109,7 @@ func (h *PaymentHandler) ListTransactions(c *fiber.Ctx) error {
 	svc := services.NewPaymentService(h.DB, h.Client)
 	transactions, totalCount, err := svc.ListTransactions(f, limit, offset)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Failed to retrieve transactions: " + err.Error()})
+		return c.Status(500).JSON(err.Error())
 	}
 
 	return c.JSON(fiber.Map{
@@ -130,22 +130,23 @@ func (h *PaymentHandler) ListTransactions(c *fiber.Ctx) error {
 //	@Produce		json
 //	@Param			id	path		string	true	"Transaction ID or charge_id"
 //	@Success		200	{object}	models.Transaction
-//	@Failure		404	{object}	map[string]string	"Not found"
-//	@Failure		500	{object}	map[string]string	"Server error"
+//	@Failure		400	{string}	string	"Invalid transaction ID"
+//	@Failure		404	{string}	string	"Not found"
+//	@Failure		500	{string}	string	"Server error"
 //	@Router			/payments/transactions/{id} [get]
 func (h *PaymentHandler) GetTransaction(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if id == "" {
-		return c.Status(400).JSON(fiber.Map{"error": "id is required"})
+		return c.Status(400).JSON("id is required")
 	}
 
 	svc := services.NewPaymentService(h.DB, h.Client)
 	tx, err := svc.GetTransaction(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.Status(404).JSON(fiber.Map{"error": "Transaction not found"})
+			return c.Status(404).JSON("Transaction not found")
 		}
-		return c.Status(500).JSON(fiber.Map{"error": "Failed to retrieve transaction: " + err.Error()})
+		return c.Status(500).JSON(err.Error())
 	}
 	return c.JSON(tx)
 }
@@ -161,14 +162,14 @@ func (h *PaymentHandler) GetTransaction(c *fiber.Ctx) error {
 //	@Param			id		path		string				true	"Transaction ID or charge_id"
 //	@Param			payload	body		map[string]int	false	"Refund payload, e.g. {\"amount\": 1000} satang"
 //	@Success		200		{object}	map[string]interface{}
-//	@Failure		400		{object}	map[string]string
-//	@Failure		404		{object}	map[string]string
-//	@Failure		500		{object}	map[string]string
+//	@Failure		400		{string}	string	"Invalid request"
+//	@Failure		404		{string} string	"Transaction not found"
+//	@Failure		500		{string} string	"Server error"
 //	@Router			/payments/transactions/{id}/refund [post]
 func (h *PaymentHandler) RefundTransaction(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if id == "" {
-		return c.Status(400).JSON(fiber.Map{"error": "id is required"})
+		return c.Status(400).JSON("id is required")
 	}
 
 	var body struct {
@@ -180,9 +181,9 @@ func (h *PaymentHandler) RefundTransaction(c *fiber.Ctx) error {
 	refund, updatedCharge, err := svc.RefundByIDOrCharge(id, body.Amount)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.Status(404).JSON(fiber.Map{"error": "Transaction not found"})
+			return c.Status(404).JSON("Transaction not found")
 		}
-		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(500).JSON(err.Error())
 	}
 	return c.JSON(fiber.Map{"refund": refund, "charge": updatedCharge})
 }
