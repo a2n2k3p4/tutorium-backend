@@ -122,8 +122,8 @@ func GetLearner(c *fiber.Ctx) error {
 //	@Tags			Learners
 //	@Security		BearerAuth
 //	@Produce		json
-//	@Param			id	path		int					true	"Learner ID"
-//	@Success		200	{string}	string				"Successfully deleted Learner"
+//	@Param			id	path		int		true	"Learner ID"
+//	@Success		200	{string}	string	"Successfully deleted Learner"
 //	@Failure		400	{string}	string	"Invalid ID"
 //	@Failure		404	{string}	string	"Learner not found"
 //	@Failure		500	{string}	string	"Server error"

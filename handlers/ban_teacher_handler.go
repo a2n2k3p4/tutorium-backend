@@ -170,8 +170,8 @@ func UpdateBanTeacher(c *fiber.Ctx) error {
 //	@Tags			BanTeachers
 //	@Security		BearerAuth
 //	@Produce		json
-//	@Param			id	path		int					true	"BanTeacher ID"
-//	@Success		200	{string}	string				"Successfully deleted ban teacher"
+//	@Param			id	path		int		true	"BanTeacher ID"
+//	@Success		200	{string}	string	"Successfully deleted ban teacher"
 //	@Failure		400	{string}	string	"Invalid ID"
 //	@Failure		404	{string}	string	"BanTeacher not found"
 //	@Failure		500	{string}	string	"Server error"
