@@ -15,6 +15,9 @@ type Class struct {
 	Categories       []ClassCategory `gorm:"many2many:class_class_categories;constraint:OnDelete:CASCADE"`
 }
 
+//NOTE: You can find class_category relation in CLASS_CLASS_CATEGORY table in Database (Gorm will create it automatically)
+//Table will have 2 fields : {class_id, class_category_id}
+
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
 
 type ClassDoc struct {
