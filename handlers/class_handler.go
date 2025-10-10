@@ -388,6 +388,24 @@ func DeleteClass(c *fiber.Ctx) error {
 	return c.Status(200).JSON("Successfully deleted class")
 }
 
+func UpdateClassAverageRating(db *gorm.DB, classID uint) error {
+	var avg float64
+
+	err := db.Model(&models.Review{}).
+		Select("AVG(rating)").
+		Where("class_id = ?", classID).
+		Scan(&avg).Error
+
+	if err != nil {
+		return err
+	}
+
+	return db.Model(&models.Class{}).
+		Omit(clause.Associations).
+		Where("id = ?", classID).
+		Update("rating", avg).Error
+}
+
 func processBannerPicture(c *fiber.Ctx, class *models.Class) error {
 	if class.BannerPictureURL != "" && !strings.HasPrefix(class.BannerPictureURL, "http") {
 		b, err := storage.DecodeBase64Image(class.BannerPictureURL)
