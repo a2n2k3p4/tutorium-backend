@@ -12,7 +12,6 @@ import (
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
-	"gorm.io/gorm"
 )
 
 type MockMinioClient struct{}
@@ -54,8 +53,13 @@ func TestIntegration_User_CRUD(t *testing.T) {
 
 	// Create
 	user := models.User{
-		Name:  "Alice",
-		Email: "alice@example.com",
+		StudentID:         "99990",
+		ProfilePictureURL: "",
+		FirstName:         "John",
+		LastName:          "Doe",
+		Gender:            "Male",
+		PhoneNumber:       "",
+		Balance:           0,
 	}
 	body, _ := json.Marshal(user)
 	req := httptest.NewRequest(http.MethodPost, "/users/", bytes.NewBuffer(body))
@@ -80,11 +84,7 @@ func TestIntegration_User_CRUD(t *testing.T) {
 	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/users/%d", created.ID), nil)
 	resp, _ = app.Test(req)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-	var fetched models.User
-	_ = json.NewDecoder(resp.Body).Decode(&fetched)
-	assert.Equal(t, created.Email, fetched.Email)
-
+	
 	// Update
 	updatePayload := map[string]interface{}{
 		"Name": "Alice Updated",

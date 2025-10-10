@@ -7,14 +7,18 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"log"
 
 	"github.com/a2n2k3p4/tutorium-backend/config"
 	"github.com/a2n2k3p4/tutorium-backend/models"
-	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
+	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
+
 )
 
-func setupEnrollmentIntegrationApp(t *testing.T) *fiber.App {
+// SetupIntegrationApp
+func SetupIntegrationApp(t *testing.T, migrateModels ...interface{}) (*fiber.App, *gorm.DB) {
 	app := fiber.New()
 
 	// connect PostgreSQL
@@ -24,39 +28,57 @@ func setupEnrollmentIntegrationApp(t *testing.T) *fiber.App {
 		t.Fatalf("failed to connect db: %v", err)
 	}
 
-	// migrate dependencies
-	if err := db.AutoMigrate(
-		&models.Enrollment{},
-		&models.Learner{},
-		&models.ClassSession{},
-		&models.Class{},
-	); err != nil {
+	// migrate only use models
+	if err := db.AutoMigrate(migrateModels...); err != nil {
 		t.Fatalf("auto migrate: %v", err)
 	}
 
-	// inject db into context
+	// inject DB into Fiber context
 	app.Use(func(c *fiber.Ctx) error {
 		c.Locals("db", db)
 		return c.Next()
 	})
 
-	EnrollmentRoutes(app)
-	return app
+	return app, db
+}
+
+// ResetTables
+func ResetTables(db *gorm.DB, tables ...string) {
+	for _, table := range tables {
+		if err := db.Exec("DELETE FROM " + table).Error; err != nil {
+			log.Printf("failed to truncate %s: %v", table, err)
+		}
+	}
 }
 
 func TestIntegration_Enrollment_CRUD(t *testing.T) {
-	app := setupEnrollmentIntegrationApp(t)
+	app, db := SetupIntegrationApp(t,
+		&models.Enrollment{},
+		&models.Learner{},
+		&models.ClassSession{},
+		&models.Class{},
+	)
+
+	// Delete all old records
+	ResetTables(db, "enrollments", "learners", "class_sessions", "classes")
 
 	// seed dependencies
-	db := config.MustConnectTestDB(t)
-	db.Create(&models.Learner{Model: models.BaseModel{ID: 1}})
-	db.Create(&models.ClassSession{Model: models.BaseModel{ID: 1}})
+	class := models.Class{ClassName: "Integration Test Class"}
+	db.Create(&class)
+
+	classSession := models.ClassSession{ClassID: class.ID, Description: "test session"}
+	db.Create(&classSession)
+
+	learner := models.Learner{}
+	db.Create(&learner)
+
+	EnrollmentRoutes(app)
 
 	// Create
 	reqBody := models.Enrollment{
 		LearnerID:      1,
 		ClassSessionID: 1,
-		PaymentStatus:  "paid",
+		EnrollmentStatus:  "paid",
 	}
 	body, _ := json.Marshal(reqBody)
 	req := httptest.NewRequest(http.MethodPost, "/enrollments/", bytes.NewBuffer(body))

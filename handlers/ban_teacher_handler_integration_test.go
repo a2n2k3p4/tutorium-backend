@@ -50,7 +50,7 @@ func TestIntegration_BanTeacher_CRUD(t *testing.T) {
 	bt := models.BanDetailsTeacher{
 		TeacherID:      1,
 		BanStart:       now,
-		BanEnd:         now.Add(2 * time.Hour),
+		BanEnd:         now.Add(24 * time.Hour),
 		BanDescription: "policy violation",
 	}
 	body, _ := json.Marshal(bt)

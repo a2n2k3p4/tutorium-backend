@@ -43,10 +43,10 @@ func TestIntegration_Teacher_CRUD(t *testing.T) {
 
 	// Create
 	teacher := models.Teacher{
-		Name:     "John Doe",
-		Email:    "john.doe@example.com",
-		Subject:  "Mathematics",
-		Biography: "Experienced teacher with 10 years of teaching calculus.",
+		UserID:    		11100,
+		Description: 	"Experienced teacher with 10 years of teaching calculus.",
+		FlagCount:   	2,
+		Email:    		"john.doe@testing.com",
 	}
 	body, _ := json.Marshal(teacher)
 	req := httptest.NewRequest(http.MethodPost, "/teachers/", bytes.NewBuffer(body))

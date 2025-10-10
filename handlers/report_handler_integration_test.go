@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/a2n2k3p4/tutorium-backend/config"
 	"github.com/a2n2k3p4/tutorium-backend/models"
@@ -41,11 +42,12 @@ func TestIntegration_Report_CRUD(t *testing.T) {
 
 	// Create
 	report := models.Report{
-		ReporterID: 1,
-		ReportedID: 2,
-		Title:      "Inappropriate behavior",
-		Detail:     "Reported user used the most offensive english word in class.",
-		Status:     "pending",
+		ReportUserID:      99999,
+		ReportedUserID:    88888,
+		ReportType:        "Inappropriate behavior",
+		ReportDescription: "Reported user used the most offensive english word in class.",
+		ReportPictureURL:  "",
+		ReportDate:        time.Now(),
 	}
 	body, _ := json.Marshal(report)
 	req := httptest.NewRequest(http.MethodPost, "/reports/", bytes.NewBuffer(body))

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/a2n2k3p4/tutorium-backend/config"
 	"github.com/a2n2k3p4/tutorium-backend/models"
@@ -44,10 +45,12 @@ func TestIntegration_Notification_CRUD(t *testing.T) {
 	// Create
 	noti := models.Notification{
 		UserID:  99900,
-		Title:   "New Feature Update",
-		Message: "Our UI are no longer overlaps on Android devices!!!",
-		IsRead:  false,
+		NotificationType:   		"New Feature Update",
+		NotificationDescription: 	"Our UI are no longer overlaps on Android devices!!!",
+		NotificationDate:  			time.Now(),
+		ReadFlag:  					false,
 	}
+	
 	body, _ := json.Marshal(noti)
 	req := httptest.NewRequest(http.MethodPost, "/notifications/", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
