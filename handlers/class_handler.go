@@ -525,11 +525,15 @@ func GetClassCategoriesByClassID(c *fiber.Ctx) error {
 		return c.Status(500).SendString(err.Error())
 	}
 
-	names := make([]string, 0, len(class.Categories))
+	categories := make([]fiber.Map, 0, len(class.Categories))
 	for _, cat := range class.Categories {
-		names = append(names, cat.ClassCategory)
+		categories = append(categories, fiber.Map{
+			"id":             cat.ID,
+			"class_category": cat.ClassCategory,
+		})
 	}
-	return c.Status(200).JSON(fiber.Map{"categories": names})
+
+	return c.Status(200).JSON(fiber.Map{"categories": categories})
 }
 
 func AddClassCategories(c *fiber.Ctx) error {
