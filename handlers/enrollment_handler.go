@@ -173,8 +173,8 @@ func UpdateEnrollment(c *fiber.Ctx) error {
 //	@Tags			Enrollments
 //	@Security		BearerAuth
 //	@Produce		json
-//	@Param			id	path		int					true	"Enrollment ID"
-//	@Success		200	{string}	string				"Successfully deleted enrollment"
+//	@Param			id	path		int		true	"Enrollment ID"
+//	@Success		200	{string}	string	"Successfully deleted enrollment"
 //	@Failure		400	{string}	string	"Invalid ID"
 //	@Failure		404	{string}	string	"Enrollment not found"
 //	@Failure		500	{string}	string	"Server error"

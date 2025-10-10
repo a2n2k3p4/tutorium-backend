@@ -171,8 +171,8 @@ func UpdateNotification(c *fiber.Ctx) error {
 //	@Tags			Notifications
 //	@Security		BearerAuth
 //	@Produce		json
-//	@Param			id	path		int					true	"Notification ID"
-//	@Success		200	{string}	string				"Successfully deleted notification"
+//	@Param			id	path		int		true	"Notification ID"
+//	@Success		200	{string}	string	"Successfully deleted notification"
 //	@Failure		400	{string}	string	"Invalid ID"
 //	@Failure		404	{string}	string	"Notification not found"
 //	@Failure		500	{string}	string	"Server error"

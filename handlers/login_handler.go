@@ -29,8 +29,8 @@ func LoginRoutes(app *fiber.App) {
 //	@Produce		json
 //	@Param			login	body		models.LoginRequestDoc	true	"Login payload"
 //	@Success		200		{object}	models.LoginResponseDoc
-//	@Failure		400		{string}    string	"Invalid input"
-//	@Failure		401		{string}    string	"Unauthorized"
+//	@Failure		400		{string}	string	"Invalid input"
+//	@Failure		401		{string}	string	"Unauthorized"
 //	@Failure		500		{string}	string	"Server error"
 //	@Router			/login [post]
 func LoginHandler(c *fiber.Ctx) error {
