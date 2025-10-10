@@ -20,12 +20,16 @@ import (
 func ClassRoutes(app *fiber.App) {
 	class := app.Group("/classes", middlewares.ProtectedMiddleware())
 	class.Get("/", GetClasses)
+	class.Get("/detailed", FindClassesDetailed)
 	class.Get("/:id", GetClass)
 
 	classProtected := class.Group("/", middlewares.TeacherRequired())
 	classProtected.Post("/", CreateClass)
 	classProtected.Put("/:id", UpdateClass)
 	classProtected.Delete("/:id", DeleteClass)
+	classProtected.Get("/:id/class_categories", GetClassCategoriesByClassID)
+	classProtected.Post("/:id/class_categories", AddClassCategories)
+	classProtected.Delete("/:id/class_categories", DeleteClassCategories)
 }
 
 // CreateClass godoc
@@ -407,4 +411,290 @@ func processBannerPicture(c *fiber.Ctx, class *models.Class) error {
 		class.BannerPictureURL = uploaded
 	}
 	return nil
+}
+
+func FindClassesDetailed(c *fiber.Ctx) error {
+	// Query detailed class info (Teacher, Categories) by ID or category list (or return all if neither)
+	// Example 1: /classes/detailed?id=1
+	// Example 2: /classes/detailed?categories=Yoga,Math
+	// Example 3: /classes/detailed
+
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	// Check ID parameter
+	if idParam := c.Query("id"); idParam != "" {
+		id, err := strconv.Atoi(idParam)
+		if err != nil || id <= 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "invalid id parameter"})
+		}
+
+		var class models.Class
+		err = db.Preload("Categories").Preload("Teacher").
+			First(&class, "id = ?", id).Error
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(404).JSON("class not found")
+		} else if err != nil {
+			return c.Status(500).JSON(err.Error())
+		}
+
+		// Generate presigned URL if available
+		if mc, ok := c.Locals("minio").(*storage.Client); ok && class.BannerPictureURL != "" {
+			url, err := mc.PresignedGetObject(c.Context(), class.BannerPictureURL, 15*time.Minute)
+			if err == nil {
+				class.BannerPictureURL = url
+			} else {
+				class.BannerPictureURL = ""
+			}
+		}
+
+		return c.Status(200).JSON(class)
+	}
+
+	// Else, category-based query
+	rawCategories := c.Query("categories")
+	parts := strings.Split(rawCategories, ",")
+	categories := make([]string, 0, len(parts))
+	for _, p := range parts {
+		t := strings.TrimSpace(p)
+		if t != "" {
+			categories = append(categories, t)
+		}
+	}
+
+	var classes []models.Class
+	query := db.Model(&models.Class{}).
+		Preload("Categories").
+		Preload("Teacher")
+
+	if len(categories) > 0 {
+		query = query.
+			Joins("JOIN class_class_categories ccc ON ccc.class_id = classes.id").
+			Joins("JOIN class_categories cc ON cc.id = ccc.class_category_id").
+			Where("cc.class_category IN ?", categories).
+			Distinct("classes.*")
+	}
+
+	if err := query.Find(&classes).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	// Generate presigned URLs for all
+	if mc, ok := c.Locals("minio").(*storage.Client); ok {
+		for i := range classes {
+			if classes[i].BannerPictureURL != "" {
+				url, err := mc.PresignedGetObject(c.Context(), classes[i].BannerPictureURL, 15*time.Minute)
+				if err == nil {
+					classes[i].BannerPictureURL = url
+				} else {
+					classes[i].BannerPictureURL = ""
+				}
+			}
+		}
+	}
+
+	return c.Status(200).JSON(classes)
+}
+
+func GetClassCategoriesByClassID(c *fiber.Ctx) error {
+	// return class categories names given class ID
+	// input : class ID
+	// output: list of class categories names
+	id, err := c.ParamsInt("id")
+	if err != nil {
+		return c.Status(400).SendString("invalid :id")
+	}
+
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).SendString(err.Error())
+	}
+
+	var class models.Class
+	if err := db.
+		Preload("Categories", func(tx *gorm.DB) *gorm.DB {
+			return tx.Select("id", "class_category").Order("class_categories.class_category")
+		}).
+		First(&class, id).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(404).SendString("class not found")
+		}
+		return c.Status(500).SendString(err.Error())
+	}
+
+	names := make([]string, 0, len(class.Categories))
+	for _, cat := range class.Categories {
+		names = append(names, cat.ClassCategory)
+	}
+	return c.Status(200).JSON(fiber.Map{"categories": names})
+}
+
+func AddClassCategories(c *fiber.Ctx) error {
+	// input: class ID from URL, classCategory IDs from body
+	// output: updated class with categories
+
+	type payload struct {
+		CategoryIDs []int `json:"class_category_ids"`
+	}
+	//example JSON body: { "class_category_ids": [1,2,3] }
+
+	// Get :id from route
+	classID, err := c.ParamsInt("id")
+	if err != nil || classID <= 0 {
+		return c.Status(400).JSON("invalid class ID")
+	}
+
+	// Parse category IDs from body
+	var p payload
+	if err := c.BodyParser(&p); err != nil {
+		return c.Status(400).JSON("invalid body")
+	}
+	if len(p.CategoryIDs) == 0 {
+		return c.Status(400).JSON("no class category IDs provided")
+	}
+
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	// Validate class exists
+	var class models.Class
+	err = db.First(&class, classID).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(404).JSON("class not found")
+		}
+		return c.Status(500).JSON(err.Error())
+	}
+
+	// Deduplicate and validate category IDs
+	seen := make(map[int]bool)
+	var validIDs []int
+	for _, id := range p.CategoryIDs {
+		if id > 0 && !seen[id] {
+			seen[id] = true
+			validIDs = append(validIDs, id)
+		}
+	}
+	if len(validIDs) == 0 {
+		return c.Status(400).JSON("no valid class category IDs")
+	}
+
+	// Get existing categories and avoid duplicates
+	var existingCategories []models.ClassCategory
+	err = db.Model(&class).Association("Categories").Find(&existingCategories)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	existingSet := make(map[uint]bool)
+	for _, cat := range existingCategories {
+		existingSet[cat.ID] = true
+	}
+
+	// Find and add only new categories
+	var categoriesToAdd []models.ClassCategory
+	err = db.Where("id IN ?", validIDs).Find(&categoriesToAdd).Error
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	var newCategories []models.ClassCategory
+	for _, cat := range categoriesToAdd {
+		if !existingSet[cat.ID] {
+			newCategories = append(newCategories, cat)
+		}
+	}
+
+	if len(newCategories) > 0 {
+		err = db.Model(&class).Association("Categories").Append(newCategories)
+		if err != nil {
+			return c.Status(500).JSON(err.Error())
+		}
+	}
+
+	// Return updated class with categories
+	var result models.Class
+	err = db.Preload("Categories").First(&result, classID).Error
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	return c.Status(200).JSON(result)
+}
+
+func DeleteClassCategories(c *fiber.Ctx) error {
+	// input: class ID from URL, classCategory IDs from body
+	// output: updated class with deleted categories
+	type payload struct {
+		CategoryIDs []int `json:"class_category_ids"`
+	}
+	//example JSON body: { "class_category_ids": [1,2,3] }
+	// Get :id from route
+	classID, err := c.ParamsInt("id")
+	if err != nil || classID <= 0 {
+		return c.Status(400).JSON("invalid class ID")
+	}
+
+	// Parse category IDs from body
+	var p payload
+	if err := c.BodyParser(&p); err != nil {
+		return c.Status(400).JSON("invalid body")
+	}
+	if len(p.CategoryIDs) == 0 {
+		return c.Status(400).JSON("no class category IDs provided")
+	}
+
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	// Validate class exists
+	var class models.Class
+	if err := db.First(&class, classID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(404).JSON("class not found")
+		}
+		return c.Status(500).JSON(err.Error())
+	}
+
+	// Deduplicate IDs
+	seen := make(map[int]bool)
+	var validIDs []int
+	for _, id := range p.CategoryIDs {
+		if id > 0 && !seen[id] {
+			seen[id] = true
+			validIDs = append(validIDs, id)
+		}
+	}
+	if len(validIDs) == 0 {
+		return c.Status(400).JSON("no valid class category IDs")
+	}
+
+	// Load categories to delete
+	var categories []models.ClassCategory
+	if err := db.Where("id IN ?", validIDs).Find(&categories).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+	if len(categories) == 0 {
+		return c.Status(400).JSON("no matching class categories found")
+	}
+
+	// Delete the association links (not the categories themselves)
+	if err := db.Model(&class).Association("Categories").Delete(categories); err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	// Return updated class with categories
+	var result models.Class
+	if err := db.Preload("Categories").First(&result, classID).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	return c.Status(200).JSON(result)
 }
