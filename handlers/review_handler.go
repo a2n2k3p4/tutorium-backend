@@ -53,6 +53,10 @@ func CreateReview(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
+	if err := UpdateClassAverageRating(db, review.ClassID); err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	return c.Status(201).JSON(review)
 }
 
@@ -177,6 +181,10 @@ func UpdateReview(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
+	if err := UpdateClassAverageRating(db, review.ClassID); err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	return c.Status(200).JSON(review)
 }
 
@@ -215,6 +223,10 @@ func DeleteReview(c *fiber.Ctx) error {
 	}
 
 	if err := db.Delete(&review).Error; err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	if err := UpdateClassAverageRating(db, review.ClassID); err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
