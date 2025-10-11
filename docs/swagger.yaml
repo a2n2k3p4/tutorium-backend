@@ -45,6 +45,15 @@ definitions:
         example: 7
         type: integer
     type: object
+  models.ClassAverageRating:
+    properties:
+      average_rating:
+        example: 4.5
+        type: number
+      class_id:
+        example: 123
+        type: integer
+    type: object
   models.ClassCategoryDoc:
     properties:
       class_category:
@@ -66,9 +75,6 @@ definitions:
       class_name:
         example: Advanced Python Programming
         type: string
-      rating:
-        example: 4.7
-        type: number
       teacher_id:
         example: 7
         type: integer
@@ -281,6 +287,15 @@ definitions:
         type: integer
       rating:
         example: 5
+        type: integer
+    type: object
+  models.TeacherAverageRating:
+    properties:
+      average_rating:
+        example: 4.5
+        type: number
+      teacher_id:
+        example: 123
         type: integer
     type: object
   models.TeacherDoc:
@@ -1315,6 +1330,36 @@ paths:
       security:
       - BearerAuth: []
       summary: Update an existing class
+      tags:
+      - Classes
+  /classes/{id}/average_rating:
+    get:
+      description: GetClassAverageRating calculates and returns the average rating
+        for a class by its ID.
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ClassAverageRating'
+        "400":
+          description: Invalid ID
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get average rating of a class
       tags:
       - Classes
   /enrollments:
@@ -2468,6 +2513,36 @@ paths:
       security:
       - BearerAuth: []
       summary: Update an existing teacher
+      tags:
+      - Teachers
+  /teachers/{id}/average_rating:
+    get:
+      description: GetTeacherAverageRating calculates and returns the average rating
+        across all classes taught by a teacher.
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TeacherAverageRating'
+        "400":
+          description: Invalid ID
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get average rating of a teacher
       tags:
       - Teachers
   /users:

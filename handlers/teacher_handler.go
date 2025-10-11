@@ -13,6 +13,7 @@ func TeacherRoutes(app *fiber.App) {
 	teacher := app.Group("/teachers", middlewares.ProtectedMiddleware())
 	teacher.Get("/", GetTeachers)
 	teacher.Get("/:id", GetTeacher)
+	teacher.Get("/:id/average_rating", GetTeacherAverageRating)
 	teacher.Post("/", CreateTeacher)
 	teacher.Put("/:id", UpdateTeacher)
 	teacher.Delete("/:id", DeleteTeacher)
@@ -112,6 +113,61 @@ func GetTeacher(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(teacher)
+}
+
+// GetTeacherAverageRating godoc
+//
+//	@Summary		Get average rating of a teacher
+//	@Description	GetTeacherAverageRating calculates and returns the average rating across all classes taught by a teacher.
+//	@Tags			Teachers
+//	@Security		BearerAuth
+//	@Produce		json
+//	@Param			id	path		int	true	"Teacher ID"
+//	@Success		200	{object}	models.TeacherAverageRating
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		500	{string}	string	"Server error"
+//	@Router			/teachers/{id}/average_rating [get]
+func GetTeacherAverageRating(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+	if err != nil {
+		return c.Status(400).JSON("Please ensure that :id is an integer")
+	}
+
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	var classIDs []uint
+	err = db.Model(&models.Class{}).
+		Where("teacher_id = ?", id).
+		Pluck("id", &classIDs).Error
+
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	if len(classIDs) == 0 {
+		return c.Status(200).JSON(fiber.Map{
+			"teacher_id":     id,
+			"average_rating": 0,
+		})
+	}
+
+	var avg float64
+	err = db.Model(&models.Review{}).
+		Select("COALESCE(AVG(rating), 0)").
+		Where("class_id IN ?", classIDs).
+		Scan(&avg).Error
+
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"teacher_id":     id,
+		"average_rating": avg,
+	})
 }
 
 // UpdateTeacher godoc

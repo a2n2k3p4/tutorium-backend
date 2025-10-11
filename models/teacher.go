@@ -18,3 +18,8 @@ type TeacherDoc struct {
 	FlagCount   int    `json:"flag_count" example:"3"`
 	Email       string `json:"email" example:"teacher@example.com"`
 }
+
+type TeacherAverageRating struct {
+	TeacherID     uint    `json:"teacher_id,omitempty" example:"123"`
+	AverageRating float64 `json:"average_rating" example:"4.5"`
+}

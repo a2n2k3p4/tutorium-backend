@@ -1483,6 +1483,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/classes/{id}/average_rating": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetClassAverageRating calculates and returns the average rating for a class by its ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Classes"
+                ],
+                "summary": "Get average rating of a class",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Class ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ClassAverageRating"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/enrollments": {
             "get": {
                 "security": [
@@ -3271,6 +3317,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/teachers/{id}/average_rating": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetTeacherAverageRating calculates and returns the average rating across all classes taught by a teacher.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Teachers"
+                ],
+                "summary": "Get average rating of a teacher",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Teacher ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TeacherAverageRating"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "security": [
@@ -3634,6 +3726,19 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ClassAverageRating": {
+            "type": "object",
+            "properties": {
+                "average_rating": {
+                    "type": "number",
+                    "example": 4.5
+                },
+                "class_id": {
+                    "type": "integer",
+                    "example": 123
+                }
+            }
+        },
         "models.ClassCategoryDoc": {
             "type": "object",
             "properties": {
@@ -3663,10 +3768,6 @@ const docTemplate = `{
                 "class_name": {
                     "type": "string",
                     "example": "Advanced Python Programming"
-                },
-                "rating": {
-                    "type": "number",
-                    "example": 4.7
                 },
                 "teacher_id": {
                     "type": "integer",
@@ -3961,6 +4062,19 @@ const docTemplate = `{
                 "rating": {
                     "type": "integer",
                     "example": 5
+                }
+            }
+        },
+        "models.TeacherAverageRating": {
+            "type": "object",
+            "properties": {
+                "average_rating": {
+                    "type": "number",
+                    "example": 4.5
+                },
+                "teacher_id": {
+                    "type": "integer",
+                    "example": 123
                 }
             }
         },

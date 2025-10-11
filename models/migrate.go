@@ -180,12 +180,12 @@ func Seed(db *gorm.DB) error {
 
 		/* ---------- Classes  ---------- */
 		classRows := []Class{
-			{TeacherID: teacherByEmail["carol.teacher@example.com"].ID, ClassName: "Algebra I", ClassDescription: "Foundations of algebra", Rating: 4},
-			{TeacherID: teacherByEmail["carol.teacher@example.com"].ID, ClassName: "Intro to Go", ClassDescription: "Go language for beginners", Rating: 2},
-			{TeacherID: teacherByEmail["eve.teacher@example.com"].ID, ClassName: "English A1", ClassDescription: "Basic English course", Rating: 3},
-			{TeacherID: teacherByEmail["eve.teacher@example.com"].ID, ClassName: "Watercolor Basics", ClassDescription: "Painting techniques", Rating: 4},
-			{TeacherID: teacherByEmail["carol.teacher@example.com"].ID, ClassName: "Physics 101", ClassDescription: "Mechanics and waves", Rating: 3.5},
-			{TeacherID: teacherByEmail["carol.teacher@example.com"].ID, ClassName: "History of Tech", ClassDescription: "From abacus to AI", Rating: 4},
+			{TeacherID: teacherByEmail["carol.teacher@example.com"].ID, ClassName: "Algebra I", ClassDescription: "Foundations of algebra"},
+			{TeacherID: teacherByEmail["carol.teacher@example.com"].ID, ClassName: "Intro to Go", ClassDescription: "Go language for beginners"},
+			{TeacherID: teacherByEmail["eve.teacher@example.com"].ID, ClassName: "English A1", ClassDescription: "Basic English course"},
+			{TeacherID: teacherByEmail["eve.teacher@example.com"].ID, ClassName: "Watercolor Basics", ClassDescription: "Painting techniques"},
+			{TeacherID: teacherByEmail["carol.teacher@example.com"].ID, ClassName: "Physics 101", ClassDescription: "Mechanics and waves"},
+			{TeacherID: teacherByEmail["carol.teacher@example.com"].ID, ClassName: "History of Tech", ClassDescription: "From abacus to AI"},
 		}
 		if err := seedHelper(tx, classRows); err != nil {
 			return err
