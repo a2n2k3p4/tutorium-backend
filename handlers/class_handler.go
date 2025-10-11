@@ -152,11 +152,13 @@ func GetClasses(c *fiber.Ctx) error {
 			classes.id,
 			classes.class_name,
 			classes.banner_picture_url,
-			classes.rating,
+			COALESCE(AVG(reviews.rating), 0) AS rating,
 			CONCAT(users.first_name, ' ', users.last_name) AS teacher_name
 		`).
 		Joins("JOIN teachers ON teachers.id = classes.teacher_id").
-		Joins("JOIN users ON users.id = teachers.user_id")
+		Joins("JOIN users ON users.id = teachers.user_id").
+		Joins("LEFT JOIN reviews ON classes.id = reviews.class_id").
+		Group("classes.id, users.first_name, users.last_name")
 
 	// Categories filter
 	if len(filters.Categories) > 0 {
@@ -173,12 +175,14 @@ func GetClasses(c *fiber.Ctx) error {
 		min, minErr := strconv.ParseFloat(filters.MinRating, 64)
 		max, maxErr := strconv.ParseFloat(filters.MaxRating, 64)
 
+		ratingCondition := "COALESCE(AVG(reviews.rating), 0)"
+
 		if minErr == nil && maxErr == nil {
-			query = query.Where("rating BETWEEN ? AND ?", min, max)
+			query = query.Having(ratingCondition+" BETWEEN ? AND ?", min, max)
 		} else if minErr == nil {
-			query = query.Where("rating >= ?", min)
+			query = query.Having(ratingCondition+" >= ?", min)
 		} else if maxErr == nil {
-			query = query.Where("rating <= ?", max)
+			query = query.Having(ratingCondition+" <= ?", max)
 		}
 	}
 
