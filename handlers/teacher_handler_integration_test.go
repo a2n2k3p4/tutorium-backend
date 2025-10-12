@@ -1,97 +1,39 @@
 package handlers
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
-	"github.com/a2n2k3p4/tutorium-backend/config"
 	"github.com/a2n2k3p4/tutorium-backend/models"
-	"github.com/gofiber/fiber/v2"
-	"github.com/stretchr/testify/assert"
 )
 
-func setupTeacherIntegrationApp(t *testing.T) *fiber.App {
-	app := fiber.New()
-
-	cfg := config.NewConfig()
-	db, err := config.ConnectDB(cfg)
-	if err != nil {
-		t.Fatalf("failed to connect db: %v", err)
-	}
-
-	// migrate teacher table
-	if err := db.AutoMigrate(&models.Teacher{}); err != nil {
-		t.Fatalf("auto migrate: %v", err)
-	}
-
-	// inject db into fiber context
-	app.Use(func(c *fiber.Ctx) error {
-		c.Locals("db", db)
-		return c.Next()
-	})
-
-	TeacherRoutes(app)
-	return app
-}
-
 func TestIntegration_Teacher_CRUD(t *testing.T) {
-	app := setupTeacherIntegrationApp(t)
+	created, _ := createTestTeacher(t)
 
-	// Create
-	teacher := models.Teacher{
-		UserID:    		11100,
-		Description: 	"Experienced teacher with 10 years of teaching calculus.",
-		FlagCount:   	2,
-		Email:    		"john.doe@testing.com",
+	teachers := getJSONResource[[]models.Teacher](t, "/teachers/", http.StatusOK)
+	if len(teachers) == 0 {
+		t.Fatalf("expected teachers list to have entries")
 	}
-	body, _ := json.Marshal(teacher)
-	req := httptest.NewRequest(http.MethodPost, "/teachers/", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	resp, _ := app.Test(req)
-	assert.Equal(t, http.StatusCreated, resp.StatusCode)
 
-	var created models.Teacher
-	err := json.NewDecoder(resp.Body).Decode(&created)
-	assert.NoError(t, err)
-	assert.NotZero(t, created.ID)
-	assert.Equal(t, teacher.Email, created.Email)
-
-	// Get All
-	req = httptest.NewRequest(http.MethodGet, "/teachers/", nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-	// Get by ID
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/teachers/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-	// Invalid ID
-	req = httptest.NewRequest(http.MethodGet, "/teachers/abc", nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-
-	// Update
-	updatePayload := map[string]interface{}{
-		"Biography": "Updated bio: now teaching advanced algebra.",
+	fetched := getJSONResource[models.Teacher](t, fmt.Sprintf("/teachers/%d", created.ID), http.StatusOK)
+	if fetched.Email != created.Email {
+		t.Fatalf("expected teacher email %s, got %s", created.Email, fetched.Email)
 	}
-	body, _ = json.Marshal(updatePayload)
-	req = httptest.NewRequest(http.MethodPut, fmt.Sprintf("/teachers/%d", created.ID), bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-	// Delete
-	req = httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/teachers/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	jsonRequestExpect(t, http.MethodGet, "/teachers/abc", nil, http.StatusBadRequest, nil)
 
-	// Not Found
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/teachers/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+	updatePayload := map[string]any{
+		"description": "Updated bio: now teaching advanced algebra.",
+		"flag_count":  3,
+	}
+	updateJSONResource(t, fmt.Sprintf("/teachers/%d", created.ID), updatePayload, http.StatusOK)
+
+	fetched = getJSONResource[models.Teacher](t, fmt.Sprintf("/teachers/%d", created.ID), http.StatusOK)
+	if fetched.Description != "Updated bio: now teaching advanced algebra." || fetched.FlagCount != 3 {
+		t.Fatalf("expected updated description/flag_count, got %s/%d", fetched.Description, fetched.FlagCount)
+	}
+
+	deleteJSONResource(t, fmt.Sprintf("/teachers/%d", created.ID), http.StatusOK)
+	jsonRequestExpect(t, http.MethodGet, fmt.Sprintf("/teachers/%d", created.ID), nil, http.StatusNotFound, nil)
 }

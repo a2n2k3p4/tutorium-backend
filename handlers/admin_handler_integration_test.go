@@ -1,84 +1,32 @@
 package handlers
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
-	"github.com/a2n2k3p4/tutorium-backend/config"
 	"github.com/a2n2k3p4/tutorium-backend/models"
-	"github.com/gofiber/fiber/v2"
-	"github.com/stretchr/testify/assert"
 )
 
-func setupAdminIntegrationApp(t *testing.T) *fiber.App {
-	app := fiber.New()
-
-	// connect PostgreSQL DB
-	cfg := config.NewConfig()
-	db, err := config.ConnectDB(cfg)
-	if err != nil {
-		t.Fatalf("failed to connect db: %v", err)
-	}
-
-	// migrate table
-	if err := db.AutoMigrate(&models.Admin{}); err != nil {
-		t.Fatalf("auto migrate: %v", err)
-	}
-
-	// inject DB
-	app.Use(func(c *fiber.Ctx) error {
-		c.Locals("db", db)
-		return c.Next()
-	})
-
-	// register admin routes
-	AdminRoutes(app)
-
-	return app
-}
-
 func TestIntegration_Admin_CRUD(t *testing.T) {
-	app := setupAdminIntegrationApp(t)
+	// preload
+	user := createTestUser(t)
 
-	// Create
-	admin := models.Admin{UserID: 99999}
-	body, _ := json.Marshal(admin)
-	req := httptest.NewRequest(http.MethodPost, "/admins/", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	resp, _ := app.Test(req)
-	assert.Equal(t, http.StatusCreated, resp.StatusCode)
+	payload := map[string]any{"user_id": user.ID}
+	created := createJSONResource[models.Admin](t, "/admins/", payload, http.StatusCreated)
 
-	var created models.Admin
-	err := json.NewDecoder(resp.Body).Decode(&created)
-	assert.NoError(t, err)
-	assert.NotZero(t, created.ID)
+	admins := getJSONResource[[]models.Admin](t, "/admins/", http.StatusOK)
+	if len(admins) == 0 {
+		t.Fatalf("expected at least one admin in list")
+	}
 
-	// Get All
-	req = httptest.NewRequest(http.MethodGet, "/admins/", nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	fetched := getJSONResource[models.Admin](t, fmt.Sprintf("/admins/%d", created.ID), http.StatusOK)
+	if fetched.UserID != user.ID {
+		t.Fatalf("expected admin user_id %d, got %d", user.ID, fetched.UserID)
+	}
 
-	// Get by ID
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/admins/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	jsonRequestExpect(t, http.MethodGet, "/admins/abc", nil, http.StatusBadRequest, nil)
 
-	// Bad Request
-	req = httptest.NewRequest(http.MethodGet, "/admins/abc", nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-
-	// Delete
-	req = httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/admins/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-	// Not Found
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/admins/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+	deleteJSONResource(t, fmt.Sprintf("/admins/%d", created.ID), http.StatusOK)
+	jsonRequestExpect(t, http.MethodGet, fmt.Sprintf("/admins/%d", created.ID), nil, http.StatusNotFound, nil)
 }
