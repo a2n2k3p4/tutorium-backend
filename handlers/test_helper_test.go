@@ -298,6 +298,21 @@ func ExpUpdateError(table string, err error) Exp {
 	}
 }
 
+func ExpRecalculateClassRating(classID uint, avg float64) Exp {
+	return func(m sqlmock.Sqlmock) {
+		rows := sqlmock.NewRows([]string{"avg"}).AddRow(avg)
+		m.ExpectQuery(`SELECT AVG\(rating\) FROM "reviews" WHERE class_id = \$1 AND "reviews"\."deleted_at" IS NULL`).
+			WithArgs(classID).
+			WillReturnRows(rows)
+
+		m.ExpectBegin()
+		m.ExpectExec(`UPDATE "classes" SET .* WHERE .*"classes"\."deleted_at" IS NULL`).
+			WithArgs(avg, sqlmock.AnyArg(), classID).
+			WillReturnResult(sqlmock.NewResult(0, 1))
+		m.ExpectCommit()
+	}
+}
+
 func ExpSoftDeleteOK(table string) Exp {
 	return func(m sqlmock.Sqlmock) {
 		m.ExpectBegin()

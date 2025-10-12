@@ -24,6 +24,7 @@ func TestCreateReview_OK(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, false, true)(mock)
 			ExpInsertReturningID(table, 1)(mock)
+			ExpRecalculateClassRating(classID, 5)(mock)
 
 			req := jsonBody(models.Review{
 				LearnerID: learnerID,
@@ -210,6 +211,7 @@ func TestUpdateReview_OK(t *testing.T) {
 			ExpPreloadField(preloadTable, []string{"id"}, []any{classID})(mock)
 			ExpPreloadField(preloadTable2, []string{"id"}, []any{learnerID})(mock)
 			ExpUpdateOK(table)(mock)
+			ExpRecalculateClassRating(classID, 5)(mock)
 
 			req := jsonBody(models.Review{
 				LearnerID: learnerID,
@@ -293,14 +295,24 @@ func TestUpdateReview_BadRequest(t *testing.T) {
 // 200
 func TestDeleteReview_OK_SoftDelete(t *testing.T) {
 	table := "reviews"
+	preloadTable := "classes"
+	preloadTable2 := "learners"
 	userID := uint(42)
 	reviewID := uint(5)
+	classID := uint(5)
+	learnerID := uint(8)
 
 	RunInDifferentStatus(t,
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, false, true)(mock)
-			ExpSelectByIDFound(table, reviewID, []string{"id"}, []any{reviewID})(mock)
+			ExpSelectByIDFound(table, reviewID,
+				[]string{"id", "class_id", "learner_id"},
+				[]any{reviewID, classID, learnerID},
+			)(mock)
+			ExpPreloadField(preloadTable, []string{"id"}, []any{classID})(mock)
+			ExpPreloadField(preloadTable2, []string{"id"}, []any{learnerID})(mock)
 			ExpSoftDeleteOK(table)(mock)
+			ExpRecalculateClassRating(classID, 4)(mock)
 			*uID = userID
 		},
 		http.StatusOK,
