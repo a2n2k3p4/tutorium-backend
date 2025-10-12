@@ -211,6 +211,59 @@ func deleteJSONResource(t *testing.T, target string, wantStatus int) {
 	jsonRequestExpect(t, http.MethodDelete, target, nil, wantStatus, nil)
 }
 
+type crudTestCase[T any] struct {
+	ResourceName  string
+	BasePath      string
+	Create        func(t *testing.T) T
+	GetID         func(T) uint
+	UpdatePayload any
+	AssertUpdated func(t *testing.T, updated T)
+	InvalidIDPath string
+}
+
+func runCRUDTest[T any](t *testing.T, cfg crudTestCase[T]) {
+	t.Helper()
+
+	if cfg.Create == nil {
+		t.Fatalf("crudTestCase requires a Create function")
+	}
+	if cfg.GetID == nil {
+		t.Fatalf("crudTestCase requires a GetID function")
+	}
+	if cfg.BasePath == "" {
+		t.Fatalf("crudTestCase requires a BasePath")
+	}
+	// create
+	created := cfg.Create(t)
+	// after create the entry should not empty
+	list := getJSONResource[[]T](t, cfg.BasePath, http.StatusOK)
+	if len(list) == 0 {
+		t.Fatalf("expected %s list to be non-empty", cfg.ResourceName)
+	}
+	// check the create entry already exist in database
+	id := cfg.GetID(created)
+	resourcePath := fmt.Sprintf("%s%d", cfg.BasePath, id)
+	fetched := getJSONResource[T](t, resourcePath, http.StatusOK)
+	if cfg.GetID(fetched) != id {
+		t.Fatalf("expected fetched %s ID %d, got %d", cfg.ResourceName, id, cfg.GetID(fetched))
+	}
+	// check request to invalid path
+	invalidPath := cfg.InvalidIDPath
+	if invalidPath == "" {
+		invalidPath = cfg.BasePath + "abc"
+	}
+	jsonRequestExpect(t, http.MethodGet, invalidPath, nil, http.StatusBadRequest, nil)
+	// update
+	if cfg.UpdatePayload != nil && cfg.AssertUpdated != nil {
+		updateJSONResource(t, resourcePath, cfg.UpdatePayload, http.StatusOK)
+		updated := getJSONResource[T](t, resourcePath, http.StatusOK)
+		cfg.AssertUpdated(t, updated)
+	}
+	// delete
+	deleteJSONResource(t, resourcePath, http.StatusOK)
+	jsonRequestExpect(t, http.MethodGet, resourcePath, nil, http.StatusNotFound, nil)
+}
+
 func nextSequence() uint64 {
 	return uniqueCounter.Add(1)
 }
@@ -245,6 +298,17 @@ func createTestUser(t *testing.T) models.User {
 	return createJSONResource[models.User](t, "/users/", payload, http.StatusCreated)
 }
 
+func createTestAdmin(t *testing.T) (models.Admin, models.User) {
+	t.Helper()
+
+	user := createTestUser(t)
+	payload := map[string]any{
+		"user_id": user.ID,
+	}
+	admin := createJSONResource[models.Admin](t, "/admins/", payload, http.StatusCreated)
+	return admin, user
+}
+
 func createTestTeacher(t *testing.T) (models.Teacher, models.User) {
 	t.Helper()
 
@@ -271,6 +335,15 @@ func createTestClass(t *testing.T, teacherID uint) models.Class {
 		},
 	}
 	return createJSONResource[models.Class](t, "/classes/", payload, http.StatusCreated)
+}
+
+func createTestClassCategory(t *testing.T) models.ClassCategory {
+	t.Helper()
+
+	payload := map[string]any{
+		"class_category": fmt.Sprintf("Integration Category %s", uniqueSuffix()),
+	}
+	return createJSONResource[models.ClassCategory](t, "/class_categories/", payload, http.StatusCreated)
 }
 
 func createTestLearner(t *testing.T) (models.Learner, models.User) {
