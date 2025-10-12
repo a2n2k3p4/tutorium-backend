@@ -18,7 +18,7 @@ func TestIntegration_Teacher_CRUD(t *testing.T) {
 			created := createTestTeacher(t, user.ID)
 			return created
 		},
-		GetID: func(te models.Teacher) uint { return te.ID },
+		GetID: func(teach models.Teacher) uint { return teach.ID },
 		UpdatePayload: map[string]any{
 			"description": updatedDescription,
 			"flag_count":  updatedFlagCount,
