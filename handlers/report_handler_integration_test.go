@@ -1,98 +1,44 @@
 package handlers
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"testing"
-	"time"
 
-	"github.com/a2n2k3p4/tutorium-backend/config"
 	"github.com/a2n2k3p4/tutorium-backend/models"
-	"github.com/gofiber/fiber/v2"
-	"github.com/stretchr/testify/assert"
 )
 
-func setupReportIntegrationApp(t *testing.T) *fiber.App {
-	app := fiber.New()
-
-	cfg := config.NewConfig()
-	db, err := config.ConnectDB(cfg)
-	if err != nil {
-		t.Fatalf("failed to connect db: %v", err)
-	}
-
-	if err := db.AutoMigrate(&models.Report{}); err != nil {
-		t.Fatalf("auto migrate: %v", err)
-	}
-
-	app.Use(func(c *fiber.Ctx) error {
-		c.Locals("db", db)
-		return c.Next()
-	})
-
-	ReportRoutes(app)
-	return app
-}
-
 func TestIntegration_Report_CRUD(t *testing.T) {
-	app := setupReportIntegrationApp(t)
+	_, reporter := createTestLearner(t)
+	teacher, reported := createTestTeacher(t)
+	class := createTestClass(t, teacher.ID)
+	session := createTestClassSession(t, class.ID)
 
-	// Create
-	report := models.Report{
-		ReportUserID:      99999,
-		ReportedUserID:    88888,
-		ReportType:        "Inappropriate behavior",
-		ReportDescription: "Reported user used the most offensive english word in class.",
-		ReportPictureURL:  "",
-		ReportDate:        time.Now(),
+	created := createTestReport(t, reporter.ID, reported.ID, session.ID)
+
+	reports := getJSONResource[[]models.Report](t, "/reports/", http.StatusOK)
+	if len(reports) == 0 {
+		t.Fatalf("expected reports list to be non-empty")
 	}
-	body, _ := json.Marshal(report)
-	req := httptest.NewRequest(http.MethodPost, "/reports/", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	resp, _ := app.Test(req)
-	assert.Equal(t, http.StatusCreated, resp.StatusCode)
 
-	var created models.Report
-	err := json.NewDecoder(resp.Body).Decode(&created)
-	assert.NoError(t, err)
-	assert.NotZero(t, created.ID)
-
-	// Get All
-	req = httptest.NewRequest(http.MethodGet, "/reports/", nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-	// Get by ID
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/reports/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-	// Bad Request
-	req = httptest.NewRequest(http.MethodGet, "/reports/abc", nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-
-	// Update
-	updated := map[string]interface{}{
-		"Status": "resolved",
-		"Detail": "Case closed by admin.",
+	fetched := getJSONResource[models.Report](t, fmt.Sprintf("/reports/%d", created.ID), http.StatusOK)
+	if fetched.ReportUserID != reporter.ID || fetched.ReportedUserID != reported.ID {
+		t.Fatalf("unexpected reporter/reported ids got %d/%d", fetched.ReportUserID, fetched.ReportedUserID)
 	}
-	body, _ = json.Marshal(updated)
-	req = httptest.NewRequest(http.MethodPut, fmt.Sprintf("/reports/%d", created.ID), bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-	// Delete
-	req = httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/reports/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	jsonRequestExpect(t, http.MethodGet, "/reports/abc", nil, http.StatusBadRequest, nil)
 
-	// Not Found
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/reports/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+	updatePayload := map[string]any{
+		"report_status": "resolved",
+		"report_result": "Case closed by admin",
+	}
+	updateJSONResource(t, fmt.Sprintf("/reports/%d", created.ID), updatePayload, http.StatusOK)
+
+	fetched = getJSONResource[models.Report](t, fmt.Sprintf("/reports/%d", created.ID), http.StatusOK)
+	if fetched.ReportStatus != "resolved" || fetched.ReportResult != "Case closed by admin" {
+		t.Fatalf("expected report resolved with result, got status=%s result=%s", fetched.ReportStatus, fetched.ReportResult)
+	}
+
+	deleteJSONResource(t, fmt.Sprintf("/reports/%d", created.ID), http.StatusOK)
+	jsonRequestExpect(t, http.MethodGet, fmt.Sprintf("/reports/%d", created.ID), nil, http.StatusNotFound, nil)
 }

@@ -1,97 +1,44 @@
 package handlers
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
-	"github.com/a2n2k3p4/tutorium-backend/config"
 	"github.com/a2n2k3p4/tutorium-backend/models"
-	"github.com/gofiber/fiber/v2"
-	"github.com/stretchr/testify/assert"
 )
 
-func setupReviewIntegrationApp(t *testing.T) *fiber.App {
-	app := fiber.New()
-
-	cfg := config.NewConfig()
-	db, err := config.ConnectDB(cfg)
-	if err != nil {
-		t.Fatalf("failed to connect db: %v", err)
-	}
-
-	// migrate review table
-	if err := db.AutoMigrate(&models.Review{}); err != nil {
-		t.Fatalf("auto migrate: %v", err)
-	}
-
-	// inject db into fiber context
-	app.Use(func(c *fiber.Ctx) error {
-		c.Locals("db", db)
-		return c.Next()
-	})
-
-	ReviewRoutes(app)
-	return app
-}
-
 func TestIntegration_Review_CRUD(t *testing.T) {
-	app := setupReviewIntegrationApp(t)
+	// preload
+	learner, _ := createTestLearner(t)
+	teacher, _ := createTestTeacher(t)
+	class := createTestClass(t, teacher.ID)
 
-	// Create
-	review := models.Review{
-		LearnerID: 1,
-		ClassID:   101,
-		Rating:    4,
-		Comment:   "Thank you so much!!! Now I can do it by myself",
+	created := createTestReview(t, learner.ID, class.ID)
+
+	reviews := getJSONResource[[]models.Review](t, "/reviews/", http.StatusOK)
+	if len(reviews) == 0 {
+		t.Fatalf("expected reviews list to be non-empty")
 	}
-	body, _ := json.Marshal(review)
-	req := httptest.NewRequest(http.MethodPost, "/reviews/", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	resp, _ := app.Test(req)
-	assert.Equal(t, http.StatusCreated, resp.StatusCode)
 
-	var created models.Review
-	err := json.NewDecoder(resp.Body).Decode(&created)
-	assert.NoError(t, err)
-	assert.NotZero(t, created.ID)
-
-	// Get All
-	req = httptest.NewRequest(http.MethodGet, "/reviews/", nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-	// Get by ID
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/reviews/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-	// Bad Request
-	req = httptest.NewRequest(http.MethodGet, "/reviews/abc", nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-
-	// Update
-	updatePayload := map[string]interface{}{
-		"Rating":  5,
-		"Comment": "Updated comment: Excellent session!",
+	fetched := getJSONResource[models.Review](t, fmt.Sprintf("/reviews/%d", created.ID), http.StatusOK)
+	if fetched.LearnerID != learner.ID || fetched.ClassID != class.ID {
+		t.Fatalf("unexpected learner/class id got %d/%d", fetched.LearnerID, fetched.ClassID)
 	}
-	body, _ = json.Marshal(updatePayload)
-	req = httptest.NewRequest(http.MethodPut, fmt.Sprintf("/reviews/%d", created.ID), bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-	// Delete
-	req = httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/reviews/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	jsonRequestExpect(t, http.MethodGet, "/reviews/abc", nil, http.StatusBadRequest, nil)
 
-	// Not Found
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/reviews/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+	updatePayload := map[string]any{
+		"rating":  4,
+		"comment": "Updated comment: Excellent session!",
+	}
+	updateJSONResource(t, fmt.Sprintf("/reviews/%d", created.ID), updatePayload, http.StatusOK)
+
+	fetched = getJSONResource[models.Review](t, fmt.Sprintf("/reviews/%d", created.ID), http.StatusOK)
+	if fetched.Rating != 4 || fetched.Comment != "Updated comment: Excellent session!" {
+		t.Fatalf("expected updated rating/comment, got %d/%s", fetched.Rating, fetched.Comment)
+	}
+
+	deleteJSONResource(t, fmt.Sprintf("/reviews/%d", created.ID), http.StatusOK)
+	jsonRequestExpect(t, http.MethodGet, fmt.Sprintf("/reviews/%d", created.ID), nil, http.StatusNotFound, nil)
 }

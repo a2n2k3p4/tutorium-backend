@@ -1,92 +1,37 @@
 package handlers
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
-	"github.com/a2n2k3p4/tutorium-backend/config"
 	"github.com/a2n2k3p4/tutorium-backend/models"
-	"github.com/gofiber/fiber/v2"
-	"github.com/stretchr/testify/assert"
 )
 
-func setupClassCategoryIntegrationApp(t *testing.T) *fiber.App {
-	app := fiber.New()
-
-	// connect PostgreSQL
-	cfg := config.NewConfig()
-	db, err := config.ConnectDB(cfg)
-	if err != nil {
-		t.Fatalf("failed to connect db: %v", err)
-	}
-
-	// migrate table
-	if err := db.AutoMigrate(&models.ClassCategory{}); err != nil {
-		t.Fatalf("auto migrate: %v", err)
-	}
-
-	// inject db
-	app.Use(func(c *fiber.Ctx) error {
-		c.Locals("db", db)
-		return c.Next()
-	})
-
-	// route
-	ClassCategoryRoutes(app)
-
-	return app
-}
-
 func TestIntegration_ClassCategory_CRUD(t *testing.T) {
-	app := setupClassCategoryIntegrationApp(t)
+	createPayload := map[string]any{"class_category": "Integration Category"}
+	created := createJSONResource[models.ClassCategory](t, "/class_categories/", createPayload, http.StatusCreated)
 
-	// Create
-	category := models.ClassCategory{ClassCategory: "Business"}
-	body, _ := json.Marshal(category)
-	req := httptest.NewRequest(http.MethodPost, "/class_categories/", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	resp, _ := app.Test(req)
-	assert.Equal(t, http.StatusCreated, resp.StatusCode)
+	cat := getJSONResource[[]models.ClassCategory](t, "/class_categories/", http.StatusOK)
+	if len(cat) == 0 {
+		t.Fatalf("expected Categories list to be non-empty")
+	}
 
-	var created models.ClassCategory
-	err := json.NewDecoder(resp.Body).Decode(&created)
-	assert.NoError(t, err)
-	assert.NotZero(t, created.ID)
+	fetched := getJSONResource[models.ClassCategory](t, fmt.Sprintf("/class_categories/%d", created.ID), http.StatusOK)
+	if fetched.ClassCategory != "Integration Category" {
+		t.Fatalf("expected Integration Category, got %s", fetched.ClassCategory)
+	}
 
-	// Get All
-	req = httptest.NewRequest(http.MethodGet, "/class_categories/", nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	jsonRequestExpect(t, http.MethodGet, "/class_categories/abc", nil, http.StatusBadRequest, nil)
 
-	// Get by ID
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/class_categories/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	updatePayload := map[string]any{"class_category": "Updated Integration Category"}
+	updateJSONResource(t, fmt.Sprintf("/class_categories/%d", created.ID), updatePayload, http.StatusOK)
 
-	// Bad Request
-	req = httptest.NewRequest(http.MethodGet, "/class_categories/abc", nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	fetched = getJSONResource[models.ClassCategory](t, fmt.Sprintf("/class_categories/%d", created.ID), http.StatusOK)
+	if fetched.ClassCategory != "Updated Integration Category" {
+		t.Fatalf("expected updated category name, got %s", fetched.ClassCategory)
+	}
 
-	// Update
-	update := map[string]string{"class_category": "Tax Calculation"}
-	upBody, _ := json.Marshal(update)
-	req = httptest.NewRequest(http.MethodPut, fmt.Sprintf("/class_categories/%d", created.ID), bytes.NewBuffer(upBody))
-	req.Header.Set("Content-Type", "application/json")
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-	// Delete
-	req = httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/class_categories/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-	// Not Found
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/class_categories/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+	deleteJSONResource(t, fmt.Sprintf("/class_categories/%d", created.ID), http.StatusOK)
+	jsonRequestExpect(t, http.MethodGet, fmt.Sprintf("/class_categories/%d", created.ID), nil, http.StatusNotFound, nil)
 }

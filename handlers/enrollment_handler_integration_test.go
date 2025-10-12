@@ -1,129 +1,42 @@
 package handlers
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"testing"
-	"log"
 
-	"github.com/a2n2k3p4/tutorium-backend/config"
 	"github.com/a2n2k3p4/tutorium-backend/models"
-	"github.com/stretchr/testify/assert"
-	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
-
 )
 
-// SetupIntegrationApp
-func SetupIntegrationApp(t *testing.T, migrateModels ...interface{}) (*fiber.App, *gorm.DB) {
-	app := fiber.New()
-
-	// connect PostgreSQL
-	cfg := config.NewConfig()
-	db, err := config.ConnectDB(cfg)
-	if err != nil {
-		t.Fatalf("failed to connect db: %v", err)
-	}
-
-	// migrate only use models
-	if err := db.AutoMigrate(migrateModels...); err != nil {
-		t.Fatalf("auto migrate: %v", err)
-	}
-
-	// inject DB into Fiber context
-	app.Use(func(c *fiber.Ctx) error {
-		c.Locals("db", db)
-		return c.Next()
-	})
-
-	return app, db
-}
-
-// ResetTables
-func ResetTables(db *gorm.DB, tables ...string) {
-	for _, table := range tables {
-		if err := db.Exec("DELETE FROM " + table).Error; err != nil {
-			log.Printf("failed to truncate %s: %v", table, err)
-		}
-	}
-}
-
 func TestIntegration_Enrollment_CRUD(t *testing.T) {
-	app, db := SetupIntegrationApp(t,
-		&models.Enrollment{},
-		&models.Learner{},
-		&models.ClassSession{},
-		&models.Class{},
-	)
+	// preload
+	learner, _ := createTestLearner(t)
+	teacher, _ := createTestTeacher(t)
+	class := createTestClass(t, teacher.ID)
+	session := createTestClassSession(t, class.ID)
 
-	// Delete all old records
-	ResetTables(db, "enrollments", "learners", "class_sessions", "classes")
+	created := createTestEnrollment(t, learner.ID, session.ID)
 
-	// seed dependencies
-	class := models.Class{ClassName: "Integration Test Class"}
-	db.Create(&class)
-
-	classSession := models.ClassSession{ClassID: class.ID, Description: "test session"}
-	db.Create(&classSession)
-
-	learner := models.Learner{}
-	db.Create(&learner)
-
-	EnrollmentRoutes(app)
-
-	// Create
-	reqBody := models.Enrollment{
-		LearnerID:      1,
-		ClassSessionID: 1,
-		EnrollmentStatus:  "paid",
+	enrollments := getJSONResource[[]models.Enrollment](t, "/enrollments/", http.StatusOK)
+	if len(enrollments) == 0 {
+		t.Fatalf("expected enrollments list to be non-empty")
 	}
-	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodPost, "/enrollments/", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
 
-	resp, _ := app.Test(req)
-	assert.Equal(t, http.StatusCreated, resp.StatusCode)
-
-	var created models.Enrollment
-	err := json.NewDecoder(resp.Body).Decode(&created)
-	assert.NoError(t, err)
-	assert.NotZero(t, created.ID)
-
-	// Get All
-	req = httptest.NewRequest(http.MethodGet, "/enrollments/", nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-	// Get By ID
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/enrollments/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-	// Invalid ID
-	req = httptest.NewRequest(http.MethodGet, "/enrollments/abc", nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-
-	// Update
-	update := map[string]interface{}{
-		"payment_status": "refunded",
+	fetched := getJSONResource[models.Enrollment](t, fmt.Sprintf("/enrollments/%d", created.ID), http.StatusOK)
+	if fetched.LearnerID != learner.ID || fetched.ClassSessionID != session.ID {
+		t.Fatalf("expected learner_id %d and class_session_id %d, got %d/%d", learner.ID, session.ID, fetched.LearnerID, fetched.ClassSessionID)
 	}
-	upBody, _ := json.Marshal(update)
-	req = httptest.NewRequest(http.MethodPut, fmt.Sprintf("/enrollments/%d", created.ID), bytes.NewBuffer(upBody))
-	req.Header.Set("Content-Type", "application/json")
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-	// Delete
-	req = httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/enrollments/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	jsonRequestExpect(t, http.MethodGet, "/enrollments/abc", nil, http.StatusBadRequest, nil)
 
-	// Not Found
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/enrollments/%d", created.ID), nil)
-	resp, _ = app.Test(req)
-	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+	updatePayload := map[string]any{"enrollment_status": "inactive"}
+	updateJSONResource(t, fmt.Sprintf("/enrollments/%d", created.ID), updatePayload, http.StatusOK)
+
+	fetched = getJSONResource[models.Enrollment](t, fmt.Sprintf("/enrollments/%d", created.ID), http.StatusOK)
+	if fetched.EnrollmentStatus != "inactive" {
+		t.Fatalf("expected enrollment_status inactive, got %s", fetched.EnrollmentStatus)
+	}
+
+	deleteJSONResource(t, fmt.Sprintf("/enrollments/%d", created.ID), http.StatusOK)
+	jsonRequestExpect(t, http.MethodGet, fmt.Sprintf("/enrollments/%d", created.ID), nil, http.StatusNotFound, nil)
 }
