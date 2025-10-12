@@ -1,44 +1,35 @@
 package handlers
 
 import (
-	"fmt"
-	"net/http"
 	"testing"
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 )
 
 func TestIntegration_Report_CRUD(t *testing.T) {
-	_, reporter := createTestLearner(t)
-	teacher, reported := createTestTeacher(t)
+	reporter, _ := createTestUser(t)
+	reported, _ := createTestUser(t)
+	teacher := createTestTeacher(t, reported.ID)
 	class := createTestClass(t, teacher.ID)
 	session := createTestClassSession(t, class.ID)
+	updatedStatus := "resolved"
+	updatedResult := "Case closed by admin"
 
-	created := createTestReport(t, reporter.ID, reported.ID, session.ID)
-
-	reports := getJSONResource[[]models.Report](t, "/reports/", http.StatusOK)
-	if len(reports) == 0 {
-		t.Fatalf("expected reports list to be non-empty")
-	}
-
-	fetched := getJSONResource[models.Report](t, fmt.Sprintf("/reports/%d", created.ID), http.StatusOK)
-	if fetched.ReportUserID != reporter.ID || fetched.ReportedUserID != reported.ID {
-		t.Fatalf("unexpected reporter/reported ids got %d/%d", fetched.ReportUserID, fetched.ReportedUserID)
-	}
-
-	jsonRequestExpect(t, http.MethodGet, "/reports/abc", nil, http.StatusBadRequest, nil)
-
-	updatePayload := map[string]any{
-		"report_status": "resolved",
-		"report_result": "Case closed by admin",
-	}
-	updateJSONResource(t, fmt.Sprintf("/reports/%d", created.ID), updatePayload, http.StatusOK)
-
-	fetched = getJSONResource[models.Report](t, fmt.Sprintf("/reports/%d", created.ID), http.StatusOK)
-	if fetched.ReportStatus != "resolved" || fetched.ReportResult != "Case closed by admin" {
-		t.Fatalf("expected report resolved with result, got status=%s result=%s", fetched.ReportStatus, fetched.ReportResult)
-	}
-
-	deleteJSONResource(t, fmt.Sprintf("/reports/%d", created.ID), http.StatusOK)
-	jsonRequestExpect(t, http.MethodGet, fmt.Sprintf("/reports/%d", created.ID), nil, http.StatusNotFound, nil)
+	runCRUDTest(t, crudTestCase[models.Report]{
+		ResourceName: "reports",
+		BasePath:     "/reports/",
+		Create: func(t *testing.T) models.Report {
+			return createTestReport(t, reporter.ID, reported.ID, session.ID)
+		},
+		GetID: func(r models.Report) uint { return r.ID },
+		UpdatePayload: map[string]any{
+			"report_status": updatedStatus,
+			"report_result": updatedResult,
+		},
+		AssertUpdated: func(t *testing.T, updated models.Report) {
+			if updated.ReportStatus != updatedStatus || updated.ReportResult != updatedResult {
+				t.Fatalf("expected report status %q with result %q, got status=%q result=%q", updatedStatus, updatedResult, updated.ReportStatus, updated.ReportResult)
+			}
+		},
+	})
 }

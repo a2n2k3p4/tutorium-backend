@@ -1,39 +1,28 @@
 package handlers
 
 import (
-	"fmt"
-	"net/http"
 	"testing"
 
 	"github.com/a2n2k3p4/tutorium-backend/models"
 )
 
 func TestIntegration_BanTeacher_CRUD(t *testing.T) {
-	// preload
-	teacher, _ := createTestTeacher(t)
+	user, _ := createTestUser(t)
+	teacher := createTestTeacher(t, user.ID)
+	updatedDescription := "updated reason"
 
-	created := createTestBanTeacher(t, teacher.ID)
-
-	bans := getJSONResource[[]models.BanDetailsTeacher](t, "/banteachers/", http.StatusOK)
-	if len(bans) == 0 {
-		t.Fatalf("expected bans list to be non-empty")
-	}
-
-	fetched := getJSONResource[models.BanDetailsTeacher](t, fmt.Sprintf("/banteachers/%d", created.ID), http.StatusOK)
-	if fetched.TeacherID != teacher.ID {
-		t.Fatalf("expected teacher_id %d, got %d", teacher.ID, fetched.TeacherID)
-	}
-
-	jsonRequestExpect(t, http.MethodGet, "/banteachers/abc", nil, http.StatusBadRequest, nil)
-
-	updatePayload := map[string]any{"ban_description": "updated reason"}
-	updateJSONResource(t, fmt.Sprintf("/banteachers/%d", created.ID), updatePayload, http.StatusOK)
-
-	fetched = getJSONResource[models.BanDetailsTeacher](t, fmt.Sprintf("/banteachers/%d", created.ID), http.StatusOK)
-	if fetched.BanDescription != "updated reason" {
-		t.Fatalf("expected updated description, got %s", fetched.BanDescription)
-	}
-
-	deleteJSONResource(t, fmt.Sprintf("/banteachers/%d", created.ID), http.StatusOK)
-	jsonRequestExpect(t, http.MethodGet, fmt.Sprintf("/banteachers/%d", created.ID), nil, http.StatusNotFound, nil)
+	runCRUDTest(t, crudTestCase[models.BanDetailsTeacher]{
+		ResourceName: "ban teachers",
+		BasePath:     "/banteachers/",
+		Create: func(t *testing.T) models.BanDetailsTeacher {
+			return createTestBanTeacher(t, teacher.ID)
+		},
+		GetID:         func(b models.BanDetailsTeacher) uint { return b.ID },
+		UpdatePayload: map[string]any{"ban_description": updatedDescription},
+		AssertUpdated: func(t *testing.T, updated models.BanDetailsTeacher) {
+			if updated.BanDescription != updatedDescription {
+				t.Fatalf("expected updated description %q, got %q", updatedDescription, updated.BanDescription)
+			}
+		},
+	})
 }
