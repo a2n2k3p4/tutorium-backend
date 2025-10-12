@@ -19,9 +19,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	tc "github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var (
@@ -68,7 +66,7 @@ func TestMain(m *testing.M) {
 		DBPort:     string(port.Port()),
 		DBName:     "tutorium",
 	}
-	integDB, err = connectDB_with_silent(cfg)
+	integDB, err = config.ConnectDB(cfg, true)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "connect db error: %v\n", err)
 		os.Exit(1)
@@ -102,26 +100,6 @@ type dummyUploader struct{}
 
 func (dummyUploader) UploadBytes(ctx context.Context, folder, filename string, b []byte) (string, error) {
 	return fmt.Sprintf("stub://%s/%s", folder, filename), nil
-}
-
-func connectDB_with_silent(cfg *config.Config) (*gorm.DB, error) {
-	dbUrl := cfg.DBUrl()
-
-	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %w", err)
-	}
-
-	sqlDB, err := db.DB()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get db instance: %w", err)
-	}
-
-	if err := sqlDB.Ping(); err != nil {
-		return nil, fmt.Errorf("database ping failed: %w", err)
-	}
-
-	return db, nil
 }
 
 /* ------------------ API Request Helper ------------------ */
