@@ -32,7 +32,6 @@ func TestCreateClass_OK(t *testing.T) {
 				ClassName:        "Testing",
 				ClassDescription: "Lorem Ipsum",
 				BannerPictureURL: "",
-				Rating:           5,
 			})
 			*payload = req
 			*uID = userID
@@ -73,7 +72,6 @@ func TestCreateClass_DBError(t *testing.T) {
 				ClassName:        "Testing",
 				ClassDescription: "Lorem Ipsum",
 				BannerPictureURL: "",
-				Rating:           5,
 			})
 			*payload = req
 			*uID = userID
@@ -217,7 +215,6 @@ func TestUpdateClass_OK(t *testing.T) {
 				ClassName:        "Testing",
 				ClassDescription: "Lorem Ipsum",
 				BannerPictureURL: "",
-				Rating:           5,
 			})
 			*payload = req
 			*uID = userID
@@ -264,7 +261,6 @@ func TestUpdateClass_DBError(t *testing.T) {
 				ClassName:        "Testing",
 				ClassDescription: "Lorem Ipsum",
 				BannerPictureURL: "",
-				Rating:           5,
 			})
 			*payload = req
 			*uID = userID

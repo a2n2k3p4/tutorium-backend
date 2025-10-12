@@ -21,6 +21,7 @@ func ClassRoutes(app *fiber.App) {
 	class := app.Group("/classes", middlewares.ProtectedMiddleware())
 	class.Get("/", GetClasses)
 	class.Get("/:id", GetClass)
+	class.Get("/:id/average_rating", GetClassAverageRating)
 
 	classProtected := class.Group("/", middlewares.TeacherRequired())
 	classProtected.Post("/", CreateClass)
@@ -151,11 +152,13 @@ func GetClasses(c *fiber.Ctx) error {
 			classes.id,
 			classes.class_name,
 			classes.banner_picture_url,
-			classes.rating,
+			COALESCE(AVG(reviews.rating), 0) AS rating,
 			CONCAT(users.first_name, ' ', users.last_name) AS teacher_name
 		`).
 		Joins("JOIN teachers ON teachers.id = classes.teacher_id").
-		Joins("JOIN users ON users.id = teachers.user_id")
+		Joins("JOIN users ON users.id = teachers.user_id").
+		Joins("LEFT JOIN reviews ON classes.id = reviews.class_id").
+		Group("classes.id, users.first_name, users.last_name")
 
 	// Categories filter
 	if len(filters.Categories) > 0 {
@@ -172,12 +175,14 @@ func GetClasses(c *fiber.Ctx) error {
 		min, minErr := strconv.ParseFloat(filters.MinRating, 64)
 		max, maxErr := strconv.ParseFloat(filters.MaxRating, 64)
 
+		ratingCondition := "COALESCE(AVG(reviews.rating), 0)"
+
 		if minErr == nil && maxErr == nil {
-			query = query.Where("rating BETWEEN ? AND ?", min, max)
+			query = query.Having(ratingCondition+" BETWEEN ? AND ?", min, max)
 		} else if minErr == nil {
-			query = query.Where("rating >= ?", min)
+			query = query.Having(ratingCondition+" >= ?", min)
 		} else if maxErr == nil {
-			query = query.Where("rating <= ?", max)
+			query = query.Having(ratingCondition+" <= ?", max)
 		}
 	}
 
@@ -254,6 +259,45 @@ func GetClass(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(class)
+}
+
+// GetClassAverageRating godoc
+//
+//	@Summary		Get average rating of a class
+//	@Description	GetClassAverageRating calculates and returns the average rating for a class by its ID.
+//	@Tags			Classes
+//	@Security		BearerAuth
+//	@Produce		json
+//	@Param			id	path		int	true	"Class ID"
+//	@Success		200	{object}	models.ClassAverageRating
+//	@Failure		400	{string}	string	"Invalid ID"
+//	@Failure		500	{string}	string	"Server error"
+//	@Router			/classes/{id}/average_rating [get]
+func GetClassAverageRating(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+	if err != nil {
+		return c.Status(400).JSON("Please ensure that :id is an integer")
+	}
+
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	var avg float64
+	err = db.Model(&models.Review{}).
+		Select("COALESCE(AVG(rating), 0)").
+		Where("class_id = ?", id).
+		Scan(&avg).Error
+
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"class_id":       id,
+		"average_rating": avg,
+	})
 }
 
 // UpdateClass godoc
