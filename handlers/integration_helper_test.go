@@ -170,6 +170,20 @@ func decodeJSON(t *testing.T, resp *http.Response, out any) {
 	}
 }
 
+func requireNonEmpty[T any](t *testing.T, list []T, resource string) {
+	t.Helper()
+	if len(list) == 0 {
+		t.Fatalf("expected %s list to be non-empty", resource)
+	}
+}
+
+func requireSameID(t *testing.T, label string, got, want uint) {
+	t.Helper()
+	if got != want {
+		t.Fatalf("expected %s %d, got %d", label, want, got)
+	}
+}
+
 func jsonRequestExpect(t *testing.T, method, target string, payload any, wantStatus int, out any) {
 	t.Helper()
 
@@ -218,7 +232,6 @@ type crudTestCase[T any] struct {
 	GetID         func(T) uint
 	UpdatePayload any
 	AssertUpdated func(t *testing.T, updated T)
-	InvalidIDPath string
 }
 
 func runCRUDTest[T any](t *testing.T, cfg crudTestCase[T]) {
@@ -237,21 +250,15 @@ func runCRUDTest[T any](t *testing.T, cfg crudTestCase[T]) {
 	created := cfg.Create(t)
 	// after create the entry should not empty
 	list := getJSONResource[[]T](t, cfg.BasePath, http.StatusOK)
-	if len(list) == 0 {
-		t.Fatalf("expected %s list to be non-empty", cfg.ResourceName)
-	}
+	requireNonEmpty(t, list, cfg.ResourceName)
 	// check the create entry already exist in database
 	id := cfg.GetID(created)
 	resourcePath := fmt.Sprintf("%s%d", cfg.BasePath, id)
 	fetched := getJSONResource[T](t, resourcePath, http.StatusOK)
-	if cfg.GetID(fetched) != id {
-		t.Fatalf("expected fetched %s ID %d, got %d", cfg.ResourceName, id, cfg.GetID(fetched))
-	}
+	requireSameID(t, cfg.ResourceName+" ID", cfg.GetID(fetched), id)
 	// check request to invalid path
-	invalidPath := cfg.InvalidIDPath
-	if invalidPath == "" {
-		invalidPath = cfg.BasePath + "abc"
-	}
+	invalidPath := cfg.BasePath + "abc"
+
 	jsonRequestExpect(t, http.MethodGet, invalidPath, nil, http.StatusBadRequest, nil)
 	// update
 	if cfg.UpdatePayload != nil && cfg.AssertUpdated != nil {
@@ -284,7 +291,11 @@ func randomEmail(prefix string) string {
 	return fmt.Sprintf("%s-%d@example.com", prefix, nextSequence())
 }
 
-func createTestUser(t *testing.T) models.User {
+func createTestEntity[T any](t *testing.T, path string, payload map[string]any) T {
+	return createJSONResource[T](t, path, payload, http.StatusCreated)
+}
+
+func createTestUser(t *testing.T) (models.User, models.Learner) {
 	t.Helper()
 
 	payload := map[string]any{
@@ -295,31 +306,31 @@ func createTestUser(t *testing.T) models.User {
 		"phone_number": randomPhoneNumber(),
 	}
 
-	return createJSONResource[models.User](t, "/users/", payload, http.StatusCreated)
+	user := createTestEntity[models.User](t, "/users/", payload)
+
+	return user, *user.Learner
 }
 
-func createTestAdmin(t *testing.T) (models.Admin, models.User) {
+func createTestAdmin(t *testing.T, userID uint) models.Admin {
 	t.Helper()
 
-	user := createTestUser(t)
 	payload := map[string]any{
-		"user_id": user.ID,
+		"user_id": userID,
 	}
-	admin := createJSONResource[models.Admin](t, "/admins/", payload, http.StatusCreated)
-	return admin, user
+	admin := createTestEntity[models.Admin](t, "/admins/", payload)
+	return admin
 }
 
-func createTestTeacher(t *testing.T) (models.Teacher, models.User) {
+func createTestTeacher(t *testing.T, userID uint) models.Teacher {
 	t.Helper()
 
-	user := createTestUser(t)
 	payload := map[string]any{
-		"user_id":     user.ID,
+		"user_id":     userID,
 		"description": "Integration teacher",
 		"email":       randomEmail("teacher"),
 	}
-	teacher := createJSONResource[models.Teacher](t, "/teachers/", payload, http.StatusCreated)
-	return teacher, user
+	teacher := createTestEntity[models.Teacher](t, "/teachers/", payload)
+	return teacher
 }
 
 func createTestClass(t *testing.T, teacherID uint) models.Class {
@@ -334,7 +345,7 @@ func createTestClass(t *testing.T, teacherID uint) models.Class {
 			{"class_category": "Mathematics"},
 		},
 	}
-	return createJSONResource[models.Class](t, "/classes/", payload, http.StatusCreated)
+	return createTestEntity[models.Class](t, "/classes/", payload)
 }
 
 func createTestClassCategory(t *testing.T) models.ClassCategory {
@@ -343,17 +354,7 @@ func createTestClassCategory(t *testing.T) models.ClassCategory {
 	payload := map[string]any{
 		"class_category": fmt.Sprintf("Integration Category %s", uniqueSuffix()),
 	}
-	return createJSONResource[models.ClassCategory](t, "/class_categories/", payload, http.StatusCreated)
-}
-
-func createTestLearner(t *testing.T) (models.Learner, models.User) {
-	t.Helper()
-
-	user := createTestUser(t)
-	if user.Learner == nil {
-		t.Fatalf("expected learner to be created automatically for user %d", user.ID)
-	}
-	return *user.Learner, user
+	return createTestEntity[models.ClassCategory](t, "/class_categories/", payload)
 }
 
 func createTestClassSession(t *testing.T, classID uint) models.ClassSession {
@@ -369,7 +370,7 @@ func createTestClassSession(t *testing.T, classID uint) models.ClassSession {
 		"class_finish":        now.Add(96 * time.Hour).Format(time.RFC3339Nano),
 		"class_status":        "upcoming",
 	}
-	return createJSONResource[models.ClassSession](t, "/class_sessions/", payload, http.StatusCreated)
+	return createTestEntity[models.ClassSession](t, "/class_sessions/", payload)
 }
 
 func createTestEnrollment(t *testing.T, learnerID, classSessionID uint) models.Enrollment {
@@ -379,7 +380,7 @@ func createTestEnrollment(t *testing.T, learnerID, classSessionID uint) models.E
 		"class_session_id":  classSessionID,
 		"enrollment_status": "active",
 	}
-	return createJSONResource[models.Enrollment](t, "/enrollments/", payload, http.StatusCreated)
+	return createTestEntity[models.Enrollment](t, "/enrollments/", payload)
 }
 
 func createTestNotification(t *testing.T, userID uint) models.Notification {
@@ -391,7 +392,7 @@ func createTestNotification(t *testing.T, userID uint) models.Notification {
 		"notification_date":        time.Now().Format(time.RFC3339Nano),
 		"read_flag":                false,
 	}
-	return createJSONResource[models.Notification](t, "/notifications/", payload, http.StatusCreated)
+	return createTestEntity[models.Notification](t, "/notifications/", payload)
 }
 
 func createTestReport(t *testing.T, reporterID, reportedID, classSessionID uint) models.Report {
@@ -406,7 +407,7 @@ func createTestReport(t *testing.T, reporterID, reportedID, classSessionID uint)
 		"report_date":        time.Now().Format(time.RFC3339Nano),
 		"report_status":      "pending",
 	}
-	return createJSONResource[models.Report](t, "/reports/", payload, http.StatusCreated)
+	return createTestEntity[models.Report](t, "/reports/", payload)
 }
 
 func createTestReview(t *testing.T, learnerID, classID uint) models.Review {
@@ -417,7 +418,7 @@ func createTestReview(t *testing.T, learnerID, classID uint) models.Review {
 		"rating":     5,
 		"comment":    "Integration review",
 	}
-	return createJSONResource[models.Review](t, "/reviews/", payload, http.StatusCreated)
+	return createTestEntity[models.Review](t, "/reviews/", payload)
 }
 
 func createTestBanLearner(t *testing.T, learnerID uint) models.BanDetailsLearner {
@@ -429,7 +430,7 @@ func createTestBanLearner(t *testing.T, learnerID uint) models.BanDetailsLearner
 		"ban_end":         now.Add(24 * time.Hour).Format(time.RFC3339Nano),
 		"ban_description": "integration ban learner",
 	}
-	return createJSONResource[models.BanDetailsLearner](t, "/banlearners/", payload, http.StatusCreated)
+	return createTestEntity[models.BanDetailsLearner](t, "/banlearners/", payload)
 }
 
 func createTestBanTeacher(t *testing.T, teacherID uint) models.BanDetailsTeacher {
@@ -441,5 +442,5 @@ func createTestBanTeacher(t *testing.T, teacherID uint) models.BanDetailsTeacher
 		"ban_end":         now.Add(24 * time.Hour).Format(time.RFC3339Nano),
 		"ban_description": "integration ban teacher",
 	}
-	return createJSONResource[models.BanDetailsTeacher](t, "/banteachers/", payload, http.StatusCreated)
+	return createTestEntity[models.BanDetailsTeacher](t, "/banteachers/", payload)
 }
