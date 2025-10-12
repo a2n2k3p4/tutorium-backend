@@ -340,7 +340,6 @@ func createTestClass(t *testing.T, teacherID uint) models.Class {
 		"teacher_id":        teacherID,
 		"class_name":        fmt.Sprintf("Integration Class %s", uniqueSuffix()),
 		"class_description": "Integration class description",
-		"rating":            4.5,
 		"categories": []map[string]string{
 			{"class_category": "Mathematics"},
 		},
