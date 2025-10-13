@@ -5,6 +5,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type Config struct {
@@ -22,8 +23,24 @@ func (c *Config) DBUrl() string {
 
 func ConnectDB(cfg *Config) (*gorm.DB, error) {
 	dbUrl := cfg.DBUrl()
+	dbConfig := &gorm.Config{}
 
-	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{})
+	modes := map[string]logger.LogLevel{
+		"silent": logger.Silent,
+		"error":  logger.Error,
+		"warn":   logger.Warn,
+		"info":   logger.Info,
+	}
+
+	mode, ok := modes[GORMLog()]
+	if !ok {
+		mode = logger.Warn
+	}
+
+	dbConfig.Logger = logger.Default.LogMode(mode)
+
+	db, err := gorm.Open(postgres.Open(dbUrl), dbConfig)
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
