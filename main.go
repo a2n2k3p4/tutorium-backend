@@ -49,6 +49,7 @@ func main() {
 	}
 
 	models.Migrate(db)
+	db.AutoMigrate(&models.Class{}, &models.ClassCategory{})
 
 	// path
 	app := fiber.New()
