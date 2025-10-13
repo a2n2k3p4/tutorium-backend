@@ -156,16 +156,23 @@ func DeleteLearner(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("Please ensure that :id is an integer")
 	}
+
 	db, err := middlewares.GetDB(c)
 	if err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
 	err = findLearner(db, id, &learner)
-	switch {
-	case errors.Is(err, gorm.ErrRecordNotFound):
-		return c.Status(404).JSON("Learner not found")
-	case err != nil:
+	if err != nil {
+		switch {
+		case errors.Is(err, gorm.ErrRecordNotFound):
+			return c.Status(404).JSON("Learner not found")
+		default:
+			return c.Status(500).JSON(err.Error())
+		}
+	}
+	// Clear many2many association with class categories
+	if err := db.Model(&learner).Association("Interested").Clear(); err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
