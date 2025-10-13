@@ -110,6 +110,7 @@ func CreateClass(c *fiber.Ctx) error {
 //	@Param			category		query	[]string	false	"Filter by one or more categories (OR relation)"
 //	@Param			min_rating		query	string		false	"Minimum class rating"
 //	@Param			max_rating		query	string		false	"Maximum class rating"
+//	@Param			sort		query	string		false	"Sort key popular"
 //	@Success		200	{array}		models.ClassDoc
 //	@Failure		400	{string}	string	"Invalid query parameters"
 //	@Failure		500	{string}	string	"Server error"
@@ -146,19 +147,24 @@ func GetClasses(c *fiber.Ctx) error {
 	}
 	var results []ClassResponse
 
+	// Subqueries
+	// Find average rating
+	ratingsSub := db.Table("reviews").
+		Select("class_id, AVG(rating) AS avg_rating").
+		Group("class_id")
+
 	// Get teacher's FirstName and LastName from users table
 	query := db.Table("classes").
 		Select(`
 			classes.id,
 			classes.class_name,
 			classes.banner_picture_url,
-			COALESCE(AVG(reviews.rating), 0) AS rating,
+			COALESCE(cal_rating.avg_rating, 0) AS rating,
 			CONCAT(users.first_name, ' ', users.last_name) AS teacher_name
 		`).
 		Joins("JOIN teachers ON teachers.id = classes.teacher_id").
 		Joins("JOIN users ON users.id = teachers.user_id").
-		Joins("LEFT JOIN reviews ON classes.id = reviews.class_id").
-		Group("classes.id, users.first_name, users.last_name")
+		Joins("LEFT JOIN (?) AS cal_rating ON cal_rating.class_id = classes.id", ratingsSub)
 
 	// Categories filter
 	if len(filters.Categories) > 0 {
@@ -175,15 +181,31 @@ func GetClasses(c *fiber.Ctx) error {
 		min, minErr := strconv.ParseFloat(filters.MinRating, 64)
 		max, maxErr := strconv.ParseFloat(filters.MaxRating, 64)
 
-		ratingCondition := "COALESCE(AVG(reviews.rating), 0)"
+		ratingCondition := "COALESCE(cal_rating.avg_rating, 0)"
 
 		if minErr == nil && maxErr == nil {
-			query = query.Having(ratingCondition+" BETWEEN ? AND ?", min, max)
+			query = query.Where(ratingCondition+" BETWEEN ? AND ?", min, max)
 		} else if minErr == nil {
-			query = query.Having(ratingCondition+" >= ?", min)
+			query = query.Where(ratingCondition+" >= ?", min)
 		} else if maxErr == nil {
-			query = query.Having(ratingCondition+" <= ?", max)
+			query = query.Where(ratingCondition+" <= ?", max)
 		}
+	}
+
+	// Sorting
+	sortKey := c.Query("sort", "")
+
+	switch sortKey {
+	case "popular":
+		// Count number of enrollments
+		enrollmentsSub := db.Table("class_sessions cs").
+			Select("cs.class_id, COUNT(e.id) AS total_enrollments").
+			Joins("LEFT JOIN enrollments e ON e.class_session_id = cs.id").
+			Group("cs.class_id")
+
+		query = query.
+			Joins("LEFT JOIN (?) AS enroll_count ON enroll_count.class_id = classes.id", enrollmentsSub).
+			Order("COALESCE(enroll_count.total_enrollments, 0) DESC")
 	}
 
 	// Executed query

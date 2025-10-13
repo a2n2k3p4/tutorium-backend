@@ -1173,6 +1173,10 @@ paths:
         in: query
         name: max_rating
         type: string
+      - description: Sort key popular
+        in: query
+        name: sort
+        type: string
       produces:
       - application/json
       responses:

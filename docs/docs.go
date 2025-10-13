@@ -1243,6 +1243,12 @@ const docTemplate = `{
                         "description": "Maximum class rating",
                         "name": "max_rating",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort key popular",
+                        "name": "sort",
+                        "in": "query"
                     }
                 ],
                 "responses": {
