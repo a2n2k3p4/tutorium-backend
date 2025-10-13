@@ -48,4 +48,7 @@ var (
 	// Payments defaults
 	PAYMENTDefaultCurrency = EnvGetter("PAYMENT_DEFAULT_CURRENCY", "THB")
 	PAYMENTReturnURI       = EnvGetter("PAYMENT_RETURN_URI", "")
+
+	// Gorm config
+	GORMLog = EnvGetter("GORM_LOG", "Warn")
 )
