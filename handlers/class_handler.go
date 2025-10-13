@@ -148,12 +148,6 @@ func GetClasses(c *fiber.Ctx) error {
 	var results []ClassResponse
 
 	// Subqueries
-	// Count number of enrollments
-	enrollmentsSub := db.Table("class_sessions cs").
-		Select("cs.class_id, COUNT(e.id) AS total_enrollments").
-		Joins("LEFT JOIN enrollments e ON e.class_session_id = cs.id").
-		Group("cs.class_id")
-
 	// Find average rating
 	ratingsSub := db.Table("reviews").
 		Select("class_id, AVG(rating) AS avg_rating").
@@ -166,13 +160,11 @@ func GetClasses(c *fiber.Ctx) error {
 			classes.class_name,
 			classes.banner_picture_url,
 			COALESCE(cal_rating.avg_rating, 0) AS rating,
-			CONCAT(users.first_name, ' ', users.last_name) AS teacher_name,
-			COALESCE(enroll_count.total_enrollments, 0) AS total_enrollments
+			CONCAT(users.first_name, ' ', users.last_name) AS teacher_name
 		`).
 		Joins("JOIN teachers ON teachers.id = classes.teacher_id").
 		Joins("JOIN users ON users.id = teachers.user_id").
-		Joins("LEFT JOIN (?) AS cal_rating ON cal_rating.class_id = classes.id", ratingsSub).
-		Joins("LEFT JOIN (?) AS enroll_count ON enroll_count.class_id = classes.id", enrollmentsSub)
+		Joins("LEFT JOIN (?) AS cal_rating ON cal_rating.class_id = classes.id", ratingsSub)
 
 	// Categories filter
 	if len(filters.Categories) > 0 {
@@ -205,7 +197,15 @@ func GetClasses(c *fiber.Ctx) error {
 
 	switch sortKey {
 	case "popular":
-		query = query.Order("total_enrollments DESC")
+		// Count number of enrollments
+		enrollmentsSub := db.Table("class_sessions cs").
+			Select("cs.class_id, COUNT(e.id) AS total_enrollments").
+			Joins("LEFT JOIN enrollments e ON e.class_session_id = cs.id").
+			Group("cs.class_id")
+
+		query = query.
+			Joins("LEFT JOIN (?) AS enroll_count ON enroll_count.class_id = classes.id", enrollmentsSub).
+			Order("COALESCE(enroll_count.total_enrollments, 0) DESC")
 	}
 
 	// Executed query
