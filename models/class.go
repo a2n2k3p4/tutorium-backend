@@ -12,6 +12,7 @@ type Class struct {
 	BannerPictureURL string          `json:"banner_picture,omitempty"`
 	Teacher          Teacher         `gorm:"foreignKey:TeacherID;references:ID;constraint:OnDelete:CASCADE"`
 	Categories       []ClassCategory `gorm:"many2many:class_class_categories;constraint:OnDelete:CASCADE"`
+	Sessions         []ClassSession  `json:"sessions" gorm:"foreignKey:ClassID;constraint:OnDelete:CASCADE"`
 }
 
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
