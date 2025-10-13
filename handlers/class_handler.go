@@ -508,7 +508,7 @@ func DeleteClass(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	// clear many2many association wuth categories
+	// clear many2many association with categories
 	if err := db.Model(&class).Association("Categories").Clear(); err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
