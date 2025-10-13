@@ -25,18 +25,19 @@ func ConnectDB(cfg *Config) (*gorm.DB, error) {
 	dbUrl := cfg.DBUrl()
 	dbConfig := &gorm.Config{}
 
-	switch GORMLog() {
-	case "silent":
-		dbConfig.Logger = logger.Default.LogMode(logger.Silent)
-	case "error":
-		dbConfig.Logger = logger.Default.LogMode(logger.Error)
-	case "warn":
-		dbConfig.Logger = logger.Default.LogMode(logger.Warn)
-	case "info":
-		dbConfig.Logger = logger.Default.LogMode(logger.Info)
-	default:
-		dbConfig.Logger = logger.Default.LogMode(logger.Warn)
-	}
+modes := map[string]logger.LogLevel{
+	"silent": logger.Silent,
+	"error":  logger.Error,
+	"warn":   logger.Warn,
+	"info":   logger.Info,
+}
+
+mode, ok := modes[GORMLog()]
+if !ok {
+	mode = logger.Warn
+}
+
+dbConfig.Logger = logger.Default.LogMode(mode)
 
 	db, err := gorm.Open(postgres.Open(dbUrl), dbConfig)
 
