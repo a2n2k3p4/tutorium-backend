@@ -32,6 +32,7 @@ var (
 /* ------------------ Main ------------------ */
 func TestMain(m *testing.M) {
 	_ = os.Setenv("STATUS", "development")
+	_ = os.Setenv("GORM_LOG", "silent")
 
 	ctx := context.Background()
 	req := tc.ContainerRequest{
@@ -66,7 +67,7 @@ func TestMain(m *testing.M) {
 		DBPort:     string(port.Port()),
 		DBName:     "tutorium",
 	}
-	integDB, err = config.ConnectDB(cfg, true)
+	integDB, err = config.ConnectDB(cfg)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "connect db error: %v\n", err)
 		os.Exit(1)

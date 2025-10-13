@@ -43,7 +43,7 @@ import (
 func main() {
 	cfg := config.NewConfig()
 
-	db, err := config.ConnectDB(cfg, false)
+	db, err := config.ConnectDB(cfg)
 	if err != nil {
 		log.Fatalf("Unable to connect to DB: %v", err)
 	}
