@@ -21,11 +21,21 @@ func (c *Config) DBUrl() string {
 		c.DBHost, c.DBUser, c.DBPassword, c.DBName, c.DBPort)
 }
 
-func ConnectDB(cfg *Config, silent_gorm bool) (*gorm.DB, error) {
+func ConnectDB(cfg *Config) (*gorm.DB, error) {
 	dbUrl := cfg.DBUrl()
 	dbConfig := &gorm.Config{}
-	if silent_gorm {
+
+	switch GORMLog() {
+	case "silent":
 		dbConfig.Logger = logger.Default.LogMode(logger.Silent)
+	case "error":
+		dbConfig.Logger = logger.Default.LogMode(logger.Error)
+	case "warn":
+		dbConfig.Logger = logger.Default.LogMode(logger.Warn)
+	case "info":
+		dbConfig.Logger = logger.Default.LogMode(logger.Info)
+	default:
+		dbConfig.Logger = logger.Default.LogMode(logger.Warn)
 	}
 
 	db, err := gorm.Open(postgres.Open(dbUrl), dbConfig)
