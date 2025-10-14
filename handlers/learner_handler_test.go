@@ -1,11 +1,9 @@
 package handlers
 
 import (
-	"database/sql/driver"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"regexp"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -266,11 +264,7 @@ func TestAddLearnerInterests_OK(t *testing.T) {
 	RunInDifferentStatus(t,
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uid *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
-			mock.ExpectQuery(regexp.QuoteMeta(
-				`SELECT * FROM "learners" WHERE "learners"."id" = $1 AND "learners"."deleted_at" IS NULL ORDER BY "learners"."id" LIMIT $2`,
-			)).
-				WithArgs(driver.Value(int64(learnerID)), driver.Value(1)).
-				WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(int64(learnerID)))
+			ExpSelectByIDFound("learners", learnerID, []string{"id"}, []any{learnerID})(mock)
 			ExpPreloadLearnerInterestedEmpty(learnerID)(mock)
 			ExpSelectCategoriesByIDs(newCats...)(mock)
 			ExpAppendLearnerInterests(learnerID, newCats...)(mock)
@@ -298,11 +292,7 @@ func TestDeleteLearnerInterests_OK(t *testing.T) {
 	RunInDifferentStatus(t,
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uid *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
-			mock.ExpectQuery(regexp.QuoteMeta(
-				`SELECT * FROM "learners" WHERE "learners"."id" = $1 AND "learners"."deleted_at" IS NULL ORDER BY "learners"."id" LIMIT $2`,
-			)).
-				WithArgs(driver.Value(int64(learnerID)), driver.Value(1)).
-				WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(int64(learnerID)))
+			ExpSelectByIDFound("learners", learnerID, []string{"id"}, []any{learnerID})(mock)
 			ExpSelectCategoriesByIDs(delCats...)(mock)
 			ExpDeleteLearnerInterests(learnerID, delCats...)(mock)
 			ExpPreloadLearnerInterestedOrdered(learnerID, remaining...)(mock)
@@ -328,13 +318,7 @@ func TestGetClassInterestsByLearnerID_OK(t *testing.T) {
 	RunInDifferentStatus(t,
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uid *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
-			mock.ExpectQuery(regexp.QuoteMeta(
-				`SELECT * FROM "learners" WHERE "learners"."id" = $1 AND "learners"."deleted_at" IS NULL ORDER BY "learners"."id" LIMIT $2`,
-			)).
-				WithArgs(driver.Value(int64(learnerID)), driver.Value(1)).
-				WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(int64(learnerID)))
 			ExpPreloadLearnerInterestedOrdered(learnerID, cats...)(mock)
-
 			*uid = userID
 		},
 		http.StatusOK,
