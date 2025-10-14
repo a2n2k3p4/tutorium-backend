@@ -273,6 +273,8 @@ func TestDeleteClassCategory_OK_SoftDelete(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, true, false, false)(mock)
 			ExpSelectByIDFound(table, classCategoryID, []string{"id"}, []any{classCategoryID})(mock)
+			ExpClearClassesForCategory(classCategoryID)(mock)
+			ExpClearLearnersForCategory(classCategoryID)(mock)
 			ExpSoftDeleteOK(table)(mock)
 			*uID = userID
 		},
@@ -310,6 +312,8 @@ func TestDeleteClassCategory_DBError(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, true, false, false)(mock)
 			ExpSelectByIDFound(table, classCategoryID, []string{"id"}, []any{classCategoryID})(mock)
+			ExpClearClassesForCategory(classCategoryID)(mock)
+			ExpClearLearnersForCategory(classCategoryID)(mock)
 			ExpSoftDeleteError(table, fmt.Errorf("update failed"))(mock)
 			*uID = userID
 		},

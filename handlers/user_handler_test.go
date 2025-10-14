@@ -313,6 +313,7 @@ func TestDeleteUser_OK_SoftDelete(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
 			ExpSelectByIDFound(table, userID, []string{"id"}, []any{userID})(mock)
+			ExpSelectLearnerByUserIDEmpty(userID)(mock)
 			ExpPreloadCanEmpty("learners", []string{"id", "user_id"})(mock)
 			ExpPreloadCanEmpty("teachers", []string{"id", "user_id"})(mock)
 			ExpPreloadCanEmpty("admins", []string{"id", "user_id"})(mock)
@@ -354,6 +355,7 @@ func TestDeleteUser_DBError(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
 			ExpSelectByIDFound(table, userID, []string{"id"}, []any{userID})(mock)
+			ExpSelectLearnerByUserIDEmpty(userID)(mock)
 			ExpPreloadCanEmpty("learners", []string{"id", "user_id"})(mock)
 			ExpPreloadCanEmpty("teachers", []string{"id", "user_id"})(mock)
 			ExpPreloadCanEmpty("admins", []string{"id", "user_id"})(mock)

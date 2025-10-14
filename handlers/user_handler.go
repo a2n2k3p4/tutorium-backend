@@ -269,6 +269,15 @@ func DeleteUser(c *fiber.Ctx) error {
 	case err != nil:
 		return c.Status(500).JSON(err.Error())
 	}
+	// clear Learner's many-to-many interests
+	var lr models.Learner
+	if err := db.First(&lr, "user_id = ?", user.ID).Error; err == nil {
+		if err := db.Model(&lr).Association("Interested").Clear(); err != nil {
+			return c.Status(500).JSON(err.Error())
+		}
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return c.Status(500).JSON(err.Error())
+	}
 
 	if err := db.Select(clause.Associations).Delete(&user).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
