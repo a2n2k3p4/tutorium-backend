@@ -33,6 +33,17 @@ func init() {
 	middlewares.SetSecret(func() []byte { return []byte(secretString) })
 }
 
+/* ------------------ Tx Helpers ------------------ */
+func ExpTxBegin() func(sqlmock.Sqlmock) {
+	return func(mock sqlmock.Sqlmock) { mock.ExpectBegin() }
+}
+func ExpTxCommit() func(sqlmock.Sqlmock) {
+	return func(mock sqlmock.Sqlmock) { mock.ExpectCommit() }
+}
+func ExpTxRollback() func(sqlmock.Sqlmock) {
+	return func(mock sqlmock.Sqlmock) { mock.ExpectRollback() }
+}
+
 /* ------------------ Test set-up Helper  ------------------ */
 
 func setupMockGorm(t *testing.T) (sqlmock.Sqlmock, *gorm.DB, func()) {
@@ -213,6 +224,29 @@ func ExpInsertReturningID(table string, id uint64) Exp {
 		m.ExpectQuery(fmt.Sprintf(`INSERT INTO "%s".*RETURNING "id"`, table)).
 			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(id))
 		m.ExpectCommit()
+	}
+}
+
+func ExpPreloadSessionsForClassOrdered(classID uint, cols ...string) func(sqlmock.Sqlmock) {
+	return func(mock sqlmock.Sqlmock) {
+		if len(cols) == 0 {
+			cols = []string{"id", "class_id"}
+		}
+		mock.ExpectQuery(regexp.QuoteMeta(
+			`SELECT * FROM "class_sessions" WHERE class_id = $1 AND "class_sessions"."deleted_at" IS NULL ORDER BY class_start ASC`,
+		)).
+			WithArgs(driver.Value(int64(classID))).
+			WillReturnRows(sqlmock.NewRows(cols))
+	}
+}
+
+func ExpClearJoinByFK(joinTable, fk string, id uint, rows int64) func(sqlmock.Sqlmock) {
+	return func(mock sqlmock.Sqlmock) {
+		mock.ExpectExec(regexp.QuoteMeta(
+			fmt.Sprintf(`DELETE FROM "%s" WHERE "%s"."%s" = $1`, joinTable, joinTable, fk),
+		)).
+			WithArgs(driver.Value(int64(id))).
+			WillReturnResult(sqlmock.NewResult(0, rows))
 	}
 }
 
