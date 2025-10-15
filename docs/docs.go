@@ -3642,9 +3642,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Processed charge information",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/handlers.OmiseWebhookResponse"
                         }
                     },
                     "400": {
@@ -3678,6 +3678,20 @@ const docTemplate = `{
                     "description": "\"event\" or \"charge\"",
                     "type": "string",
                     "example": "charge"
+                }
+            }
+        },
+        "handlers.OmiseWebhookResponse": {
+            "type": "object",
+            "properties": {
+                "charge_id": {
+                    "type": "string"
+                },
+                "paid": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
