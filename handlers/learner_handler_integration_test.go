@@ -98,9 +98,9 @@ func TestIntegration_Learner_Recommended(t *testing.T) {
 	var updated models.Learner
 
 	var noInterestResp struct {
-		RecommendedFound   bool             `json:"recommended_found"`
-		RecommendedClasses []models.Class   `json:"recommended_classes"`
-		RemainingClasses   []models.Class   `json:"remaining_classes"`
+		RecommendedFound   bool           `json:"recommended_found"`
+		RecommendedClasses []models.Class `json:"recommended_classes"`
+		RemainingClasses   []models.Class `json:"remaining_classes"`
 	}
 	jsonRequestExpect(
 		t,
@@ -200,9 +200,9 @@ func TestIntegration_Learner_Recommended(t *testing.T) {
 	)
 
 	var noMatchResp struct {
-		RecommendedFound   bool             `json:"recommended_found"`
-		RecommendedClasses []models.Class   `json:"recommended_classes"`
-		RemainingClasses   []models.Class   `json:"remaining_classes"`
+		RecommendedFound   bool           `json:"recommended_found"`
+		RecommendedClasses []models.Class `json:"recommended_classes"`
+		RemainingClasses   []models.Class `json:"remaining_classes"`
 	}
 	jsonRequestExpect(
 		t,
