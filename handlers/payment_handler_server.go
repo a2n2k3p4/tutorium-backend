@@ -117,5 +117,9 @@ func (h *PaymentHandler) HandleWebhook(c *fiber.Ctx) error {
 	}
 
 	log.Printf("webhook: processed charge=%s status=%s amount=%d source=%v", ch.ID, ch.Status, ch.Amount, ch.Source)
-	return c.SendStatus(fiber.StatusOK)
+	return c.JSON(fiber.Map{
+		"charge_id": ch.ID,
+		"status":    ch.Status,
+		"paid":      ch.Paid,
+	})
 }
