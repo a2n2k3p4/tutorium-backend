@@ -262,20 +262,15 @@ func DeleteUser(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	err = findUser(db, id, &user)
+	err = db.Preload("Learner.Interested").
+		Preload("Teacher").
+		Preload("Admin").
+		First(&user, "id = ?", id).Error
+
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("user not found")
 	case err != nil:
-		return c.Status(500).JSON(err.Error())
-	}
-	// clear Learner's many-to-many interests
-	var lr models.Learner
-	if err := db.First(&lr, "user_id = ?", user.ID).Error; err == nil {
-		if err := db.Model(&lr).Association("Interested").Clear(); err != nil {
-			return c.Status(500).JSON(err.Error())
-		}
-	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return c.Status(500).JSON(err.Error())
 	}
 

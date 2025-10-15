@@ -273,10 +273,8 @@ func TestDeleteClassCategory_OK_SoftDelete(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, true, false, false)(mock)
 			ExpSelectByIDFound(table, classCategoryID, []string{"id"}, []any{classCategoryID})(mock)
-			ExpTxBegin()(mock)
-			ExpClearJoinByFK("class_class_categories", "class_category_id", classCategoryID, 0)(mock)
-			ExpClearJoinByFK("interested_class_categories", "class_category_id", classCategoryID, 0)(mock)
-			ExpTxCommit()(mock)
+			ExpClearAssociation("class_class_categories", "class_category_id", "class_id", classCategoryID)(mock)
+			ExpClearAssociation("interested_class_categories", "class_category_id", "learner_id", classCategoryID)(mock)
 			ExpSoftDeleteOK(table)(mock)
 			*uID = userID
 		},
@@ -314,11 +312,9 @@ func TestDeleteClassCategory_DBError(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, true, false, false)(mock)
 			ExpSelectByIDFound(table, classCategoryID, []string{"id"}, []any{classCategoryID})(mock)
-			ExpTxBegin()(mock)
-			ExpClearJoinByFK("class_class_categories", "class_category_id", classCategoryID, 0)(mock)
-			ExpClearJoinByFK("interested_class_categories", "class_category_id", classCategoryID, 0)(mock)
+			ExpClearAssociation("class_class_categories", "class_category_id", "class_id", classCategoryID)(mock)
+			ExpClearAssociation("interested_class_categories", "class_category_id", "learner_id", classCategoryID)(mock)
 			ExpSoftDeleteError(table, fmt.Errorf("update failed"))(mock)
-			ExpTxRollback()(mock)
 			*uID = userID
 		},
 		http.StatusInternalServerError,

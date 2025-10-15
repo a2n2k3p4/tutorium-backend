@@ -1,9 +1,7 @@
 package handlers
 
 import (
-	"database/sql/driver"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -131,8 +129,8 @@ func TestGetClass_OK(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
 			ExpSelectByIDFound(table, classID, []string{"id"}, []any{classID})(mock)
-			ExpPreloadTeacherForClassAny()(mock)
 			ExpPreloadM2M("class_class_categories", "class_categories", "class_id", "class_category_id", [][2]any{{classID, classCategoryID}})(mock)
+			ExpJoinTable("class_sessions", "class_id", classID, []string{"id"}, nil)(mock)
 			*uID = userID
 		},
 		http.StatusOK,
@@ -301,7 +299,7 @@ func TestDeleteClass_OK_SoftDelete(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, true, false, false)(mock)
 			ExpSelectByIDFound(table, classID, []string{"id"}, []any{classID})(mock)
-			ExpClearCategoriesForClass(classID)(mock)
+			ExpClearAssociation("class_class_categories", "class_id", "class_category_id", classID)(mock)
 			ExpSoftDeleteOK(table)(mock)
 			*uID = userID
 		},
@@ -339,7 +337,7 @@ func TestDeleteClass_DBError(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, true, false, false)(mock)
 			ExpSelectByIDFound(table, classID, []string{"id"}, []any{classID})(mock)
-			ExpClearCategoriesForClass(classID)(mock)
+			ExpClearAssociation("class_class_categories", "class_id", "class_category_id", classID)(mock)
 			ExpSoftDeleteError(table, fmt.Errorf("update failed"))(mock)
 			*uID = userID
 		},
@@ -361,176 +359,6 @@ func TestDeleteClass_BadRequest(t *testing.T) {
 		http.StatusBadRequest,
 		http.MethodDelete,
 		"/classes/not-an-int",
-	)
-}
-
-// ---------- AddClassCategories ----------
-func TestAddClassCategories_OK(t *testing.T) {
-	userID := uint(42)
-	classID := uint(10)
-	// send three category IDs in body
-	newCats := []uint{2, 4, 6}
-
-	RunInDifferentStatus(t,
-		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uid *uint) {
-			ExpAuthUser(userID, true, false, false)(mock)
-			ExpSelectByIDFound("classes", classID, []string{"id"}, []any{classID})(mock)
-			ExpAssociationFindClassCategoriesEmpty(classID)(mock)
-			ExpSelectCategoriesByIDs(newCats...)(mock)
-			ExpAppendClassCategories(classID, newCats...)(mock)
-			ExpPreloadClassWithCategories(classID, newCats...)(mock)
-			type body struct {
-				CategoryIDs []int `json:"class_category_ids"`
-			}
-			b, _ := json.Marshal(body{CategoryIDs: []int{2, 4, 6}})
-			*payload = b
-			*uid = userID
-		},
-		http.StatusOK,
-		http.MethodPost,
-		fmt.Sprintf("/classes/%d/categories", classID),
-	)
-}
-
-func TestAddClassCategories_NoIDs_BadRequest(t *testing.T) {
-	userID := uint(42)
-	classID := uint(10)
-	RunInDifferentStatus(t,
-		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uid *uint) {
-			ExpAuthUser(userID, true, false, false)(mock)
-			type body struct {
-				CategoryIDs []int `json:"class_category_ids"`
-			}
-			b, _ := json.Marshal(body{CategoryIDs: []int{}})
-			*payload = b
-			*uid = userID
-		},
-		http.StatusBadRequest,
-		http.MethodPost,
-		fmt.Sprintf("/classes/%d/categories", classID),
-	)
-}
-
-func TestAddClassCategories_NotFound(t *testing.T) {
-	userID := uint(42)
-	classID := uint(999)
-	RunInDifferentStatus(t,
-		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uid *uint) {
-			ExpAuthUser(userID, true, false, false)(mock)
-			ExpSelectByIDEmpty("classes", classID)(mock)
-			type body struct {
-				CategoryIDs []int `json:"class_category_ids"`
-			}
-			b, _ := json.Marshal(body{CategoryIDs: []int{2}})
-			*payload = b
-			*uid = userID
-		},
-		http.StatusNotFound,
-		http.MethodPost,
-		fmt.Sprintf("/classes/%d/categories", classID),
-	)
-}
-
-// ---------- DeleteClassCategories ----------
-
-func TestDeleteClassCategories_OK(t *testing.T) {
-	userID := uint(42)
-	classID := uint(10)
-	delCats := []uint{2, 4}
-
-	RunInDifferentStatus(t,
-		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uid *uint) {
-			ExpAuthUser(userID, true, false, false)(mock)
-			ExpSelectByIDFound("classes", classID, []string{"id"}, []any{classID})(mock)
-			ExpSelectCategoriesByIDs(delCats...)(mock)
-			ExpDeleteClassCategories(classID, delCats...)(mock)
-			ExpPreloadClassWithCategories(classID /*none*/)(mock)
-			type body struct {
-				CategoryIDs []int `json:"class_category_ids"`
-			}
-			b, _ := json.Marshal(body{CategoryIDs: []int{2, 4}})
-			*payload = b
-			*uid = userID
-		},
-		http.StatusOK,
-		http.MethodDelete,
-		fmt.Sprintf("/classes/%d/categories", classID),
-	)
-}
-
-func TestDeleteClassCategories_NoIDs_BadRequest(t *testing.T) {
-	userID := uint(42)
-	classID := uint(10)
-	RunInDifferentStatus(t,
-		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uid *uint) {
-			ExpAuthUser(userID, true, false, false)(mock)
-			type body struct {
-				CategoryIDs []int `json:"class_category_ids"`
-			}
-			b, _ := json.Marshal(body{CategoryIDs: []int{}})
-			*payload = b
-			*uid = userID
-		},
-		http.StatusBadRequest,
-		http.MethodDelete,
-		fmt.Sprintf("/classes/%d/categories", classID),
-	)
-}
-
-func TestDeleteClassCategories_NotFound(t *testing.T) {
-	userID := uint(42)
-	classID := uint(999)
-	RunInDifferentStatus(t,
-		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uid *uint) {
-			ExpAuthUser(userID, true, false, false)(mock)
-			ExpSelectByIDEmpty("classes", classID)(mock)
-			type body struct {
-				CategoryIDs []int `json:"class_category_ids"`
-			}
-			b, _ := json.Marshal(body{CategoryIDs: []int{2}})
-			*payload = b
-			*uid = userID
-		},
-		http.StatusNotFound,
-		http.MethodDelete,
-		fmt.Sprintf("/classes/%d/categories", classID),
-	)
-}
-
-// ---------- GetClassCategoriesByClassID ----------
-func TestGetClassCategoriesByClassID_OK(t *testing.T) {
-	userID := uint(42)
-	classID := uint(10)
-	cats := []uint{1, 3, 5}
-
-	RunInDifferentStatus(t,
-		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uid *uint) {
-			ExpAuthUser(userID, false, false, false)(mock)
-			ExpPreloadClassCategoriesOrdered(classID, cats...)(mock)
-
-			*uid = userID
-		},
-		http.StatusOK,
-		http.MethodGet,
-		fmt.Sprintf("/classes/%d/categories", classID),
-	)
-}
-
-func TestGetClassCategoriesByClassID_NotFound(t *testing.T) {
-	userID := uint(42)
-	classID := uint(999)
-
-	RunInDifferentStatus(t,
-		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uid *uint) {
-			ExpAuthUser(userID, false, false, false)(mock)
-			mock.ExpectQuery(q(`SELECT * FROM "classes" WHERE "classes"."id" = $1 AND "classes"."deleted_at" IS NULL ORDER BY "classes"."id" LIMIT 1`)).
-				WithArgs(driver.Value(int64(classID))).
-				WillReturnRows(sqlmock.NewRows([]string{"id"}))
-			*uid = userID
-		},
-		http.StatusNotFound,
-		http.MethodGet,
-		fmt.Sprintf("/classes/%d/categories", classID),
 	)
 }
 

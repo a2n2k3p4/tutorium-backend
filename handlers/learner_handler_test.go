@@ -82,7 +82,13 @@ func TestGetLearners_OK(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
 			ExpListRows("learners", []string{"id"}, []any{1}, []any{2})(mock)
-			ExpPreloadLearnersInterestedEmpty(1, 2)(mock)
+			ExpSelectAssociation(
+				"interested_class_categories",
+				"learner_id",
+				[]uint{uint(1), uint(2)},
+				[]string{"learner_id", "class_category_id"},
+				nil,
+			)(mock)
 			*uID = userID
 		},
 		http.StatusOK,
@@ -119,7 +125,13 @@ func TestGetLearner_OK(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
 			ExpSelectByIDFound(table, learnerID, []string{"id"}, []any{learnerID})(mock)
-			ExpPreloadLearnerInterestedEmpty(learnerID)(mock)
+			ExpSelectAssociation(
+				"interested_class_categories",
+				"learner_id",
+				[]uint{learnerID},
+				[]string{"learner_id", "class_category_id"},
+				nil,
+			)(mock)
 			*uID = userID
 		},
 		http.StatusOK,
@@ -191,7 +203,14 @@ func TestDeleteLearner_OK_SoftDelete(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
 			ExpSelectByIDFound(table, learnerID, []string{"id"}, []any{learnerID})(mock)
-			ExpClearInterestedForLearner(learnerID)(mock)
+			ExpSelectAssociation(
+				"interested_class_categories",
+				"learner_id",
+				[]uint{learnerID},
+				[]string{"learner_id", "class_category_id"},
+				nil,
+			)(mock)
+			ExpClearAssociation("interested_class_categories", "learner_id", "class_category_id", learnerID)(mock)
 			ExpSoftDeleteOK(table)(mock)
 			*uID = userID
 		},
@@ -229,9 +248,15 @@ func TestDeleteLearner_DBError(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
 			ExpSelectByIDFound(table, learnerID, []string{"id"}, []any{learnerID})(mock)
-			ExpClearJoinByFK("interested_class_categories", "learner_id", learnerID, 0)(mock)
+			ExpSelectAssociation(
+				"interested_class_categories",
+				"learner_id",
+				[]uint{learnerID},
+				[]string{"learner_id", "class_category_id"},
+				nil,
+			)(mock)
+			ExpClearAssociation("interested_class_categories", "learner_id", "class_category_id", learnerID)(mock)
 			ExpSoftDeleteError(table, fmt.Errorf("update failed"))(mock)
-
 			*uID = userID
 		},
 		http.StatusInternalServerError,
@@ -254,91 +279,3 @@ func TestDeleteLearner_BadRequest(t *testing.T) {
 		"/learners/not-an-int",
 	)
 }
-
-/*
-/* ------------------ AddLearnerInterests ------------------
-func TestAddLearnerInterests_OK(t *testing.T) {
-	userID := uint(42)
-	learnerID := uint(7)
-	newCats := []uint{2, 4, 6}
-
-	RunInDifferentStatus(t,
-		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uid *uint) {
-			ExpAuthUser(userID, false, false, false)(mock)
-			mock.ExpectQuery(regexp.QuoteMeta(
-				`SELECT * FROM "learners" WHERE "learners"."id" = $1 AND "learners"."deleted_at" IS NULL ORDER BY "learners"."id" LIMIT $2`,
-			)).
-				WithArgs(driver.Value(int64(learnerID)), driver.Value(1)).
-				WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(int64(learnerID)))
-			ExpPreloadLearnerInterestedEmpty(learnerID)(mock)
-			ExpSelectCategoriesByIDs(newCats...)(mock)
-			ExpAppendLearnerInterests(learnerID, newCats...)(mock)
-			ExpPreloadLearnerInterestedOrdered(learnerID, newCats...)(mock)
-			type body struct {
-				CategoryIDs []int `json:"class_category_ids"`
-			}
-			b, _ := json.Marshal(body{CategoryIDs: []int{2, 4, 6}})
-			*payload = b
-			*uid = userID
-		},
-		http.StatusOK,
-		http.MethodPost,
-		fmt.Sprintf("/learners/%d/interests", learnerID),
-	)
-}
-
-/* ------------------ DeleteLearnerInterests ------------------
-func TestDeleteLearnerInterests_OK(t *testing.T) {
-	userID := uint(42)
-	learnerID := uint(7)
-	delCats := []uint{2, 4}
-	remaining := []uint{6}
-
-	RunInDifferentStatus(t,
-		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uid *uint) {
-			ExpAuthUser(userID, false, false, false)(mock)
-			mock.ExpectQuery(regexp.QuoteMeta(
-				`SELECT * FROM "learners" WHERE "learners"."id" = $1 AND "learners"."deleted_at" IS NULL ORDER BY "learners"."id" LIMIT $2`,
-			)).
-				WithArgs(driver.Value(int64(learnerID)), driver.Value(1)).
-				WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(int64(learnerID)))
-			ExpSelectCategoriesByIDs(delCats...)(mock)
-			ExpDeleteLearnerInterests(learnerID, delCats...)(mock)
-			ExpPreloadLearnerInterestedOrdered(learnerID, remaining...)(mock)
-			type body struct {
-				CategoryIDs []int `json:"class_category_ids"`
-			}
-			b, _ := json.Marshal(body{CategoryIDs: []int{2, 4}})
-			*payload = b
-			*uid = userID
-		},
-		http.StatusOK,
-		http.MethodDelete,
-		fmt.Sprintf("/learners/%d/interests", learnerID),
-	)
-}
-
-/* ------------------ GetClassInterests ------------------
-func TestGetClassInterestsByLearnerID_OK(t *testing.T) {
-	userID := uint(42)
-	learnerID := uint(7)
-	cats := []uint{3, 5}
-
-	RunInDifferentStatus(t,
-		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uid *uint) {
-			ExpAuthUser(userID, false, false, false)(mock)
-			mock.ExpectQuery(regexp.QuoteMeta(
-				`SELECT * FROM "learners" WHERE "learners"."id" = $1 AND "learners"."deleted_at" IS NULL ORDER BY "learners"."id" LIMIT $2`,
-			)).
-				WithArgs(driver.Value(int64(learnerID)), driver.Value(1)).
-				WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(int64(learnerID)))
-			ExpPreloadLearnerInterestedOrdered(learnerID, cats...)(mock)
-
-			*uid = userID
-		},
-		http.StatusOK,
-		http.MethodGet,
-		fmt.Sprintf("/learners/%d/interests", learnerID),
-	)
-}
-*/
