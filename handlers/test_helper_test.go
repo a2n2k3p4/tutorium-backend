@@ -447,6 +447,36 @@ func ExpClearAssociationEmpty(joinTable, parentKey string) Exp {
 	}
 }
 
+func ExpDeleteUserCascadeOK(userID uint) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
+		m.ExpectExec(`DELETE FROM "interested_class_categories" WHERE "interested_class_categories"\."learner_id" IN \(NULL\)`).
+			WillReturnResult(sqlmock.NewResult(0, 0))
+		m.ExpectExec(`UPDATE "users" SET "deleted_at"=.*`).
+			WithArgs(sqlmock.AnyArg(), userID).
+			WillReturnResult(sqlmock.NewResult(0, 1))
+		m.ExpectExec(`UPDATE "learners" SET "deleted_at"=.*`).
+			WithArgs(sqlmock.AnyArg(), userID).
+			WillReturnResult(sqlmock.NewResult(0, 0))
+		m.ExpectExec(`UPDATE "teachers" SET "deleted_at"=.*`).
+			WithArgs(sqlmock.AnyArg(), userID).
+			WillReturnResult(sqlmock.NewResult(0, 0))
+		m.ExpectExec(`UPDATE "admins" SET "deleted_at"=.*`).
+			WithArgs(sqlmock.AnyArg(), userID).
+			WillReturnResult(sqlmock.NewResult(0, 0))
+		m.ExpectCommit()
+	}
+}
+
+func ExpDeleteError(userID any, table string, err error) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
+		m.ExpectExec(fmt.Sprintf(`DELETE FROM "%s" WHERE .*`, table)).
+			WillReturnError(err)
+		m.ExpectRollback()
+	}
+}
+
 /* ------------------Raising Status warning Helper------------------ */
 func wantStatus(t *testing.T, got *http.Response, want int) {
 	t.Helper()
