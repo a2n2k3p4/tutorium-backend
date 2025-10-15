@@ -308,18 +308,22 @@ func TestUpdateUser_BadRequest(t *testing.T) {
 func TestDeleteUser_OK_SoftDelete(t *testing.T) {
 	table := "users"
 	userID := uint(42)
-
+	learnerID := uint(40)
 	RunInDifferentStatus(t,
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
 			ExpSelectByIDFound(table, userID, []string{"id"}, []any{userID})(mock)
-			ExpPreloadCanEmpty("learners", []string{"id", "user_id"})(mock)
+			ExpPreloadField("learners", []string{"id", "user_id"}, []any{learnerID, userID})(mock)
 			ExpPreloadCanEmpty("teachers", []string{"id", "user_id"})(mock)
 			ExpPreloadCanEmpty("admins", []string{"id", "user_id"})(mock)
-			ExpSoftDeleteOK(table)(mock)
-			ExpSoftDeleteOKWithAllowNoTransaction("learners")(mock)
-			ExpSoftDeleteOKWithAllowNoTransaction("teachers")(mock)
-			ExpSoftDeleteOKWithAllowNoTransaction("admins")(mock)
+			ExpSelectAssociation(
+				"interested_class_categories",
+				"learner_id",
+				[]uint{learnerID},
+				[]string{"learner_id", "class_category_id"},
+				nil,
+			)(mock)
+			ExpDeleteUserCascadeOK(userID)(mock)
 			*uID = userID
 		},
 		http.StatusOK,
@@ -349,18 +353,24 @@ func TestDeleteUser_NotFound(t *testing.T) {
 func TestDeleteUser_DBError(t *testing.T) {
 	table := "users"
 	userID := uint(42)
+	learnerID := uint(40)
 
 	RunInDifferentStatus(t,
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
 			ExpSelectByIDFound(table, userID, []string{"id"}, []any{userID})(mock)
-			ExpPreloadCanEmpty("learners", []string{"id", "user_id"})(mock)
+			ExpPreloadField("learners", []string{"id", "user_id"}, []any{learnerID, userID})(mock)
 			ExpPreloadCanEmpty("teachers", []string{"id", "user_id"})(mock)
 			ExpPreloadCanEmpty("admins", []string{"id", "user_id"})(mock)
-			ExpSoftDeleteError(table, fmt.Errorf("update failed"))(mock)
-			ExpSoftDeleteOKWithAllowNoTransaction("learners")(mock)
-			ExpSoftDeleteOKWithAllowNoTransaction("teachers")(mock)
-			ExpSoftDeleteOKWithAllowNoTransaction("admins")(mock)
+			ExpSelectAssociation(
+				"interested_class_categories",
+				"learner_id",
+				[]uint{learnerID},
+				[]string{"learner_id", "class_category_id"},
+				nil,
+			)(mock)
+			ExpDeleteError(userID, "interested_class_categories", fmt.Errorf("delete association failed"))
+
 			*uID = userID
 		},
 		http.StatusInternalServerError,
