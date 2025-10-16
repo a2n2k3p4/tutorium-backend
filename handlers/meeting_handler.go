@@ -2,19 +2,30 @@ package handlers
 
 import (
 	"errors"
+	"log"
+	"os"
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
-
-const BASE_JITSI_URL = "https://meet.jit.si"
 
 func MeetingRoutes(app *fiber.App) {
 	meetingurl := NewMeetingHandler()
 	meeting := app.Group("/meetings", middlewares.ProtectedMiddleware(), middlewares.TeacherRequired(), middlewares.LearnerRequired())
 	meeting.Get("/:id", meetingurl.GetMeetingLink)
+}
+
+var BASE_JITSI_URL string
+
+func init() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Println("Warning: could not load .env file")
+	}
+	BASE_JITSI_URL = os.Getenv("JITSI_URL")
 }
 
 // Create baseURL variable type
