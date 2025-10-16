@@ -24,6 +24,12 @@ type ClassDoc struct {
 	BannerPicture    string `json:"banner_picture,omitempty" example:"<base64-encoded-image>"`
 }
 
+type RecommendClassesDoc struct {
+	RecommendedFound   bool       `json:"recommended_found" example:"true"`
+	RecommendedClasses []ClassDoc `json:"recommended_classes"`
+	RemainingClasses   []ClassDoc `json:"remaining_classes"`
+}
+
 type ClassAverageRating struct {
 	ClassID       uint    `json:"class_id,omitempty" example:"123"`
 	AverageRating float64 `json:"average_rating" example:"4.5"`

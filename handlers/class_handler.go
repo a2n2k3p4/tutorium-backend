@@ -106,16 +106,25 @@ func CreateClass(c *fiber.Ctx) error {
 // GetClasses godoc
 //
 //	@Summary		List all classes
-//	@Description	Retrieve a list of classes filtered by optional query parameters: categories, and rating range
+//	@Description	Retrieve classes filtered by optional query parameters.
+//	@Description
+//	@Description	**Filters**
+//	@Description	- `category`: repeatable; OR-matched, e.g. `?category=English&category=Math`
+//	@Description	- `min_rating` / `max_rating`: numeric range on average review rating
+//	@Description	- `open`: `"true"`/`"1"` to return only enrollable classes (have a session with `enrollment_deadline > now`), `"false"`/`"0"` for the inverse, or omit for no filter
+//	@Description	- `detailed`: `"true"`/`"1"` returns full class objects with `Teacher`, `Categories`, and `Sessions` preloaded;
+//	@Description	  `"false"`/`"0"` (default) returns a lightweight summary list `{id, class_name, banner_picture_url, rating, teacher_name}`
 //	@Tags			Classes
 //	@Security		BearerAuth
 //	@Produce		json
 //	@Param			category		query	[]string	false	"Filter by one or more categories (OR relation)"
-//	@Param			min_rating		query	string		false	"Minimum class rating"
-//	@Param			max_rating		query	string		false	"Maximum class rating"
-//	@Success		200	{array}		models.ClassDoc
-//	@Failure		400	{string}	string	"Invalid query parameters"
-//	@Failure		500	{string}	string	"Server error"
+//	@Param			min_rating		query	number		false	"Minimum average rating"						example(3.5)
+//	@Param			max_rating		query	number		false	"Maximum average rating"						example(5)
+//	@Param			open			query	boolean		false	"Only enrollable classes if true"			example(true)
+//	@Param			detailed		query	boolean		false	"Return full class details if true"			example(true)
+//	@Success		200	{array}		models.ClassDoc	"Returned when detailed=true"
+//	@Failure		400	{string}	string			"Invalid query parameters"
+//	@Failure		500	{string}	string			"Server error"
 //	@Router			/classes [get]
 func GetClasses(c *fiber.Ctx) error {
 	/*
@@ -172,6 +181,7 @@ func GetClasses(c *fiber.Ctx) error {
 		Joins("JOIN teachers ON teachers.id = classes.teacher_id").
 		Joins("JOIN users ON users.id = teachers.user_id").
 		Joins("LEFT JOIN reviews ON classes.id = reviews.class_id").
+		Where("classes.deleted_at IS NULL").
 		Group("classes.id, users.first_name, users.last_name")
 
 	// Categories filter
@@ -248,13 +258,13 @@ func GetClasses(c *fiber.Ctx) error {
 	var detailed []models.Class
 	if err := db.
 		Where("id IN ?", ids).
-		Preload("Teacher").
-		Preload("Categories").
-		Preload("Sessions").
+		Where("deleted_at IS NULL").
+		Preload("Teacher", "deleted_at IS NULL").
+		Preload("Categories", "deleted_at IS NULL").
+		Preload("Sessions", "deleted_at IS NULL").
 		Find(&detailed).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
-
 	// presign in detailed payload too
 	if mc, ok := c.Locals("minio").(*storage.Client); ok {
 		for i := range detailed {
@@ -540,6 +550,21 @@ func processBannerPicture(c *fiber.Ctx, class *models.Class) error {
 	return nil
 }
 
+// AddClassCategories godoc
+//
+//	@Summary		Add categories to a class
+//	@Description	Append one or more ClassCategory relations to a Class (many-to-many). Duplicate IDs are ignored.
+//	@Tags			Classes
+//	@Security		BearerAuth
+//	@Accept		json
+//	@Produce		json
+//	@Param			id			path		int									true	"Class ID"
+//	@Param			payload		body		models.ClassCategoryIDsDoc	true	"List of category IDs to add"
+//	@Success		200			{object}	models.ClassDoc							"Updated class with Categories preloaded"
+//	@Failure		400			{string}	string								"invalid class ID | invalid body | no class category IDs provided | no valid class category IDs"
+//	@Failure		404			{string}	string								"class not found"
+//	@Failure		500			{string}	string								"Server error"
+//	@Router			/classes/{id}/categories [post]
 func AddClassCategories(c *fiber.Ctx) error {
 	// input: class ID from URL, classCategory IDs from body
 	// output: updated class with categories
@@ -635,6 +660,21 @@ func AddClassCategories(c *fiber.Ctx) error {
 	return c.Status(200).JSON(result)
 }
 
+// DeleteClassCategories godoc
+//
+//	@Summary		Remove categories from a class
+//	@Description	Deletes the associations between a class and the provided category IDs (does **not** delete the categories themselves). Returns the updated categories.
+//	@Tags			Classes
+//	@Security		BearerAuth
+//	@Accept		json
+//	@Produce		json
+//	@Param			id			path		int										true	"Class ID"
+//	@Param			payload		body		models.ClassCategoryIDsDoc		true	"Category IDs to remove"
+//	@Success		200			{object}	models.ClassCategoriesDoc
+//	@Failure		400			{string}	string	"invalid class ID" / "invalid body" / "no class category IDs provided" / "no valid class category IDs" / "no matching class categories found"
+//	@Failure		404			{string}	string	"class not found"
+//	@Failure		500			{string}	string	"Server error"
+//	@Router			/classes/{id}/categories [delete]
 func DeleteClassCategories(c *fiber.Ctx) error {
 	// input: class ID from URL, classCategory IDs from body
 	// output: updated class with deleted categories
@@ -707,6 +747,19 @@ func DeleteClassCategories(c *fiber.Ctx) error {
 	return c.Status(200).JSON(result)
 }
 
+// GetClassCategoriesByClassID godoc
+//
+//	@Summary		List category names for a class
+//	@Description	Returns the list of class category names attached to the class.
+//	@Tags			Classes
+//	@Security		BearerAuth
+//	@Produce		json
+//	@Param			id	path		int		true	"Class ID"
+//	@Success		200	{object}	models.ClassCategoriesDoc
+//	@Failure		400	{string}	string	"invalid :id"
+//	@Failure		404	{string}	string	"class not found"
+//	@Failure		500	{string}	string	"Server error"
+//	@Router			/classes/{id}/categories [get]
 func GetClassCategoriesByClassID(c *fiber.Ctx) error {
 	// return class categories names given class ID
 	// input : class ID

@@ -16,3 +16,11 @@ type ClassCategoryDoc struct {
 	ClassCategory string     `json:"class_category" example:"Mathematics"`
 	Classes       []ClassDoc `json:"classes,omitempty"`
 }
+
+type ClassCategoryIDsDoc struct {
+	ClassCategoryIDs []int `json:"class_category_ids" swaggertype:"array,integer" example:"1"`
+}
+
+type ClassCategoriesDoc struct {
+	Categories []string `json:"categories" swaggertype:"array,string" example:"Mathematics"`
+}

@@ -182,6 +182,19 @@ func DeleteLearner(c *fiber.Ctx) error {
 	return c.Status(200).JSON("Successfully deleted Learner")
 }
 
+// RecommendClasses godoc
+//
+//	@Summary		Recommend enrollable classes for a learner
+//	@Description	Returns two buckets: **recommended_classes** (enrollable classes matching the learner’s interested categories) and **remaining_classes** (other enrollable classes). If no interests or no matches, `recommended_found` is false and `remaining_classes` contains all enrollable classes.
+//	@Tags			Learners
+//	@Security		BearerAuth
+//	@Produce		json
+//	@Param			id	path		int		true	"Learner ID"
+//	@Success		200	{object}	models.RecommendClassesDoc
+//	@Failure		400	{string}	string	"Please ensure that :id is an integer"
+//	@Failure		404	{string}	string	"learner not found"
+//	@Failure		500	{string}	string	"Server error"
+//	@Router			/learners/{id}/recommended [get]
 func RecommendClasses(c *fiber.Ctx) error {
 	/*
 		input : learner ID from url
@@ -308,6 +321,24 @@ func RecommendClasses(c *fiber.Ctx) error {
 	})
 }
 
+// AddLearnerInterests godoc
+//
+//	@Summary		Add categories to a learner's interests
+//	@Description	Appends rows to `interested_class_categories` for the given learner. Duplicate IDs are ignored. Returns the updated Learner with `Interested` preloaded.
+//	@Tags			Learners
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int							true	"Learner ID"
+//	@Param			body	body		models.ClassCategoryIDsDoc	true	"IDs of class categories to add"
+//	@Success		200		{object}	models.LearnerDoc
+//	@Failure		400		{string}	string	"invalid learner ID"
+//	@Failure		400		{string}	string	"invalid body"
+//	@Failure		400		{string}	string	"no class category IDs provided"
+//	@Failure		400		{string}	string	"no valid class category IDs"
+//	@Failure		404		{string}	string	"learner not found"
+//	@Failure		500		{string}	string	"Server error"
+//	@Router			/learners/{id}/interests [post]
 func AddLearnerInterests(c *fiber.Ctx) error {
 	/*
 		input : learner ID from url, body with class_category_ids array
@@ -400,6 +431,25 @@ func AddLearnerInterests(c *fiber.Ctx) error {
 	return c.Status(200).JSON(result)
 }
 
+// DeleteLearnerInterests godoc
+//
+//	@Summary		Remove categories from a learner's interests
+//	@Description	Deletes the association rows in `interested_class_categories` for the given learner and category IDs. Returns the updated Learner with `Interested` preloaded and ordered.
+//	@Tags			Learners
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int						true	"Learner ID"
+//	@Param			body	body		models.ClassCategoryIDsDoc	true	"IDs of class categories to remove"
+//	@Success		200		{object}	models.LearnerDoc
+//	@Failure		400		{string}	string	"invalid learner ID"
+//	@Failure		400		{string}	string	"invalid body"
+//	@Failure		400		{string}	string	"no class category IDs provided"
+//	@Failure		400		{string}	string	"no valid class category IDs"
+//	@Failure		400		{string}	string	"no matching class categories found"
+//	@Failure		404		{string}	string	"learner not found"
+//	@Failure		500		{string}	string	"Server error"
+//	@Router			/learners/{id}/interests [delete]
 func DeleteLearnerInterests(c *fiber.Ctx) error {
 	/*
 		input : learner ID from url, body with class_category_ids array
@@ -477,6 +527,19 @@ func DeleteLearnerInterests(c *fiber.Ctx) error {
 	return c.Status(200).JSON(result)
 }
 
+// GetClassInterestsByLearnerID godoc
+//
+//	@Summary		Get a learner's interested class categories
+//	@Description	Returns the list of class category names the learner is interested in (alphabetically ordered).
+//	@Tags			Learners
+//	@Security		BearerAuth
+//	@Produce		json
+//	@Param			id	path		int		true	"Learner ID"
+//	@Success		200	{object}	map[string][]string	"keys: categories"
+//	@Failure		400	{string}	string	"invalid :id"
+//	@Failure		404	{string}	string	"learner not found"
+//	@Failure		500	{string}	string	"Server error"
+//	@Router			/learners/{id}/interests [get]
 func GetClassInterestsByLearnerID(c *fiber.Ctx) error {
 	/*
 		input : learner ID from url
