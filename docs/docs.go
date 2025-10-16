@@ -1213,7 +1213,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Retrieve classes filtered by optional query parameters.\n\n**Filters**\n- ` + "`" + `category` + "`" + `: repeatable; OR-matched, e.g. ` + "`" + `?category=English\u0026category=Math` + "`" + `\n- ` + "`" + `min_rating` + "`" + ` / ` + "`" + `max_rating` + "`" + `: numeric range on average review rating\n- ` + "`" + `open` + "`" + `: ` + "`" + `\"true\"` + "`" + `/` + "`" + `\"1\"` + "`" + ` to return only enrollable classes (have a session with ` + "`" + `enrollment_deadline \u003e now` + "`" + `), ` + "`" + `\"false\"` + "`" + `/` + "`" + `\"0\"` + "`" + ` for the inverse, or omit for no filter\n- ` + "`" + `detailed` + "`" + `: ` + "`" + `\"true\"` + "`" + `/` + "`" + `\"1\"` + "`" + ` returns full class objects with ` + "`" + `Teacher` + "`" + `, ` + "`" + `Categories` + "`" + `, and ` + "`" + `Sessions` + "`" + ` preloaded;\n` + "`" + `\"false\"` + "`" + `/` + "`" + `\"0\"` + "`" + ` (default) returns a lightweight summary list ` + "`" + `{id, class_name, banner_picture_url, rating, teacher_name}` + "`" + `",
+                "description": "Retrieve classes filtered by optional query parameters.\n\n**Filters**\n- ` + "`" + `category` + "`" + `: repeatable; OR-matched, e.g. ` + "`" + `?category=English\u0026category=Math` + "`" + `\n- ` + "`" + `min_rating` + "`" + ` / ` + "`" + `max_rating` + "`" + `: numeric range on average review rating\n- ` + "`" + `open` + "`" + `: ` + "`" + `\"true\"` + "`" + `/` + "`" + `\"1\"` + "`" + ` to return only enrollable classes (have a session with ` + "`" + `enrollment_deadline \u003e now` + "`" + `), ` + "`" + `\"false\"` + "`" + `/` + "`" + `\"0\"` + "`" + ` for the inverse, or omit for no filter\n- ` + "`" + `detailed` + "`" + `: ` + "`" + `\"true\"` + "`" + `/` + "`" + `\"1\"` + "`" + ` returns full class objects with ` + "`" + `Teacher` + "`" + `, ` + "`" + `Categories` + "`" + `, and ` + "`" + `Sessions` + "`" + ` preloaded;\n` + "`" + `\"false\"` + "`" + `/` + "`" + `\"0\"` + "`" + ` (default) returns a lightweight summary list ` + "`" + `{id, class_name, banner_picture_url, rating, teacher_name}` + "`" + `\n- ` + "`" + `sort` + "`" + `: supports sorting by: popular, rating, newest, alphabetical",
                 "produces": [
                     "application/json"
                 ],
@@ -1234,30 +1234,32 @@ const docTemplate = `{
                     },
                     {
                         "type": "number",
-                        "example": 3.5,
                         "description": "Minimum average rating",
                         "name": "min_rating",
                         "in": "query"
                     },
                     {
                         "type": "number",
-                        "example": 5,
                         "description": "Maximum average rating",
                         "name": "max_rating",
                         "in": "query"
                     },
                     {
                         "type": "boolean",
-                        "example": true,
                         "description": "Only enrollable classes if true",
                         "name": "open",
                         "in": "query"
                     },
                     {
                         "type": "boolean",
-                        "example": true,
                         "description": "Return full class details if true",
                         "name": "detailed",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort order: popular, rating, newest, alphabetical",
+                        "name": "sort",
                         "in": "query"
                     }
                 ],

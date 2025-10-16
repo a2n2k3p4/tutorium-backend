@@ -114,14 +114,16 @@ func CreateClass(c *fiber.Ctx) error {
 //	@Description	- `open`: `"true"`/`"1"` to return only enrollable classes (have a session with `enrollment_deadline > now`), `"false"`/`"0"` for the inverse, or omit for no filter
 //	@Description	- `detailed`: `"true"`/`"1"` returns full class objects with `Teacher`, `Categories`, and `Sessions` preloaded;
 //	@Description	  `"false"`/`"0"` (default) returns a lightweight summary list `{id, class_name, banner_picture_url, rating, teacher_name}`
+//	@Description	- `sort`: supports sorting by: popular, rating, newest, alphabetical
 //	@Tags			Classes
 //	@Security		BearerAuth
 //	@Produce		json
 //	@Param			category		query	[]string	false	"Filter by one or more categories (OR relation)"
-//	@Param			min_rating		query	number		false	"Minimum average rating"						example(3.5)
-//	@Param			max_rating		query	number		false	"Maximum average rating"						example(5)
-//	@Param			open			query	boolean		false	"Only enrollable classes if true"			example(true)
-//	@Param			detailed		query	boolean		false	"Return full class details if true"			example(true)
+//	@Param			min_rating		query	number		false	"Minimum average rating"
+//	@Param			max_rating		query	number		false	"Maximum average rating"
+//	@Param			open			query	boolean		false	"Only enrollable classes if true"
+//	@Param			detailed		query	boolean		false	"Return full class details if true"
+//	@Param			sort	    	query	string		false	"Sort order: popular, rating, newest, alphabetical"
 //	@Success		200	{array}		models.ClassDoc	"Returned when detailed=true"
 //	@Failure		400	{string}	string			"Invalid query parameters"
 //	@Failure		500	{string}	string			"Server error"
@@ -144,6 +146,7 @@ func GetClasses(c *fiber.Ctx) error {
 		MaxRating  string   `query:"max_rating"`
 		Open       string   `query:"open"`     // "1"/"true" enrollable, "0"/"false" not enrollable
 		Detailed   string   `query:"detailed"` // "1"/"true" expand to Categories + Sessions
+		Sort       string   `query:"sort"`     // e.g., "popular"
 	}
 
 	if err := c.QueryParser(&filters); err != nil {
@@ -169,20 +172,26 @@ func GetClasses(c *fiber.Ctx) error {
 	}
 	var results []ClassResponse
 
+	// Subqueries
+	// Find average rating
+	ratingsSub := db.Table("reviews").
+		Select("class_id, AVG(rating) AS avg_rating").
+		Where("reviews.deleted_at IS NULL").
+		Group("class_id")
+
 	// Get teacher's FirstName and LastName from users table
 	query := db.Table("classes").
 		Select(`
 			classes.id,
 			classes.class_name,
 			classes.banner_picture_url,
-			COALESCE(AVG(reviews.rating), 0) AS rating,
+			COALESCE(cal_rating.avg_rating, 0) AS rating,
 			CONCAT(users.first_name, ' ', users.last_name) AS teacher_name
 		`).
 		Joins("JOIN teachers ON teachers.id = classes.teacher_id").
 		Joins("JOIN users ON users.id = teachers.user_id").
-		Joins("LEFT JOIN reviews ON classes.id = reviews.class_id").
-		Where("classes.deleted_at IS NULL").
-		Group("classes.id, users.first_name, users.last_name")
+		Joins("LEFT JOIN (?) AS cal_rating ON cal_rating.class_id = classes.id", ratingsSub).
+		Where("classes.deleted_at IS NULL")
 
 	// Categories filter
 	if len(filters.Categories) > 0 {
@@ -213,15 +222,42 @@ func GetClasses(c *fiber.Ctx) error {
 		min, minErr := strconv.ParseFloat(filters.MinRating, 64)
 		max, maxErr := strconv.ParseFloat(filters.MaxRating, 64)
 
-		ratingCondition := "COALESCE(AVG(reviews.rating), 0)"
+		ratingCondition := "COALESCE(cal_rating.avg_rating, 0)"
 
 		if minErr == nil && maxErr == nil {
-			query = query.Having(ratingCondition+" BETWEEN ? AND ?", min, max)
+			query = query.Where(ratingCondition+" BETWEEN ? AND ?", min, max)
 		} else if minErr == nil {
-			query = query.Having(ratingCondition+" >= ?", min)
+			query = query.Where(ratingCondition+" >= ?", min)
 		} else if maxErr == nil {
-			query = query.Having(ratingCondition+" <= ?", max)
+			query = query.Where(ratingCondition+" <= ?", max)
 		}
+	}
+
+	// Sorting
+	sortKey := strings.ToLower(strings.TrimSpace(filters.Sort))
+
+	switch sortKey {
+	case "popular":
+		// Count number of enrollments
+		enrollmentsSub := db.Table("class_sessions cs").
+			Select("cs.class_id, COUNT(e.id) AS total_enrollments").
+			Joins("LEFT JOIN enrollments e ON e.class_session_id = cs.id").
+			Group("cs.class_id")
+
+		query = query.
+			Joins("LEFT JOIN (?) AS enroll_count ON enroll_count.class_id = classes.id", enrollmentsSub).
+			Order("COALESCE(enroll_count.total_enrollments, 0) DESC")
+	case "rating":
+		// Sort by rating
+		query = query.Order("COALESCE(cal_rating.avg_rating, 0) DESC")
+	case "newest":
+		// Sort by latest created
+		query = query.Order("classes.created_at DESC")
+	case "alphabetical":
+		// Sort alphabetically
+		query = query.Order("classes.class_name ASC")
+	default:
+		// No sort
 	}
 
 	// Executed query

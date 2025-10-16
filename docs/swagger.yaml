@@ -1196,6 +1196,7 @@ paths:
         - `open`: `"true"`/`"1"` to return only enrollable classes (have a session with `enrollment_deadline > now`), `"false"`/`"0"` for the inverse, or omit for no filter
         - `detailed`: `"true"`/`"1"` returns full class objects with `Teacher`, `Categories`, and `Sessions` preloaded;
         `"false"`/`"0"` (default) returns a lightweight summary list `{id, class_name, banner_picture_url, rating, teacher_name}`
+        - `sort`: supports sorting by: popular, rating, newest, alphabetical
       parameters:
       - collectionFormat: csv
         description: Filter by one or more categories (OR relation)
@@ -1205,25 +1206,25 @@ paths:
         name: category
         type: array
       - description: Minimum average rating
-        example: 3.5
         in: query
         name: min_rating
         type: number
       - description: Maximum average rating
-        example: 5
         in: query
         name: max_rating
         type: number
       - description: Only enrollable classes if true
-        example: true
         in: query
         name: open
         type: boolean
       - description: Return full class details if true
-        example: true
         in: query
         name: detailed
         type: boolean
+      - description: 'Sort order: popular, rating, newest, alphabetical'
+        in: query
+        name: sort
+        type: string
       produces:
       - application/json
       responses:
