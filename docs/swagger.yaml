@@ -1225,6 +1225,10 @@ paths:
         in: query
         name: sort
         type: string
+      - description: Sort key popular
+        in: query
+        name: sort
+        type: string
       produces:
       - application/json
       responses:
