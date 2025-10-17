@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
+	"github.com/a2n2k3p4/tutorium-backend/services"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -17,6 +19,9 @@ func AdminRoutes(app *fiber.App) {
 	admin.Get("/:id", GetAdmin)
 	// admin.Put("/admin/:id", UpdateAdmin) No application logic for updating admin
 	admin.Delete("/:id", DeleteAdmin)
+
+	admin.Post("/flags/learners", middlewares.AdminRequired(), AddLearnerFlag)
+	admin.Post("/flags/teachers", middlewares.AdminRequired(), AddTeacherFlag)
 }
 
 // CreateAdmin godoc
@@ -158,4 +163,82 @@ func DeleteAdmin(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 	return c.Status(200).JSON("Successfully deleted admin")
+}
+
+type FlagRequest struct {
+	ID         uint   `json:"id"` // This would be LearnerID or TeacherID
+	FlagsToAdd int    `json:"flags_to_add"`
+	Reason     string `json:"reason"`
+}
+
+// AddLearnerFlag godoc
+//
+//	@Summary		Flag a learner
+//	@Description	Allows an admin to apply flags directly to a learner
+//	@Tags			Admins
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			flag	body		FlagRequest	true	"Flag details"
+//	@Success		200		{object}	map[string]string	"Flags applied successfully"
+//	@Failure		400		{object}	map[string]string	"Invalid request body"
+//	@Failure		500		{object}	map[string]string	"Failed to apply flags"
+//	@Router			/admins/flags/learner [post]
+func AddLearnerFlag(c *fiber.Ctx) error {
+	var req FlagRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	var learner models.Learner
+	if err := db.First(&learner, req.ID).Error; err == nil {
+		desc := fmt.Sprintf("An administrator has issued a warning with %d flag(s). Reason: %s", req.FlagsToAdd, req.Reason)
+		services.CreateNotification(db, learner.UserID, "system", desc)
+	}
+
+	if err := services.ApplyLearnerFlags(db, req.ID, req.FlagsToAdd, req.Reason); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to apply flags", "details": err.Error()})
+	}
+	return c.Status(200).JSON(fiber.Map{"message": "Flags applied successfully to learner"})
+}
+
+// AddTeacherFlag godoc
+//
+//	@Summary		Flag a teacher
+//	@Description	Allows an admin to apply flags directly to a teacher
+//	@Tags			Admins
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			flag	body		FlagRequest	true	"Flag details"
+//	@Success		200		{object}	map[string]string	"Flags applied successfully"
+//	@Failure		400		{object}	map[string]string	"Invalid request body"
+//	@Failure		500		{object}	map[string]string	"Failed to apply flags"
+//	@Router			/admins/flags/teacher [post]
+func AddTeacherFlag(c *fiber.Ctx) error {
+	var req FlagRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	db, err := middlewares.GetDB(c)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	var teacher models.Teacher
+	if err := db.First(&teacher, req.ID).Error; err == nil {
+		desc := fmt.Sprintf("An administrator has issued a warning with %d flag(s). Reason: %s", req.FlagsToAdd, req.Reason)
+		services.CreateNotification(db, teacher.UserID, "system", desc)
+	}
+
+	if err := services.ApplyTeacherFlags(db, req.ID, req.FlagsToAdd, req.Reason); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to apply flags", "details": err.Error()})
+	}
+	return c.Status(200).JSON(fiber.Map{"message": "Flags applied successfully to teacher"})
 }
