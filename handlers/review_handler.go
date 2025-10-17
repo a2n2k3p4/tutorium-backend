@@ -11,7 +11,7 @@ import (
 )
 
 func ReviewRoutes(app *fiber.App) {
-	review := app.Group("/reviews", middlewares.ProtectedMiddleware())
+	review := app.Group("/reviews", middlewares.ProtectedMiddleware(), middlewares.BanMiddleware())
 	review.Get("/", GetReviews)
 	review.Get("/:id", GetReview)
 

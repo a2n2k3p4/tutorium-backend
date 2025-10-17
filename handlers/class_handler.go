@@ -18,7 +18,7 @@ import (
 )
 
 func ClassRoutes(app *fiber.App) {
-	class := app.Group("/classes", middlewares.ProtectedMiddleware())
+	class := app.Group("/classes", middlewares.ProtectedMiddleware(), middlewares.BanMiddleware())
 	class.Get("/", GetClasses)
 	class.Get("/:id", GetClass)
 	class.Get("/:id/average_rating", GetClassAverageRating)

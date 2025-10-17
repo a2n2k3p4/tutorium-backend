@@ -1,4 +1,14 @@
 definitions:
+  handlers.FlagRequest:
+    properties:
+      flags_to_add:
+        type: integer
+      id:
+        description: This would be LearnerID or TeacherID
+        type: integer
+      reason:
+        type: string
+    type: object
   handlers.OmiseWebhookPayload:
     properties:
       id:
@@ -527,6 +537,82 @@ paths:
       security:
       - BearerAuth: []
       summary: Get admin by ID
+      tags:
+      - Admins
+  /admins/flags/learner:
+    post:
+      consumes:
+      - application/json
+      description: Allows an admin to apply flags directly to a learner
+      parameters:
+      - description: Flag details
+        in: body
+        name: flag
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.FlagRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Flags applied successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to apply flags
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Flag a learner
+      tags:
+      - Admins
+  /admins/flags/teacher:
+    post:
+      consumes:
+      - application/json
+      description: Allows an admin to apply flags directly to a teacher
+      parameters:
+      - description: Flag details
+        in: body
+        name: flag
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.FlagRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Flags applied successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to apply flags
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Flag a teacher
       tags:
       - Admins
   /banlearners:

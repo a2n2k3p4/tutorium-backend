@@ -10,7 +10,7 @@ import (
 )
 
 func TeacherRoutes(app *fiber.App) {
-	teacher := app.Group("/teachers", middlewares.ProtectedMiddleware())
+	teacher := app.Group("/teachers", middlewares.ProtectedMiddleware(), middlewares.BanMiddleware())
 	teacher.Get("/", GetTeachers)
 	teacher.Get("/:id", GetTeacher)
 	teacher.Get("/:id/average_rating", GetTeacherAverageRating)

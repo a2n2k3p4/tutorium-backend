@@ -110,6 +110,126 @@ const docTemplate = `{
                 }
             }
         },
+        "/admins/flags/learner": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Allows an admin to apply flags directly to a learner",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admins"
+                ],
+                "summary": "Flag a learner",
+                "parameters": [
+                    {
+                        "description": "Flag details",
+                        "name": "flag",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.FlagRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Flags applied successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to apply flags",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admins/flags/teacher": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Allows an admin to apply flags directly to a teacher",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admins"
+                ],
+                "summary": "Flag a teacher",
+                "parameters": [
+                    {
+                        "description": "Flag details",
+                        "name": "flag",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.FlagRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Flags applied successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to apply flags",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/admins/{id}": {
             "get": {
                 "security": [
@@ -3667,6 +3787,21 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "handlers.FlagRequest": {
+            "type": "object",
+            "properties": {
+                "flags_to_add": {
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "This would be LearnerID or TeacherID",
+                    "type": "integer"
+                },
+                "reason": {
+                    "type": "string"
+                }
+            }
+        },
         "handlers.OmiseWebhookPayload": {
             "type": "object",
             "properties": {

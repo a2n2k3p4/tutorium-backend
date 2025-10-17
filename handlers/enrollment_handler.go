@@ -11,7 +11,7 @@ import (
 )
 
 func EnrollmentRoutes(app *fiber.App) {
-	enrollment := app.Group("/enrollments", middlewares.ProtectedMiddleware(), middlewares.LearnerRequired())
+	enrollment := app.Group("/enrollments", middlewares.ProtectedMiddleware(), middlewares.BanMiddleware(), middlewares.LearnerRequired())
 
 	enrollment.Post("/", CreateEnrollment)
 	enrollment.Get("/", GetEnrollments)

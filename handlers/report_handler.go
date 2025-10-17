@@ -10,6 +10,7 @@ import (
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
+	"github.com/a2n2k3p4/tutorium-backend/services"
 	"github.com/a2n2k3p4/tutorium-backend/storage"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -17,7 +18,7 @@ import (
 )
 
 func ReportRoutes(app *fiber.App) {
-	report := app.Group("/reports", middlewares.ProtectedMiddleware())
+	report := app.Group("/reports", middlewares.ProtectedMiddleware(), middlewares.BanMiddleware())
 	report.Post("/", CreateReport)
 
 	reportAdmin := report.Group("/", middlewares.AdminRequired())
@@ -58,6 +59,26 @@ func CreateReport(c *fiber.Ctx) error {
 
 	if err := db.Create(&report).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
+	}
+
+	// Notify the reported user
+	services.CreateNotification(
+		db,
+		report.ReportedUserID,
+		"system",
+		"You have been reported. An admin will review the case shortly.",
+	)
+
+	// Notify all admins
+	var admins []models.Admin
+	db.Find(&admins)
+	for _, admin := range admins {
+		services.CreateNotification(
+			db,
+			admin.UserID,
+			"system",
+			fmt.Sprintf("A new report (ID: %d) has been filed and requires your review.", report.ID),
+		)
 	}
 
 	return c.Status(201).JSON(report)
@@ -193,6 +214,54 @@ func UpdateReport(c *fiber.Ctx) error {
 	var report_updated models.Report
 	if err := c.BodyParser(&report_updated); err != nil {
 		return c.Status(400).JSON(err.Error())
+	}
+
+	if report.ReportStatus == "pending" && report_updated.ReportStatus == "resolve" {
+		flags := 0
+		switch report.ReportReason {
+		case "teacher_absent", "poor_teaching", "not_teaching":
+			flags = 1
+		case "fake_review", "disruption", "disrespected", "harassment", "bullying":
+			flags = 2
+		}
+
+		if flags > 0 {
+			reason := fmt.Sprintf("Flagged from resolved report ID %d: %s", report.ID, report.ReportDescription)
+			switch report.ReportType {
+			case "learner": // Learner reported a Teacher
+				var teacher models.Teacher
+				if err := db.Where("user_id = ?", report.ReportedUserID).First(&teacher).Error; err == nil {
+					desc := fmt.Sprintf("An admin has reviewed report #%d and issued a warning with %d flag(s).", report.ID, flags)
+					services.CreateNotification(db, teacher.UserID, "system", desc)
+					services.ApplyTeacherFlags(db, teacher.ID, flags, reason)
+				}
+			case "teacher": // Teacher reported a Learner
+				var learner models.Learner
+				if err := db.Where("user_id = ?", report.ReportedUserID).First(&learner).Error; err == nil {
+					desc := fmt.Sprintf("An admin has reviewed report #%d and issued a warning with %d flag(s).", report.ID, flags)
+					services.CreateNotification(db, learner.UserID, "system", desc)
+					services.ApplyLearnerFlags(db, learner.ID, flags, reason)
+				}
+			}
+		} // False Report
+	} else if report.ReportStatus == "pending" && report_updated.ReportStatus == "reject" {
+		reason := fmt.Sprintf("Flagged for submitting a false report (ID: %d)", report.ID)
+		switch report.ReportType {
+		case "learner": // The reporter was a Learner
+			var learner models.Learner
+			if err := db.Where("user_id = ?", report.ReportUserID).First(&learner).Error; err == nil {
+				desc := fmt.Sprintf("Report #%d was found to be false. You have received 1 flag as a warning.", report.ID)
+				services.CreateNotification(db, learner.UserID, "system", desc)
+				services.ApplyLearnerFlags(db, learner.ID, 1, reason)
+			}
+		case "teacher": // The reporter was a Teacher
+			var teacher models.Teacher
+			if err := db.Where("user_id = ?", report.ReportUserID).First(&teacher).Error; err == nil {
+				desc := fmt.Sprintf("Report #%d was found to be false. You have received 1 flag as a warning.", report.ID)
+				services.CreateNotification(db, teacher.UserID, "system", desc)
+				services.ApplyTeacherFlags(db, teacher.ID, 1, reason)
+			}
+		}
 	}
 
 	if err := processReportPicture(c, &report_updated); err != nil {

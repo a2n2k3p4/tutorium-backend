@@ -13,7 +13,7 @@ import (
 )
 
 func ClassSessionRoutes(app *fiber.App) {
-	classSession := app.Group("/class_sessions", middlewares.ProtectedMiddleware())
+	classSession := app.Group("/class_sessions", middlewares.ProtectedMiddleware(), middlewares.BanMiddleware())
 	classSession.Get("/", GetClassSessions)
 	classSession.Get("/:id", GetClassSession)
 

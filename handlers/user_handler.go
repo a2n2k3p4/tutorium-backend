@@ -16,7 +16,7 @@ import (
 )
 
 func UserRoutes(app *fiber.App) {
-	user := app.Group("/users", middlewares.ProtectedMiddleware())
+	user := app.Group("/users", middlewares.ProtectedMiddleware(), middlewares.BanMiddleware())
 	user.Post("/", CreateUser)
 	user.Get("/:id", GetUser)
 	user.Put("/:id", UpdateUser)

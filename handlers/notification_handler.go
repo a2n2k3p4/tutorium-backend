@@ -11,7 +11,7 @@ import (
 )
 
 func NotificationRoutes(app *fiber.App) {
-	notification := app.Group("/notifications", middlewares.ProtectedMiddleware())
+	notification := app.Group("/notifications", middlewares.ProtectedMiddleware(), middlewares.BanMiddleware())
 	notification.Get("/", GetNotifications)
 	notification.Get("/:id", GetNotification)
 	notification.Put("/:id", UpdateNotification)

@@ -11,7 +11,7 @@ import (
 )
 
 func ClassCategoryRoutes(app *fiber.App) {
-	classCategory := app.Group("/class_categories", middlewares.ProtectedMiddleware())
+	classCategory := app.Group("/class_categories", middlewares.ProtectedMiddleware(), middlewares.BanMiddleware())
 	classCategory.Get("/", GetClassCategories)
 	classCategory.Get("/:id", GetClassCategory)
 

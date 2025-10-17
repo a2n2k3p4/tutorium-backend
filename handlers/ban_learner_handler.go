@@ -11,7 +11,7 @@ import (
 )
 
 func BanLearnerRoutes(app *fiber.App) {
-	banLearner := app.Group("/banlearners", middlewares.ProtectedMiddleware(), middlewares.AdminRequired())
+	banLearner := app.Group("/banlearners", middlewares.ProtectedMiddleware(), middlewares.BanMiddleware(), middlewares.AdminRequired())
 
 	banLearner.Post("/", CreateBanLearner)
 	banLearner.Get("/", GetBanLearners)

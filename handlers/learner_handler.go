@@ -10,7 +10,7 @@ import (
 )
 
 func LearnerRoutes(app *fiber.App) {
-	learner := app.Group("/learners", middlewares.ProtectedMiddleware())
+	learner := app.Group("/learners", middlewares.ProtectedMiddleware(), middlewares.BanMiddleware())
 
 	learner.Post("/", CreateLearner)
 	learner.Get("/", GetLearners)
