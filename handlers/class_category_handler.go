@@ -200,6 +200,14 @@ func DeleteClassCategory(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
+	// clear many-to-many associations with Classes and Learners
+	if err := db.Model(&class_category).Association("Classes").Clear(); err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+	if err := db.Model(&class_category).Association("Learners").Clear(); err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
 	if err = db.Delete(&class_category).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}

@@ -262,7 +262,11 @@ func DeleteUser(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	err = findUser(db, id, &user)
+	err = db.Preload("Learner.Interested").
+		Preload("Teacher").
+		Preload("Admin").
+		First(&user, "id = ?", id).Error
+
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return c.Status(404).JSON("user not found")

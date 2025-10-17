@@ -130,6 +130,7 @@ func TestGetClass_OK(t *testing.T) {
 			ExpAuthUser(userID, false, false, false)(mock)
 			ExpSelectByIDFound(table, classID, []string{"id"}, []any{classID})(mock)
 			ExpPreloadM2M("class_class_categories", "class_categories", "class_id", "class_category_id", [][2]any{{classID, classCategoryID}})(mock)
+			ExpJoinTable("class_sessions", "class_id", classID, []string{"id"}, nil)(mock)
 			*uID = userID
 		},
 		http.StatusOK,
@@ -298,6 +299,7 @@ func TestDeleteClass_OK_SoftDelete(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, true, false, false)(mock)
 			ExpSelectByIDFound(table, classID, []string{"id"}, []any{classID})(mock)
+			ExpClearAssociation("class_class_categories", "class_id", "class_category_id", classID)(mock)
 			ExpSoftDeleteOK(table)(mock)
 			*uID = userID
 		},
@@ -335,6 +337,7 @@ func TestDeleteClass_DBError(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, true, false, false)(mock)
 			ExpSelectByIDFound(table, classID, []string{"id"}, []any{classID})(mock)
+			ExpClearAssociation("class_class_categories", "class_id", "class_category_id", classID)(mock)
 			ExpSoftDeleteError(table, fmt.Errorf("update failed"))(mock)
 			*uID = userID
 		},
