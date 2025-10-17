@@ -9,6 +9,15 @@ definitions:
         example: charge
         type: string
     type: object
+  handlers.OmiseWebhookResponse:
+    properties:
+      charge_id:
+        type: string
+      paid:
+        type: boolean
+      status:
+        type: string
+    type: object
   models.AdminDoc:
     properties:
       user_id:
@@ -2724,9 +2733,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Processed charge information
           schema:
-            type: string
+            $ref: '#/definitions/handlers.OmiseWebhookResponse'
         "400":
           description: Bad request
           schema:

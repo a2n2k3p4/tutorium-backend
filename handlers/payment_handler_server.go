@@ -39,6 +39,13 @@ type OmiseWebhookPayload struct {
 	ID     string `json:"id" example:"chrg_test_658q8luocil7hlhd07n"`
 }
 
+// omise wekhook return
+type OmiseWebhookResponse struct {
+	ChargeID string `json:"charge_id"`
+	Status   string `json:"status"`
+	Paid     bool   `json:"paid"`
+}
+
 // HandleWebhook accepts either an Event payload (object:"event") or a Charge payload (object:"charge").
 // Flow:
 //   - if event: RetrieveEvent -> extract charge.id -> RetrieveCharge -> upsert
@@ -53,7 +60,7 @@ type OmiseWebhookPayload struct {
 //	@Accept			json
 //	@Produce		json
 //	@Param			payload	body		OmiseWebhookPayload	true	"Omise webhook payload (event or charge object)"
-//	@Success		200		{string}	string				"OK"
+//	@Success		200		{object}	OmiseWebhookResponse	"Processed charge information"
 //	@Failure		400		{object}	map[string]string	"Bad request"
 //	@Failure		500		{string}	string				"Retryable server error"
 //	@Router			/webhooks/omise [post]
@@ -117,5 +124,9 @@ func (h *PaymentHandler) HandleWebhook(c *fiber.Ctx) error {
 	}
 
 	log.Printf("webhook: processed charge=%s status=%s amount=%d source=%v", ch.ID, ch.Status, ch.Amount, ch.Source)
-	return c.SendStatus(fiber.StatusOK)
+	return c.Status(fiber.StatusOK).JSON(OmiseWebhookResponse{
+		ChargeID: ch.ID,
+		Status:   string(ch.Status),
+		Paid:     ch.Paid,
+	})
 }
