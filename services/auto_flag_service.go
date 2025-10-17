@@ -52,7 +52,7 @@ func CheckForAbsentTeachers(db *gorm.DB) {
 			if err := AddTeacherFlag(db, teacher.ID, 1); err != nil {
 				log.Printf("Error applying immediate flag to teacher %d: %v", teacher.ID, err)
 			} else {
-				desc := fmt.Sprintf("You have been automatically flagged for absence from your class session on %s.", session.ClassStart.Format(time.RFC822))
+				desc := fmt.Sprintf("You have been automatically flagged for absence from your class session on %s.", session.ClassStart.Format(time.RFC3339))
 				CreateNotification(db, teacher.UserID, "system", desc)
 			}
 		} else {
@@ -76,7 +76,7 @@ func CheckForAbsentTeachers(db *gorm.DB) {
 			if err := db.Create(&systemReport).Error; err != nil {
 				log.Printf("Failed to create system report for session %d: %v", session.ID, err)
 			} else {
-				desc := fmt.Sprintf("Your absence from the class on %s has been flagged for admin review due to your current flag count.", session.ClassStart.Format(time.RFC822))
+				desc := fmt.Sprintf("Your absence from the class on %s has been flagged for admin review due to your current flag count.", session.ClassStart.Format(time.RFC3339))
 				CreateNotification(db, teacher.UserID, "system", desc)
 			}
 		}
