@@ -9,6 +9,7 @@ import (
 	"github.com/a2n2k3p4/tutorium-backend/handlers"
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
+	"github.com/a2n2k3p4/tutorium-backend/services"
 	"github.com/a2n2k3p4/tutorium-backend/storage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -98,6 +99,9 @@ func main() {
 		DocExpansion:             "false",
 		DefaultModelsExpandDepth: 2, // expand models
 	}))
+
+	// Check all class sessions every 5 minutes
+	go services.StartScheduler(db)
 
 	handlers.AllRoutes(app) // Register admin routes
 	// Define the /users route and handler inline
