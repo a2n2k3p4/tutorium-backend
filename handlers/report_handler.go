@@ -18,7 +18,7 @@ import (
 )
 
 func ReportRoutes(app *fiber.App) {
-	report := app.Group("/reports", middlewares.ProtectedMiddleware())
+	report := app.Group("/reports", middlewares.ProtectedMiddleware(), middlewares.BanMiddleware())
 	report.Post("/", CreateReport)
 
 	reportAdmin := report.Group("/", middlewares.AdminRequired())

@@ -12,7 +12,7 @@ import (
 )
 
 func AdminRoutes(app *fiber.App) {
-	admin := app.Group("/admins", middlewares.ProtectedMiddleware())
+	admin := app.Group("/admins", middlewares.ProtectedMiddleware(), middlewares.BanMiddleware())
 
 	admin.Post("/", CreateAdmin)
 	admin.Get("/", GetAdmins)

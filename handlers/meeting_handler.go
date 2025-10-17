@@ -14,7 +14,7 @@ import (
 
 func MeetingRoutes(app *fiber.App) {
 	meetingurl := NewMeetingHandler()
-	meeting := app.Group("/meetings", middlewares.ProtectedMiddleware(), middlewares.TeacherRequired(), middlewares.LearnerRequired())
+	meeting := app.Group("/meetings", middlewares.ProtectedMiddleware(), middlewares.BanMiddleware(), middlewares.TeacherRequired(), middlewares.LearnerRequired())
 	meeting.Get("/:id", meetingurl.GetMeetingLink)
 }
 
