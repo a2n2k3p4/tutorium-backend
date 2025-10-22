@@ -4041,17 +4041,9 @@ const docTemplate = `{
         "models.LoginRequestDoc": {
             "type": "object",
             "properties": {
-                "first_name": {
-                    "type": "string",
-                    "example": "Alice"
-                },
                 "gender": {
                     "type": "string",
                     "example": "Female"
-                },
-                "last_name": {
-                    "type": "string",
-                    "example": "Smith"
                 },
                 "password": {
                     "type": "string",
