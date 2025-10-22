@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"log"
 	"os"
@@ -8,6 +11,7 @@ import (
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
@@ -35,6 +39,33 @@ type MeetingURL struct {
 
 func NewMeetingHandler() *MeetingURL {
 	return &MeetingURL{BaseURL: BASE_JITSI_URL}
+}
+
+// GenerateMeetingLink generates a meeting link using UUID v8 hashed with SHA-256
+func GenerateMeetingLink(baseURL string) (string, error) {
+	// Generate UUID v8
+	uuidBytes := make([]byte, 16)
+	_, err := rand.Read(uuidBytes)
+	if err != nil {
+		return "", err
+	}
+
+	// Set version to 8 (bits 4-7 of byte 6)
+	uuidBytes[6] = (uuidBytes[6] & 0x0f) | 0x80
+	// Set variant to RFC4122 (bits 6-7 of byte 8)
+	uuidBytes[8] = (uuidBytes[8] & 0x3f) | 0x80
+
+	uuidV8, err := uuid.FromBytes(uuidBytes)
+	if err != nil {
+		return "", err
+	}
+
+	// Hash UUID with SHA-256
+	hash := sha256.Sum256([]byte(uuidV8.String()))
+	hashedString := hex.EncodeToString(hash[:])
+
+	// Return full meeting URL
+	return baseURL + "/" + hashedString, nil
 }
 
 // GetMeetingLink godoc

@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"errors"
-	"fmt"
-	"time"
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
@@ -48,22 +46,16 @@ func CreateClassSession(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	// Autogenerate ClassURL for new class session
-	var teacher_id uint
+	// Autogenerate meeting URL for new class session using UUID v8 + SHA-256
 	meeting_url := NewMeetingHandler()
-
-	err = db.Table("classes").
-		Select("teacher_id").
-		Where("id = ?", class_session_request.ClassID).
-		Scan(&teacher_id).Error
-	if err != nil {
-		return c.Status(500).JSON(err.Error())
-	}
 
 	var class_session models.ClassSession
 	copy_class_session_content(&class_session, &class_session_request)
 
-	link := fmt.Sprintf("%s/KUtutorium_%d_%d", meeting_url.BaseURL, teacher_id, time.Now().Unix())
+	link, err := GenerateMeetingLink(meeting_url.BaseURL)
+	if err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
 	class_session.MeetingUrl = link
 
 	if err := db.Create(&class_session).Error; err != nil {
