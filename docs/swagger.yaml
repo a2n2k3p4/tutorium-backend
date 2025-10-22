@@ -178,14 +178,8 @@ definitions:
     type: object
   models.LoginRequestDoc:
     properties:
-      first_name:
-        example: Alice
-        type: string
       gender:
         example: Female
-        type: string
-      last_name:
-        example: Smith
         type: string
       password:
         example: mySecretPassword
