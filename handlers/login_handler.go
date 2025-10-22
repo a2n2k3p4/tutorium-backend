@@ -38,8 +38,6 @@ func LoginHandler(c *fiber.Ctx) error {
 		Username       string `json:"username"`
 		Password       string `json:"password"`
 		ProfilePicture string `json:"profile_picture,omitempty"`
-		FirstName      string `json:"first_name"`
-		LastName       string `json:"last_name"`
 		Gender         string `json:"gender"`
 		PhoneNumber    string `json:"phone_number"`
 	}
@@ -100,8 +98,8 @@ func LoginHandler(c *fiber.Ctx) error {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		user = models.User{
 			StudentID:         loginResp.ID,
-			FirstName:         req.FirstName,
-			LastName:          req.LastName,
+			FirstName:         loginResp.NameTH,
+			LastName:          loginResp.SurnameTH,
 			Gender:            req.Gender,
 			PhoneNumber:       req.PhoneNumber,
 			ProfilePictureURL: uploadedURL,
