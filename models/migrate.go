@@ -249,12 +249,12 @@ func Seed(db *gorm.DB) error {
 
 		/* ---------- Notifications ---------- */
 		notificationRows := []Notification{
-			{UserID: userBySID[userKeys[1]].ID, NotificationType: "system", NotificationDescription: "Welcome!", NotificationDate: now, ReadFlag: false},
-			{UserID: userBySID[userKeys[1]].ID, NotificationType: "enrollment", NotificationDescription: "You enrolled successfully.", NotificationDate: now, ReadFlag: false},
-			{UserID: userBySID[userKeys[2]].ID, NotificationType: "class", NotificationDescription: "Your class got a new review.", NotificationDate: now, ReadFlag: false},
-			{UserID: userBySID[userKeys[1]].ID, NotificationType: "system", NotificationDescription: "Password changed.", NotificationDate: now, ReadFlag: true},
-			{UserID: userBySID[userKeys[0]].ID, NotificationType: "report", NotificationDescription: "A report needs your attention.", NotificationDate: now, ReadFlag: false},
-			{UserID: userBySID[userKeys[5]].ID, NotificationType: "system", NotificationDescription: "Balance updated.", NotificationDate: now, ReadFlag: false},
+			{UserID: userBySID[userKeys[1]].ID, NotificationTitle: "Welcome", NotificationType: "system", NotificationDescription: "Welcome!", NotificationDate: now, ReadFlag: false},
+			{UserID: userBySID[userKeys[1]].ID, NotificationTitle: "Enrollment successful", NotificationType: "enrollment", NotificationDescription: "You enrolled successfully.", NotificationDate: now, ReadFlag: false},
+			{UserID: userBySID[userKeys[2]].ID, NotificationTitle: "Review received", NotificationType: "class", NotificationDescription: "Your class got a new review.", NotificationDate: now, ReadFlag: false},
+			{UserID: userBySID[userKeys[1]].ID, NotificationTitle: "Password changed", NotificationType: "system", NotificationDescription: "Password changed.", NotificationDate: now, ReadFlag: true},
+			{UserID: userBySID[userKeys[0]].ID, NotificationTitle: "New report", NotificationType: "report", NotificationDescription: "A report needs your attention.", NotificationDate: now, ReadFlag: false},
+			{UserID: userBySID[userKeys[5]].ID, NotificationTitle: "Balance updated", NotificationType: "system", NotificationDescription: "Balance updated.", NotificationDate: now, ReadFlag: false},
 		}
 		if err := seedHelper(tx, notificationRows); err != nil {
 			return err
