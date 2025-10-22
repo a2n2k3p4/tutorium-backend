@@ -4094,6 +4094,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Your class has been rescheduled"
                 },
+                "notification_title": {
+                    "type": "string",
+                    "example": "Review received"
+                },
                 "notification_type": {
                     "type": "string",
                     "example": "System Alert"
