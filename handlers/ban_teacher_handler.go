@@ -11,7 +11,7 @@ import (
 )
 
 func BanTeacherRoutes(app *fiber.App) {
-	banTeacher := app.Group("/banteachers", middlewares.ProtectedMiddleware(), middlewares.AdminRequired())
+	banTeacher := app.Group("/banteachers", middlewares.ProtectedMiddleware(), middlewares.BanMiddleware(), middlewares.AdminRequired())
 
 	banTeacher.Post("/", CreateBanTeacher)
 	banTeacher.Get("/", GetBanTeachers)
