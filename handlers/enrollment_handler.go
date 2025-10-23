@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
@@ -58,20 +59,100 @@ func CreateEnrollment(c *fiber.Ctx) error {
 //	@Tags			Enrollments
 //	@Security		BearerAuth
 //	@Produce		json
+//	@Param			session_ids	query	[]string	false	"Filter by one or more class session IDs (comma-separated or repeated query param)"
+//	@Param			include		query	[]string	false	"Include related entities: learner, class_session, user (comma-separated or repeated query param)"
 //	@Success		200	{array}		models.EnrollmentDoc
 //	@Failure		500	{string}	string	"Server error"
 //	@Router			/enrollments [get]
 func GetEnrollments(c *fiber.Ctx) error {
+	type EnrollmentQueryParams struct {
+		SessionIDs []string `query:"session_ids"`
+		Include    []string `query:"include"`
+	}
+
+	var params EnrollmentQueryParams
+
+	if err := c.QueryParser(&params); err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	// This splits a single string "1,3" into multiple values ["1", "3"]
+	if len(params.SessionIDs) == 1 && strings.Contains(params.SessionIDs[0], ",") {
+		params.SessionIDs = strings.Split(params.SessionIDs[0], ",")
+		for i := range params.SessionIDs {
+			params.SessionIDs[i] = strings.TrimSpace(params.SessionIDs[i])
+		}
+	}
+
+	// This splits a single string "learner,user" into multiple values ["learner", "user"]
+	if len(params.Include) == 1 && strings.Contains(params.Include[0], ",") {
+		params.Include = strings.Split(params.Include[0], ",")
+		for i := range params.Include {
+			params.Include[i] = strings.TrimSpace(params.Include[i])
+		}
+	}
+
 	enrollments := []models.Enrollment{}
 	db, err := middlewares.GetDB(c)
 	if err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	if err := db.Preload("Learner").Preload("ClassSession").Find(&enrollments).Error; err != nil {
+	query := db.Model(&models.Enrollment{})
+
+	// include logic
+	includeMap := make(map[string]bool)
+	for _, inc := range params.Include {
+		includeMap[inc] = true
+	}
+
+	if includeMap["learner"] {
+		query = query.Preload("Learner")
+	}
+
+	if includeMap["class_session"] {
+		query = query.Preload("ClassSession")
+	}
+
+	// Only include enrollments for the given session IDs
+	if len(params.SessionIDs) > 0 {
+		query = query.Where("class_session_id IN (?)", params.SessionIDs)
+	}
+
+	if err := query.Find(&enrollments).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
-	return c.Status(200).JSON(enrollments)
+
+	responses := make([]models.EnrollmentResponse, len(enrollments))
+
+	if includeMap["user"] {
+		// collect all user IDs from enrollments
+		userIDs := make([]uint, len(enrollments))
+		for i, e := range enrollments {
+			userIDs[i] = e.Learner.UserID
+		}
+
+		users := []models.User{}
+		if err := db.Where("id IN (?)", userIDs).Find(&users).Error; err != nil {
+			return c.Status(500).JSON(err.Error())
+		}
+
+		userMap := make(map[uint]*models.User, len(users))
+		for i := range users {
+			userMap[users[i].ID] = &users[i]
+		}
+
+		for i, e := range enrollments {
+			responses[i].Enrollment = e
+			responses[i].User = userMap[e.Learner.UserID]
+		}
+	} else {
+		for i, e := range enrollments {
+			responses[i].Enrollment = e
+		}
+	}
+
+	return c.Status(200).JSON(responses)
 }
 
 func findEnrollment(db *gorm.DB, id int, enrollment *models.Enrollment) error {
