@@ -1094,6 +1094,18 @@ const docTemplate = `{
                     "ClassSessions"
                 ],
                 "summary": "List all class sessions",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Filter by one or more class IDs (comma-separated or repeated query param)",
+                        "name": "class_ids",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1670,6 +1682,28 @@ const docTemplate = `{
                     "Enrollments"
                 ],
                 "summary": "List all enrollments",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Filter by one or more class session IDs (comma-separated or repeated query param)",
+                        "name": "session_ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Include related entities: learner, class_session, user (comma-separated or repeated query param)",
+                        "name": "include",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
