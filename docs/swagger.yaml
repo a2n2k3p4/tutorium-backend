@@ -210,6 +210,9 @@ definitions:
       notification_description:
         example: Your class has been rescheduled
         type: string
+      notification_title:
+        example: Review received
+        type: string
       notification_type:
         example: System Alert
         type: string
