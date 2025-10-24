@@ -14,6 +14,11 @@ type Enrollment struct {
 	ClassSession ClassSession `gorm:"foreignKey:ClassSessionID;references:ID;constraint:OnDelete:CASCADE"`
 }
 
+type EnrollmentResponse struct {
+	Enrollment
+	User *User `json:"user,omitempty"`
+}
+
 // ---- DOC-ONLY STRUCT FOR SWAGGER BELOW ----
 
 type EnrollmentDoc struct {

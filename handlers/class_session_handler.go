@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/a2n2k3p4/tutorium-backend/middlewares"
 	"github.com/a2n2k3p4/tutorium-backend/models"
@@ -72,17 +73,43 @@ func CreateClassSession(c *fiber.Ctx) error {
 //	@Tags			ClassSessions
 //	@Security		BearerAuth
 //	@Produce		json
+//	@Param			class_ids	query	[]string	false	"Filter by one or more class IDs (comma-separated or repeated query param)"
 //	@Success		200	{array}		models.ClassSessionDoc
 //	@Failure		500	{string}	string	"Server error"
 //	@Router			/class_sessions [get]
 func GetClassSessions(c *fiber.Ctx) error {
+	type ClassSessionQueryParams struct {
+		ClassIDs []string `query:"class_ids"`
+	}
+
+	var params ClassSessionQueryParams
+
+	if err := c.QueryParser(&params); err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	// This splits a single string "1,3" into multiple values ["1", "3"]
+	if len(params.ClassIDs) == 1 && strings.Contains(params.ClassIDs[0], ",") {
+		params.ClassIDs = strings.Split(params.ClassIDs[0], ",")
+		for i := range params.ClassIDs {
+			params.ClassIDs[i] = strings.TrimSpace(params.ClassIDs[i])
+		}
+	}
+
 	class_sessions := []models.ClassSession{}
 	db, err := middlewares.GetDB(c)
 	if err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
-	if err := db.Preload("Class").Find(&class_sessions).Error; err != nil {
+	query := db.Model(&models.ClassSession{})
+
+	// Only include class sessions for the given class IDs
+	if len(params.ClassIDs) > 0 {
+		query = query.Where("class_id IN (?)", params.ClassIDs)
+	}
+
+	if err := query.Preload("Class").Find(&class_sessions).Error; err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 

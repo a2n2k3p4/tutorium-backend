@@ -1090,6 +1090,15 @@ paths:
     get:
       description: GetClassSessions retrieves all ClassSession records with Class
         relation
+      parameters:
+      - collectionFormat: csv
+        description: Filter by one or more class IDs (comma-separated or repeated
+          query param)
+        in: query
+        items:
+          type: string
+        name: class_ids
+        type: array
       produces:
       - application/json
       responses:
@@ -1462,6 +1471,23 @@ paths:
     get:
       description: GetEnrollments retrieves all Enrollment records with associated
         Learner and Class
+      parameters:
+      - collectionFormat: csv
+        description: Filter by one or more class session IDs (comma-separated or repeated
+          query param)
+        in: query
+        items:
+          type: string
+        name: session_ids
+        type: array
+      - collectionFormat: csv
+        description: 'Include related entities: learner, class_session, user (comma-separated
+          or repeated query param)'
+        in: query
+        items:
+          type: string
+        name: include
+        type: array
       produces:
       - application/json
       responses:
