@@ -73,6 +73,15 @@ definitions:
         example: 123
         type: integer
     type: object
+  models.ClassCategoriesDoc:
+    properties:
+      categories:
+        example:
+        - Mathematics
+        items:
+          type: string
+        type: array
+    type: object
   models.ClassCategoryDoc:
     properties:
       class_category:
@@ -81,6 +90,15 @@ definitions:
       classes:
         items:
           $ref: '#/definitions/models.ClassDoc'
+        type: array
+    type: object
+  models.ClassCategoryIDsDoc:
+    properties:
+      class_category_ids:
+        example:
+        - 1
+        items:
+          type: integer
         type: array
     type: object
   models.ClassDoc:
@@ -256,6 +274,20 @@ definitions:
       user_id:
         description: FK to users.id
         type: integer
+    type: object
+  models.RecommendClassesDoc:
+    properties:
+      recommended_classes:
+        items:
+          $ref: '#/definitions/models.ClassDoc'
+        type: array
+      recommended_found:
+        example: true
+        type: boolean
+      remaining_classes:
+        items:
+          $ref: '#/definitions/models.ClassDoc'
+        type: array
     type: object
   models.ReportDoc:
     properties:
@@ -1256,8 +1288,16 @@ paths:
       - ClassSessions
   /classes:
     get:
-      description: 'Retrieve a list of classes filtered by optional query parameters:
-        categories, and rating range'
+      description: |-
+        Retrieve classes filtered by optional query parameters.
+
+        **Filters**
+        - `category`: repeatable; OR-matched, e.g. `?category=English&category=Math`
+        - `min_rating` / `max_rating`: numeric range on average review rating
+        - `open`: `"true"`/`"1"` to return only enrollable classes (have a session with `enrollment_deadline > now`), `"false"`/`"0"` for the inverse, or omit for no filter
+        - `detailed`: `"true"`/`"1"` returns full class objects with `Teacher`, `Categories`, and `Sessions` preloaded;
+        `"false"`/`"0"` (default) returns a lightweight summary list `{id, class_name, banner_picture_url, rating, teacher_name}`
+        - `sort`: supports sorting by: popular, rating, newest, alphabetical
       parameters:
       - collectionFormat: csv
         description: Filter by one or more categories (OR relation)
@@ -1266,15 +1306,23 @@ paths:
           type: string
         name: category
         type: array
-      - description: Minimum class rating
+      - description: Minimum average rating
         in: query
         name: min_rating
-        type: string
-      - description: Maximum class rating
+        type: number
+      - description: Maximum average rating
         in: query
         name: max_rating
-        type: string
-      - description: Sort key popular
+        type: number
+      - description: Only enrollable classes if true
+        in: query
+        name: open
+        type: boolean
+      - description: Return full class details if true
+        in: query
+        name: detailed
+        type: boolean
+      - description: 'Sort order: popular, rating, newest, alphabetical'
         in: query
         name: sort
         type: string
@@ -1282,7 +1330,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Returned when detailed=true
           schema:
             items:
               $ref: '#/definitions/models.ClassDoc'
@@ -1465,6 +1513,124 @@ paths:
       security:
       - BearerAuth: []
       summary: Get average rating of a class
+      tags:
+      - Classes
+  /classes/{id}/categories:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes the associations between a class and the provided category
+        IDs (does **not** delete the categories themselves). Returns the updated categories.
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Category IDs to remove
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/models.ClassCategoryIDsDoc'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ClassCategoriesDoc'
+        "400":
+          description: invalid class ID" / "invalid body" / "no class category IDs
+            provided" / "no valid class category IDs" / "no matching class categories
+            found
+          schema:
+            type: string
+        "404":
+          description: class not found
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Remove categories from a class
+      tags:
+      - Classes
+    get:
+      description: Returns the list of class category names attached to the class.
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ClassCategoriesDoc'
+        "400":
+          description: invalid :id
+          schema:
+            type: string
+        "404":
+          description: class not found
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: List category names for a class
+      tags:
+      - Classes
+    post:
+      consumes:
+      - application/json
+      description: Append one or more ClassCategory relations to a Class (many-to-many).
+        Duplicate IDs are ignored.
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: List of category IDs to add
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/models.ClassCategoryIDsDoc'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated class with Categories preloaded
+          schema:
+            $ref: '#/definitions/models.ClassDoc'
+        "400":
+          description: invalid class ID | invalid body | no class category IDs provided
+            | no valid class category IDs
+          schema:
+            type: string
+        "404":
+          description: class not found
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Add categories to a class
       tags:
       - Classes
   /enrollments:
@@ -1773,6 +1939,163 @@ paths:
       security:
       - BearerAuth: []
       summary: Get learner by ID
+      tags:
+      - Learners
+  /learners/{id}/interests:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes the association rows in `interested_class_categories` for
+        the given learner and category IDs. Returns the updated Learner with `Interested`
+        preloaded and ordered.
+      parameters:
+      - description: Learner ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: IDs of class categories to remove
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.ClassCategoryIDsDoc'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LearnerDoc'
+        "400":
+          description: no matching class categories found
+          schema:
+            type: string
+        "404":
+          description: learner not found
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Remove categories from a learner's interests
+      tags:
+      - Learners
+    get:
+      description: Returns the list of class category names the learner is interested
+        in (alphabetically ordered).
+      parameters:
+      - description: Learner ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'keys: categories'
+          schema:
+            additionalProperties:
+              items:
+                type: string
+              type: array
+            type: object
+        "400":
+          description: invalid :id
+          schema:
+            type: string
+        "404":
+          description: learner not found
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get a learner's interested class categories
+      tags:
+      - Learners
+    post:
+      consumes:
+      - application/json
+      description: Appends rows to `interested_class_categories` for the given learner.
+        Duplicate IDs are ignored. Returns the updated Learner with `Interested` preloaded.
+      parameters:
+      - description: Learner ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: IDs of class categories to add
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.ClassCategoryIDsDoc'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LearnerDoc'
+        "400":
+          description: no valid class category IDs
+          schema:
+            type: string
+        "404":
+          description: learner not found
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Add categories to a learner's interests
+      tags:
+      - Learners
+  /learners/{id}/recommended:
+    get:
+      description: 'Returns two buckets: **recommended_classes** (enrollable classes
+        matching the learner’s interested categories) and **remaining_classes** (other
+        enrollable classes). If no interests or no matches, `recommended_found` is
+        false and `remaining_classes` contains all enrollable classes.'
+      parameters:
+      - description: Learner ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RecommendClassesDoc'
+        "400":
+          description: Please ensure that :id is an integer
+          schema:
+            type: string
+        "404":
+          description: learner not found
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Recommend enrollable classes for a learner
       tags:
       - Learners
   /login:

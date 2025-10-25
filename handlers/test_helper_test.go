@@ -364,6 +364,119 @@ func ExpPreloadM2M(joinTable string, childTable string, parentKey string,
 	}
 }
 
+func ExpSelectAssociation(joinTable, parentKey string, parentIDs []uint, columns []string, rows [][]any) Exp {
+	return func(m sqlmock.Sqlmock) {
+		rs := sqlmock.NewRows(columns)
+		for _, row := range rows {
+			values := make([]driver.Value, len(row))
+			for i, v := range row {
+				values[i] = v
+			}
+			rs.AddRow(values...)
+		}
+
+		pattern := fmt.Sprintf(`SELECT .* FROM "%s".*WHERE "%s"\."%s" (=\s*\$1|IN \(.*\)).*`, joinTable, joinTable, parentKey)
+		query := m.ExpectQuery(pattern)
+		if len(parentIDs) > 0 {
+			args := make([]driver.Value, len(parentIDs))
+			for i, v := range parentIDs {
+				args[i] = v
+			}
+			query = query.WithArgs(args...)
+		}
+		query.WillReturnRows(rs)
+	}
+}
+
+func ExpSelectAssociationTargets(childTable string, ids []uint, columns []string, rows [][]any) Exp {
+	return func(m sqlmock.Sqlmock) {
+		rs := sqlmock.NewRows(columns)
+		for _, row := range rows {
+			values := make([]driver.Value, len(row))
+			for i, v := range row {
+				values[i] = v
+			}
+			rs.AddRow(values...)
+		}
+		pattern := fmt.Sprintf(`SELECT .* FROM "%s".*WHERE "%s"\."id" (=\s*\$1|IN \(.*\)).*`, childTable, childTable)
+		query := m.ExpectQuery(pattern)
+		if len(ids) > 0 {
+			args := make([]driver.Value, len(ids))
+			for i, v := range ids {
+				args[i] = v
+			}
+			query = query.WithArgs(args...)
+		}
+		query.WillReturnRows(rs)
+	}
+}
+
+func ExpJoinTable(table1, table2 string, id uint, columns []string, rows [][]any) Exp {
+	return func(m sqlmock.Sqlmock) {
+		rs := sqlmock.NewRows(columns)
+		for _, row := range rows {
+			values := make([]driver.Value, len(row))
+			for i, v := range row {
+				values[i] = v
+			}
+			rs.AddRow(values...)
+		}
+		pattern := fmt.Sprintf(`SELECT .* FROM "%s".*WHERE .*%s\s*=\s*\$1.*`, table1, table2)
+		m.ExpectQuery(pattern).
+			WithArgs(id).
+			WillReturnRows(rs)
+	}
+}
+
+func ExpClearAssociation(joinTable, parentKey, childKey string, parentID uint) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
+		m.ExpectExec(fmt.Sprintf(`DELETE FROM "%s" WHERE "%s"\."%s" = \$1`, joinTable, joinTable, parentKey)).
+			WithArgs(parentID).
+			WillReturnResult(sqlmock.NewResult(0, 0))
+		m.ExpectCommit()
+	}
+}
+
+func ExpClearAssociationEmpty(joinTable, parentKey string) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
+		m.ExpectExec(fmt.Sprintf(`DELETE FROM "%s" WHERE "%s"\."%s" IN \(NULL\)`, joinTable, joinTable, parentKey)).
+			WillReturnResult(sqlmock.NewResult(0, 0))
+		m.ExpectCommit()
+	}
+}
+
+func ExpDeleteUserCascadeOK(userID uint) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
+		m.ExpectExec(`DELETE FROM "interested_class_categories" WHERE "interested_class_categories"\."learner_id" IN \(NULL\)`).
+			WillReturnResult(sqlmock.NewResult(0, 0))
+		m.ExpectExec(`UPDATE "users" SET "deleted_at"=.*`).
+			WithArgs(sqlmock.AnyArg(), userID).
+			WillReturnResult(sqlmock.NewResult(0, 1))
+		m.ExpectExec(`UPDATE "learners" SET "deleted_at"=.*`).
+			WithArgs(sqlmock.AnyArg(), userID).
+			WillReturnResult(sqlmock.NewResult(0, 0))
+		m.ExpectExec(`UPDATE "teachers" SET "deleted_at"=.*`).
+			WithArgs(sqlmock.AnyArg(), userID).
+			WillReturnResult(sqlmock.NewResult(0, 0))
+		m.ExpectExec(`UPDATE "admins" SET "deleted_at"=.*`).
+			WithArgs(sqlmock.AnyArg(), userID).
+			WillReturnResult(sqlmock.NewResult(0, 0))
+		m.ExpectCommit()
+	}
+}
+
+func ExpDeleteError(userID any, table string, err error) Exp {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
+		m.ExpectExec(fmt.Sprintf(`DELETE FROM "%s" WHERE .*`, table)).
+			WillReturnError(err)
+		m.ExpectRollback()
+	}
+}
+
 /* ------------------Raising Status warning Helper------------------ */
 func wantStatus(t *testing.T, got *http.Response, want int) {
 	t.Helper()

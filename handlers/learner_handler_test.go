@@ -82,6 +82,13 @@ func TestGetLearners_OK(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
 			ExpListRows("learners", []string{"id"}, []any{1}, []any{2})(mock)
+			ExpSelectAssociation(
+				"interested_class_categories",
+				"learner_id",
+				[]uint{uint(1), uint(2)},
+				[]string{"learner_id", "class_category_id"},
+				nil,
+			)(mock)
 			*uID = userID
 		},
 		http.StatusOK,
@@ -118,6 +125,13 @@ func TestGetLearner_OK(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
 			ExpSelectByIDFound(table, learnerID, []string{"id"}, []any{learnerID})(mock)
+			ExpSelectAssociation(
+				"interested_class_categories",
+				"learner_id",
+				[]uint{learnerID},
+				[]string{"learner_id", "class_category_id"},
+				nil,
+			)(mock)
 			*uID = userID
 		},
 		http.StatusOK,
@@ -189,6 +203,14 @@ func TestDeleteLearner_OK_SoftDelete(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
 			ExpSelectByIDFound(table, learnerID, []string{"id"}, []any{learnerID})(mock)
+			ExpSelectAssociation(
+				"interested_class_categories",
+				"learner_id",
+				[]uint{learnerID},
+				[]string{"learner_id", "class_category_id"},
+				nil,
+			)(mock)
+			ExpClearAssociation("interested_class_categories", "learner_id", "class_category_id", learnerID)(mock)
 			ExpSoftDeleteOK(table)(mock)
 			*uID = userID
 		},
@@ -226,6 +248,14 @@ func TestDeleteLearner_DBError(t *testing.T) {
 		func(t *testing.T, mock sqlmock.Sqlmock, gdb *gorm.DB, app *fiber.App, payload *[]byte, uID *uint) {
 			ExpAuthUser(userID, false, false, false)(mock)
 			ExpSelectByIDFound(table, learnerID, []string{"id"}, []any{learnerID})(mock)
+			ExpSelectAssociation(
+				"interested_class_categories",
+				"learner_id",
+				[]uint{learnerID},
+				[]string{"learner_id", "class_category_id"},
+				nil,
+			)(mock)
+			ExpClearAssociation("interested_class_categories", "learner_id", "class_category_id", learnerID)(mock)
 			ExpSoftDeleteError(table, fmt.Errorf("update failed"))(mock)
 			*uID = userID
 		},

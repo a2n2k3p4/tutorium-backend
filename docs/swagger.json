@@ -1337,7 +1337,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Retrieve a list of classes filtered by optional query parameters: categories, and rating range",
+                "description": "Retrieve classes filtered by optional query parameters.\n\n**Filters**\n- `category`: repeatable; OR-matched, e.g. `?category=English\u0026category=Math`\n- `min_rating` / `max_rating`: numeric range on average review rating\n- `open`: `\"true\"`/`\"1\"` to return only enrollable classes (have a session with `enrollment_deadline \u003e now`), `\"false\"`/`\"0\"` for the inverse, or omit for no filter\n- `detailed`: `\"true\"`/`\"1\"` returns full class objects with `Teacher`, `Categories`, and `Sessions` preloaded;\n`\"false\"`/`\"0\"` (default) returns a lightweight summary list `{id, class_name, banner_picture_url, rating, teacher_name}`\n- `sort`: supports sorting by: popular, rating, newest, alphabetical",
                 "produces": [
                     "application/json"
                 ],
@@ -1357,27 +1357,39 @@
                         "in": "query"
                     },
                     {
-                        "type": "string",
-                        "description": "Minimum class rating",
+                        "type": "number",
+                        "description": "Minimum average rating",
                         "name": "min_rating",
                         "in": "query"
                     },
                     {
-                        "type": "string",
-                        "description": "Maximum class rating",
+                        "type": "number",
+                        "description": "Maximum average rating",
                         "name": "max_rating",
                         "in": "query"
                     },
                     {
+                        "type": "boolean",
+                        "description": "Only enrollable classes if true",
+                        "name": "open",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Return full class details if true",
+                        "name": "detailed",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
-                        "description": "Sort key popular",
+                        "description": "Sort order: popular, rating, newest, alphabetical",
                         "name": "sort",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Returned when detailed=true",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -1646,6 +1658,182 @@
                     },
                     "400": {
                         "description": "Invalid ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/classes/{id}/categories": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the list of class category names attached to the class.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Classes"
+                ],
+                "summary": "List category names for a class",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Class ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ClassCategoriesDoc"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid :id",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "class not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Append one or more ClassCategory relations to a Class (many-to-many). Duplicate IDs are ignored.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Classes"
+                ],
+                "summary": "Add categories to a class",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Class ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "List of category IDs to add",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ClassCategoryIDsDoc"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated class with Categories preloaded",
+                        "schema": {
+                            "$ref": "#/definitions/models.ClassDoc"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid class ID | invalid body | no class category IDs provided | no valid class category IDs",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "class not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes the associations between a class and the provided category IDs (does **not** delete the categories themselves). Returns the updated categories.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Classes"
+                ],
+                "summary": "Remove categories from a class",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Class ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Category IDs to remove",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ClassCategoryIDsDoc"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ClassCategoriesDoc"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid class ID\" / \"invalid body\" / \"no class category IDs provided\" / \"no valid class category IDs\" / \"no matching class categories found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "class not found",
                         "schema": {
                             "type": "string"
                         }
@@ -2123,6 +2311,240 @@
                     },
                     "404": {
                         "description": "Learner not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/learners/{id}/interests": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the list of class category names the learner is interested in (alphabetically ordered).",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Learners"
+                ],
+                "summary": "Get a learner's interested class categories",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Learner ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "keys: categories",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "invalid :id",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "learner not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Appends rows to `interested_class_categories` for the given learner. Duplicate IDs are ignored. Returns the updated Learner with `Interested` preloaded.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Learners"
+                ],
+                "summary": "Add categories to a learner's interests",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Learner ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "IDs of class categories to add",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ClassCategoryIDsDoc"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.LearnerDoc"
+                        }
+                    },
+                    "400": {
+                        "description": "no valid class category IDs",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "learner not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes the association rows in `interested_class_categories` for the given learner and category IDs. Returns the updated Learner with `Interested` preloaded and ordered.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Learners"
+                ],
+                "summary": "Remove categories from a learner's interests",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Learner ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "IDs of class categories to remove",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ClassCategoryIDsDoc"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.LearnerDoc"
+                        }
+                    },
+                    "400": {
+                        "description": "no matching class categories found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "learner not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/learners/{id}/recommended": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns two buckets: **recommended_classes** (enrollable classes matching the learner’s interested categories) and **remaining_classes** (other enrollable classes). If no interests or no matches, `recommended_found` is false and `remaining_classes` contains all enrollable classes.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Learners"
+                ],
+                "summary": "Recommend enrollable classes for a learner",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Learner ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.RecommendClassesDoc"
+                        }
+                    },
+                    "400": {
+                        "description": "Please ensure that :id is an integer",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "learner not found",
                         "schema": {
                             "type": "string"
                         }
@@ -3920,6 +4342,20 @@
                 }
             }
         },
+        "models.ClassCategoriesDoc": {
+            "type": "object",
+            "properties": {
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "Mathematics"
+                    ]
+                }
+            }
+        },
         "models.ClassCategoryDoc": {
             "type": "object",
             "properties": {
@@ -3932,6 +4368,20 @@
                     "items": {
                         "$ref": "#/definitions/models.ClassDoc"
                     }
+                }
+            }
+        },
+        "models.ClassCategoryIDsDoc": {
+            "type": "object",
+            "properties": {
+                "class_category_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "example": [
+                        1
+                    ]
                 }
             }
         },
@@ -4173,6 +4623,27 @@
                 "user_id": {
                     "description": "FK to users.id",
                     "type": "integer"
+                }
+            }
+        },
+        "models.RecommendClassesDoc": {
+            "type": "object",
+            "properties": {
+                "recommended_classes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ClassDoc"
+                    }
+                },
+                "recommended_found": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "remaining_classes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ClassDoc"
+                    }
                 }
             }
         },
